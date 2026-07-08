@@ -1,0 +1,199 @@
+# =============================================================================
+# CI/CD — Homologação (DigitalOcean droplet 8GB) — Opção B (build no Actions +
+# push pro GHCR; a droplet só faz `docker compose pull`).
+#
+# Gatilhos (triggers):
+#   - pull_request -> homol : SÓ roda os testes (valida o PR, não implanta).
+#   - push        -> homol  : roda testes + builda/push imagens + deploy na VPS.
+#     (push na homol acontece quando o PR é MERGEADO.)
+#
+# Segredos necessários (Settings > Secrets and variables > Actions):
+#   DROPLET_HOST      IP/host da droplet
+#   DROPLET_USER      usuário SSH (ex.: root ou deploy)
+#   DROPLET_SSH_KEY   chave PRIVADA SSH (conteúdo do id_ed25519)
+#   DROPLET_APP_DIR   caminho do repo na droplet (ex.: /root/norya-app) [opcional]
+#   MAIL_USER         usuário SMTP (ex.: seu Gmail)
+#   MAIL_PASS         senha de app SMTP (Gmail App Password, 16 chars)
+# =============================================================================
+name: homol-ci-cd
+
+on:
+  pull_request:
+    branches: [homol]
+  push:
+    branches: [homol]
+
+concurrency:
+  group: homol-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/gruposehloiro/norya-backend
+  CONSOLE_IMAGE: ghcr.io/gruposehloiro/norya-console
+  # E-mail de destino das notificações (hardcoded, como pedido).
+  NOTIFY_TO: victorcordeiro.contact@gmail.com
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1) TESTES — roda no PR e no push. Barra o merge se falhar.
+  # ---------------------------------------------------------------------------
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: backend/pnpm-lock.yaml
+
+      - name: Backend — install, build, test
+        working-directory: backend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm -r build
+          pnpm test
+
+      - name: Frontend — install, typecheck, test
+        working-directory: norya-front
+        run: |
+          npm ci --no-audit --no-fund
+          npm run typecheck
+          npm test
+
+  # ---------------------------------------------------------------------------
+  # 2) BUILD + PUSH das imagens pro GHCR — só no push (merge) na homol.
+  # ---------------------------------------------------------------------------
+  build-push:
+    if: github.event_name == 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - name: backend
+            context: backend
+            image: ghcr.io/gruposehloiro/norya-backend
+          - name: console
+            context: norya-front
+            image: ghcr.io/gruposehloiro/norya-console
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Login no GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build & push ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: |
+            ${{ matrix.image }}:homolog
+            ${{ matrix.image }}:sha-${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
+  # ---------------------------------------------------------------------------
+  # 3) DEPLOY na droplet — só no push. Puxa as imagens e sobe. Não builda lá.
+  # ---------------------------------------------------------------------------
+  deploy:
+    if: github.event_name == 'push'
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          envs: GHCR_USER,GHCR_TOKEN,APP_DIR
+          script: |
+            set -e
+            APP_DIR="${APP_DIR:-/root/norya-app}"
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            cd "$APP_DIR"
+            git fetch origin homol && git checkout homol && git reset --hard origin/homol
+            cd infra/homolog
+            docker compose pull nest-api worker console
+            docker compose up -d --remove-orphans
+            docker image prune -f
+            echo "=== status ==="
+            docker compose ps
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_DIR: ${{ secrets.DROPLET_APP_DIR }}
+
+      - name: Healthcheck (API no ar)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          envs: APP_DIR
+          script: |
+            APP_DIR="${APP_DIR:-/root/norya-app}"
+            cd "$APP_DIR/infra/homolog"
+            for i in $(seq 1 20); do
+              if docker compose exec -T nest-api wget -qO- http://localhost:3000/api/identity/ping >/dev/null 2>&1; then
+                echo "API respondeu OK (tentativa $i)"; exit 0
+              fi
+              echo "aguardando API... ($i/20)"; sleep 6
+            done
+            echo "API não respondeu ao ping após ~2min"; exit 1
+        env:
+          APP_DIR: ${{ secrets.DROPLET_APP_DIR }}
+
+  # ---------------------------------------------------------------------------
+  # 4) NOTIFICAÇÃO por e-mail — sempre (sucesso OU erro), só no push.
+  # ---------------------------------------------------------------------------
+  notify:
+    if: github.event_name == 'push' && always()
+    needs: [test, build-push, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resultado consolidado
+        id: r
+        run: |
+          if [ "${{ needs.deploy.result }}" = "success" ]; then
+            echo "status=✅ CONCLUÍDO" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=❌ ERRO" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Enviar e-mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USER }}
+          password: ${{ secrets.MAIL_PASS }}
+          from: Norya CI <${{ secrets.MAIL_USER }}>
+          to: ${{ env.NOTIFY_TO }}
+          subject: "[Homolog] Deploy ${{ steps.r.outputs.status }} — ${{ github.sha }}"
+          body: |
+            Deploy homologação — resultado por etapa:
+
+              Testes .......... ${{ needs.test.result }}
+              Build/Push ...... ${{ needs.build-push.result }}
+              Deploy .......... ${{ needs.deploy.result }}
+
+            Status geral: ${{ steps.r.outputs.status }}
+
+            Commit:  ${{ github.sha }}
+            Autor:   ${{ github.actor }}
+            Branch:  ${{ github.ref_name }}
+            Logs:    ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
