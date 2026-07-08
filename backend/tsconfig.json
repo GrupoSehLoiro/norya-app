@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "ES2022",
+    "module": "commonjs",
+    "baseUrl": ".",
+    "paths": {
+      "@sehloro/domain": ["libs/domain/src"],
+      "@sehloro/domain/*": ["libs/domain/src/*"],
+      "@sehloro/infra": ["libs/infra/src"],
+      "@sehloro/infra/*": ["libs/infra/src/*"]
+    }
+  },
+  "include": ["apps/**/*.ts", "libs/**/*.ts"]
+}

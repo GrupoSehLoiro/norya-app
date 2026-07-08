@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": false,
+    "types": ["node"],
+    "baseUrl": "../..",
+    "paths": {
+      "@sehloro/domain": ["libs/domain/dist"],
+      "@sehloro/domain/*": ["libs/domain/dist/*"],
+      "@sehloro/infra": ["libs/infra/dist"],
+      "@sehloro/infra/*": ["libs/infra/dist/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "test", "**/*.spec.ts", "**/*.e2e-spec.ts"]
+}

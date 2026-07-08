@@ -1,0 +1,180 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { ClickHouseClient } from '@sehloro/infra';
+import type { BatchAnalysis } from './batch-analysis.types';
+
+interface ChRow {
+  batch_id: string;
+  channel_id: string;
+  session_id: string | null;
+  window_start: string;
+  window_end: string;
+  message_count: number;
+  message_count_weighted: number;
+  unique_users: number;
+  is_subscriber_ratio: number;
+  sentiment_pos: number;
+  sentiment_neu: number;
+  sentiment_neg: number;
+  dominant_category: string;
+  top_categories_json: string;
+  least_category: string;
+  least_category_count: number;
+  most_toxic_username: string;
+  most_toxic_ratio: number;
+  most_toxic_msg_count: number;
+  least_toxic_username: string;
+  least_toxic_ratio: number;
+  least_toxic_msg_count: number;
+  ad_active: number;
+  ad_source: string;
+  ad_sentiment_pos: number;
+  ad_sentiment_neu: number;
+  ad_sentiment_neg: number;
+  ad_sample_size: number;
+  mentioned_brands_json: string;
+  top_tokens: string[];
+  llm_tier: number;
+  llm_model: string;
+  llm_cost_usd: string | number;
+  llm_latency_ms: number;
+  llm_cache_hit_rate: number;
+  llm_confidence: number;
+  insight_text: string;
+  created_at: string;
+}
+
+@Injectable()
+export class InsightsService {
+  private readonly logger = new Logger(InsightsService.name);
+  constructor(private readonly ch: ClickHouseClient) {}
+
+  async latest(channelId: string): Promise<BatchAnalysis | null> {
+    const rows = await this._select(
+      `SELECT * FROM batch_analysis
+       WHERE channel_id = {ch: String}
+       ORDER BY window_start DESC
+       LIMIT 1`,
+      { ch: channelId },
+    );
+    return rows[0] ?? null;
+  }
+
+  async history(channelId: string, from?: Date, to?: Date, limit = 200): Promise<BatchAnalysis[]> {
+    const where = ['channel_id = {ch: String}'];
+    const params: Record<string, unknown> = { ch: channelId, lim: Math.min(limit, 500) };
+    if (from) {
+      where.push('window_start >= {from: DateTime64(3)}');
+      params.from = _dt(from);
+    }
+    if (to) {
+      where.push('window_start <= {to:   DateTime64(3)}');
+      params.to = _dt(to);
+    }
+    return this._select(
+      `SELECT * FROM batch_analysis
+       WHERE ${where.join(' AND ')}
+       ORDER BY window_start DESC
+       LIMIT {lim: UInt32}`,
+      params,
+    );
+  }
+
+  private async _select(query: string, params: Record<string, unknown>): Promise<BatchAnalysis[]> {
+    const rows = await this.ch.query<ChRow>(query, params);
+    return rows.map((r) => this._toAnalysis(r));
+  }
+
+  /**
+   * Recupera a primeira categoria do `top_categories_json` (== pauta mais
+   * comentada, conforme o writer serializa) pra resgatar count + context da IA.
+   */
+  private _dominantFromJson(
+    json: string,
+  ): { category?: string; count?: number; context?: string } | null {
+    try {
+      const arr = JSON.parse(json || '[]');
+      return Array.isArray(arr) && arr[0] ? arr[0] : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private _toAnalysis(r: ChRow): BatchAnalysis {
+    let brands: BatchAnalysis['marcasMencionadas'] = [];
+    try {
+      brands = JSON.parse(r.mentioned_brands_json || '[]');
+    } catch {
+      brands = [];
+    }
+
+    return {
+      batchId: r.batch_id,
+      channelId: r.channel_id,
+      sessionId: r.session_id,
+      windowStart: new Date(r.window_start),
+      windowEnd: new Date(r.window_end),
+      messageCount: Number(r.message_count),
+      messageCountWeighted: Number(r.message_count_weighted),
+      uniqueUsers: Number(r.unique_users),
+      isSubscriberRatio: Number(r.is_subscriber_ratio),
+      topTokens: r.top_tokens ?? [],
+      climaGeral: {
+        pos: Number(r.sentiment_pos) / 1000,
+        neg: Number(r.sentiment_neg) / 1000,
+        neu: Number(r.sentiment_neu) / 1000,
+      },
+      pautaMaisComentada:
+        r.dominant_category && r.dominant_category !== 'other'
+          ? {
+              category: r.dominant_category,
+              count: this._dominantFromJson(r.top_categories_json)?.count ?? 0,
+              context: this._dominantFromJson(r.top_categories_json)?.context || undefined,
+            }
+          : null,
+      pautaMenosComentada: r.least_category
+        ? { category: r.least_category, count: Number(r.least_category_count) }
+        : null,
+      userMaisToxico: r.most_toxic_username
+        ? {
+            username: r.most_toxic_username,
+            ratio: Number(r.most_toxic_ratio),
+            msgCount: Number(r.most_toxic_msg_count),
+            negCount: Math.round(Number(r.most_toxic_ratio) * Number(r.most_toxic_msg_count)),
+          }
+        : null,
+      userMenosToxico: r.least_toxic_username
+        ? {
+            username: r.least_toxic_username,
+            ratio: Number(r.least_toxic_ratio),
+            msgCount: Number(r.least_toxic_msg_count),
+            posCount: Math.round(Number(r.least_toxic_ratio) * Number(r.least_toxic_msg_count)),
+          }
+        : null,
+      sentimentoAd:
+        r.ad_active === 1
+          ? {
+              active: true,
+              source: (r.ad_source as 'twitch' | 'manual') || null,
+              pos: Number(r.ad_sentiment_pos),
+              neg: Number(r.ad_sentiment_neg),
+              neu: Number(r.ad_sentiment_neu),
+              sampleSize: Number(r.ad_sample_size),
+            }
+          : null,
+      marcasMencionadas: brands,
+      llmTier: Number(r.llm_tier) as 0 | 1 | 2 | 3,
+      llmModel: r.llm_model,
+      llmCostUsd: Number(r.llm_cost_usd ?? 0),
+      llmLatencyMs: Number(r.llm_latency_ms),
+      llmCacheHitRate: Number(r.llm_cache_hit_rate),
+      llmConfidence: Number(r.llm_confidence),
+      needsEscalation: false,
+      insightText: r.insight_text ?? '',
+      createdAt: new Date(r.created_at),
+    };
+  }
+}
+
+function _dt(d: Date): string {
+  return d.toISOString().replace('T', ' ').replace('Z', '');
+}

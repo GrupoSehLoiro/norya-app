@@ -1,0 +1,2055 @@
+{
+  "viewerCount": 3200,
+  "messages": [
+    {
+      "id": "brhype-0000",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkkkkkkk que jogada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:00Z"
+    },
+    {
+      "id": "brhype-0001",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog que clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:00.600000Z"
+    },
+    {
+      "id": "brhype-0002",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais esse round",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:01.200000Z"
+    },
+    {
+      "id": "brhype-0003",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected mano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:01.800000Z"
+    },
+    {
+      "id": "brhype-0004",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkk morri de rir",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:02.400000Z"
+    },
+    {
+      "id": "brhype-0005",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara é hacker com certeza",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:03Z"
+    },
+    {
+      "id": "brhype-0006",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog pog pog",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:03.600000Z"
+    },
+    {
+      "id": "brhype-0007",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkkk não acredito",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:04.200000Z"
+    },
+    {
+      "id": "brhype-0008",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "cheater detected!!!!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:04.800000Z"
+    },
+    {
+      "id": "brhype-0009",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "que pica de jogada cara",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:05.400000Z"
+    },
+    {
+      "id": "brhype-0010",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk olha isso",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:06Z"
+    },
+    {
+      "id": "brhype-0011",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog meu deus",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:06.600000Z"
+    },
+    {
+      "id": "brhype-0012",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "esse cara tá hackando sim",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:07.200000Z"
+    },
+    {
+      "id": "brhype-0013",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkk caiu",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:07.800000Z"
+    },
+    {
+      "id": "brhype-0014",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais BR",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:08.400000Z"
+    },
+    {
+      "id": "brhype-0015",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk perdeu feio",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:09Z"
+    },
+    {
+      "id": "brhype-0016",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "pog chegou a hora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:09.600000Z"
+    },
+    {
+      "id": "brhype-0017",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected reportar",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:10.200000Z"
+    },
+    {
+      "id": "brhype-0018",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk n tem como",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:10.800000Z"
+    },
+    {
+      "id": "brhype-0019",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog vitória!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:11.400000Z"
+    },
+    {
+      "id": "brhype-0020",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkkkkkkk que jogada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:12Z"
+    },
+    {
+      "id": "brhype-0021",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog que clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:12.600000Z"
+    },
+    {
+      "id": "brhype-0022",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais esse round",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:13.200000Z"
+    },
+    {
+      "id": "brhype-0023",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected mano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:13.800000Z"
+    },
+    {
+      "id": "brhype-0024",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkk morri de rir",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:14.400000Z"
+    },
+    {
+      "id": "brhype-0025",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara é hacker com certeza",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:15Z"
+    },
+    {
+      "id": "brhype-0026",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog pog pog",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:15.600000Z"
+    },
+    {
+      "id": "brhype-0027",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkkk não acredito",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:16.200000Z"
+    },
+    {
+      "id": "brhype-0028",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "cheater detected!!!!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:16.800000Z"
+    },
+    {
+      "id": "brhype-0029",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "que pica de jogada cara",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:17.400000Z"
+    },
+    {
+      "id": "brhype-0030",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk olha isso",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:18Z"
+    },
+    {
+      "id": "brhype-0031",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog meu deus",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:18.600000Z"
+    },
+    {
+      "id": "brhype-0032",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "esse cara tá hackando sim",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:19.200000Z"
+    },
+    {
+      "id": "brhype-0033",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkk caiu",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:19.800000Z"
+    },
+    {
+      "id": "brhype-0034",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais BR",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:20.400000Z"
+    },
+    {
+      "id": "brhype-0035",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk perdeu feio",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:21Z"
+    },
+    {
+      "id": "brhype-0036",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "pog chegou a hora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:21.600000Z"
+    },
+    {
+      "id": "brhype-0037",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected reportar",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:22.200000Z"
+    },
+    {
+      "id": "brhype-0038",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk n tem como",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:22.800000Z"
+    },
+    {
+      "id": "brhype-0039",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog vitória!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:23.400000Z"
+    },
+    {
+      "id": "brhype-0040",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkkkkkkk que jogada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:24Z"
+    },
+    {
+      "id": "brhype-0041",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog que clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:24.600000Z"
+    },
+    {
+      "id": "brhype-0042",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais esse round",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:25.200000Z"
+    },
+    {
+      "id": "brhype-0043",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected mano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:25.800000Z"
+    },
+    {
+      "id": "brhype-0044",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkk morri de rir",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:26.400000Z"
+    },
+    {
+      "id": "brhype-0045",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara é hacker com certeza",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:27Z"
+    },
+    {
+      "id": "brhype-0046",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog pog pog",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:27.600000Z"
+    },
+    {
+      "id": "brhype-0047",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkkk não acredito",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:28.200000Z"
+    },
+    {
+      "id": "brhype-0048",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "cheater detected!!!!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:28.800000Z"
+    },
+    {
+      "id": "brhype-0049",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "que pica de jogada cara",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:29.400000Z"
+    },
+    {
+      "id": "brhype-0050",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk olha isso",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:30Z"
+    },
+    {
+      "id": "brhype-0051",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog meu deus",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:30.600000Z"
+    },
+    {
+      "id": "brhype-0052",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "esse cara tá hackando sim",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:31.200000Z"
+    },
+    {
+      "id": "brhype-0053",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkk caiu",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:31.800000Z"
+    },
+    {
+      "id": "brhype-0054",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais BR",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:32.400000Z"
+    },
+    {
+      "id": "brhype-0055",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk perdeu feio",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:33Z"
+    },
+    {
+      "id": "brhype-0056",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "pog chegou a hora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:33.600000Z"
+    },
+    {
+      "id": "brhype-0057",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected reportar",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:34.200000Z"
+    },
+    {
+      "id": "brhype-0058",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk n tem como",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:34.800000Z"
+    },
+    {
+      "id": "brhype-0059",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog vitória!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:35.400000Z"
+    },
+    {
+      "id": "brhype-0060",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkkkkkkk que jogada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:36Z"
+    },
+    {
+      "id": "brhype-0061",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog que clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:36.600000Z"
+    },
+    {
+      "id": "brhype-0062",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais esse round",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:37.200000Z"
+    },
+    {
+      "id": "brhype-0063",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected mano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:37.800000Z"
+    },
+    {
+      "id": "brhype-0064",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkk morri de rir",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:38.400000Z"
+    },
+    {
+      "id": "brhype-0065",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara é hacker com certeza",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:39Z"
+    },
+    {
+      "id": "brhype-0066",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog pog pog",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:39.600000Z"
+    },
+    {
+      "id": "brhype-0067",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkkk não acredito",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:40.200000Z"
+    },
+    {
+      "id": "brhype-0068",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "cheater detected!!!!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:40.800000Z"
+    },
+    {
+      "id": "brhype-0069",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "que pica de jogada cara",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:41.400000Z"
+    },
+    {
+      "id": "brhype-0070",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk olha isso",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:42Z"
+    },
+    {
+      "id": "brhype-0071",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog meu deus",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:42.600000Z"
+    },
+    {
+      "id": "brhype-0072",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "esse cara tá hackando sim",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:43.200000Z"
+    },
+    {
+      "id": "brhype-0073",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkk caiu",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:43.800000Z"
+    },
+    {
+      "id": "brhype-0074",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais BR",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:44.400000Z"
+    },
+    {
+      "id": "brhype-0075",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk perdeu feio",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:45Z"
+    },
+    {
+      "id": "brhype-0076",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "pog chegou a hora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:45.600000Z"
+    },
+    {
+      "id": "brhype-0077",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected reportar",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:46.200000Z"
+    },
+    {
+      "id": "brhype-0078",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk n tem como",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:46.800000Z"
+    },
+    {
+      "id": "brhype-0079",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog vitória!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:47.400000Z"
+    },
+    {
+      "id": "brhype-0080",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkkkkkkk que jogada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:48Z"
+    },
+    {
+      "id": "brhype-0081",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog que clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:48.600000Z"
+    },
+    {
+      "id": "brhype-0082",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais esse round",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:49.200000Z"
+    },
+    {
+      "id": "brhype-0083",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected mano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:49.800000Z"
+    },
+    {
+      "id": "brhype-0084",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "kkkkk morri de rir",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:50.400000Z"
+    },
+    {
+      "id": "brhype-0085",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara é hacker com certeza",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:51Z"
+    },
+    {
+      "id": "brhype-0086",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog pog pog",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:51.600000Z"
+    },
+    {
+      "id": "brhype-0087",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkkk não acredito",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:52.200000Z"
+    },
+    {
+      "id": "brhype-0088",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "cheater detected!!!!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:52.800000Z"
+    },
+    {
+      "id": "brhype-0089",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "que pica de jogada cara",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:53.400000Z"
+    },
+    {
+      "id": "brhype-0090",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk olha isso",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:54Z"
+    },
+    {
+      "id": "brhype-0091",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog meu deus",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:54.600000Z"
+    },
+    {
+      "id": "brhype-0092",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "esse cara tá hackando sim",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:55.200000Z"
+    },
+    {
+      "id": "brhype-0093",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkkk caiu",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:55.800000Z"
+    },
+    {
+      "id": "brhype-0094",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pica demais BR",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:56.400000Z"
+    },
+    {
+      "id": "brhype-0095",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br001",
+        "username": "rogerbatt",
+        "displayName": "RogerBatt",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk perdeu feio",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:57Z"
+    },
+    {
+      "id": "brhype-0096",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br002",
+        "username": "gabsscheidt",
+        "displayName": "GabsScheidt",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/3"
+        ]
+      },
+      "text": "pog chegou a hora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:57.600000Z"
+    },
+    {
+      "id": "brhype-0097",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br003",
+        "username": "br_viewer1",
+        "displayName": "brViewer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cheater detected reportar",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:58.200000Z"
+    },
+    {
+      "id": "brhype-0098",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br004",
+        "username": "naclfan",
+        "displayName": "naclFan",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "kkkkk n tem como",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:58.800000Z"
+    },
+    {
+      "id": "brhype-0099",
+      "platform": "twitch",
+      "channelExternalId": "rogerbatt",
+      "channelName": "rogerbatt",
+      "user": {
+        "externalId": "br005",
+        "username": "cblolwatcher",
+        "displayName": "cblolWatcher",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pog vitória!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T20:00:59.400000Z"
+    }
+  ]
+}

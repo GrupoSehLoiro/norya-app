@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "types": ["node"],
+    "baseUrl": "../..",
+    "paths": {
+      "@sehloro/domain": ["libs/domain/src"],
+      "@sehloro/domain/*": ["libs/domain/src/*"],
+      "@sehloro/infra": ["libs/infra/src"],
+      "@sehloro/infra/*": ["libs/infra/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

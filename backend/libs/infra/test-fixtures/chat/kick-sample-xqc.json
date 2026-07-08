@@ -1,0 +1,3005 @@
+{
+  "viewerCount": 45000,
+  "messages": [
+    {
+      "id": "kick-xqc-0000",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:00Z"
+    },
+    {
+      "id": "kick-xqc-0001",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:00.400000Z"
+    },
+    {
+      "id": "kick-xqc-0002",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:00.800000Z"
+    },
+    {
+      "id": "kick-xqc-0003",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:01.200000Z"
+    },
+    {
+      "id": "kick-xqc-0004",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:01.600000Z"
+    },
+    {
+      "id": "kick-xqc-0005",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:02Z"
+    },
+    {
+      "id": "kick-xqc-0006",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:02.400000Z"
+    },
+    {
+      "id": "kick-xqc-0007",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:02.800000Z"
+    },
+    {
+      "id": "kick-xqc-0008",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:03.200000Z"
+    },
+    {
+      "id": "kick-xqc-0009",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:03.600000Z"
+    },
+    {
+      "id": "kick-xqc-0010",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:04Z"
+    },
+    {
+      "id": "kick-xqc-0011",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:04.400000Z"
+    },
+    {
+      "id": "kick-xqc-0012",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:04.800000Z"
+    },
+    {
+      "id": "kick-xqc-0013",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:05.200000Z"
+    },
+    {
+      "id": "kick-xqc-0014",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:05.600000Z"
+    },
+    {
+      "id": "kick-xqc-0015",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:06Z"
+    },
+    {
+      "id": "kick-xqc-0016",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:06.400000Z"
+    },
+    {
+      "id": "kick-xqc-0017",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:06.800000Z"
+    },
+    {
+      "id": "kick-xqc-0018",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:07.200000Z"
+    },
+    {
+      "id": "kick-xqc-0019",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:07.600000Z"
+    },
+    {
+      "id": "kick-xqc-0020",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:08Z"
+    },
+    {
+      "id": "kick-xqc-0021",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:08.400000Z"
+    },
+    {
+      "id": "kick-xqc-0022",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:08.800000Z"
+    },
+    {
+      "id": "kick-xqc-0023",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:09.200000Z"
+    },
+    {
+      "id": "kick-xqc-0024",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:09.600000Z"
+    },
+    {
+      "id": "kick-xqc-0025",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:10Z"
+    },
+    {
+      "id": "kick-xqc-0026",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:10.400000Z"
+    },
+    {
+      "id": "kick-xqc-0027",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:10.800000Z"
+    },
+    {
+      "id": "kick-xqc-0028",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:11.200000Z"
+    },
+    {
+      "id": "kick-xqc-0029",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:11.600000Z"
+    },
+    {
+      "id": "kick-xqc-0030",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:12Z"
+    },
+    {
+      "id": "kick-xqc-0031",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:12.400000Z"
+    },
+    {
+      "id": "kick-xqc-0032",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:12.800000Z"
+    },
+    {
+      "id": "kick-xqc-0033",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:13.200000Z"
+    },
+    {
+      "id": "kick-xqc-0034",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:13.600000Z"
+    },
+    {
+      "id": "kick-xqc-0035",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:14Z"
+    },
+    {
+      "id": "kick-xqc-0036",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:14.400000Z"
+    },
+    {
+      "id": "kick-xqc-0037",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:14.800000Z"
+    },
+    {
+      "id": "kick-xqc-0038",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:15.200000Z"
+    },
+    {
+      "id": "kick-xqc-0039",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:15.600000Z"
+    },
+    {
+      "id": "kick-xqc-0040",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:16Z"
+    },
+    {
+      "id": "kick-xqc-0041",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:16.400000Z"
+    },
+    {
+      "id": "kick-xqc-0042",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:16.800000Z"
+    },
+    {
+      "id": "kick-xqc-0043",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:17.200000Z"
+    },
+    {
+      "id": "kick-xqc-0044",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:17.600000Z"
+    },
+    {
+      "id": "kick-xqc-0045",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:18Z"
+    },
+    {
+      "id": "kick-xqc-0046",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:18.400000Z"
+    },
+    {
+      "id": "kick-xqc-0047",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:18.800000Z"
+    },
+    {
+      "id": "kick-xqc-0048",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:19.200000Z"
+    },
+    {
+      "id": "kick-xqc-0049",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:19.600000Z"
+    },
+    {
+      "id": "kick-xqc-0050",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:20Z"
+    },
+    {
+      "id": "kick-xqc-0051",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:20.400000Z"
+    },
+    {
+      "id": "kick-xqc-0052",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:20.800000Z"
+    },
+    {
+      "id": "kick-xqc-0053",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:21.200000Z"
+    },
+    {
+      "id": "kick-xqc-0054",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:21.600000Z"
+    },
+    {
+      "id": "kick-xqc-0055",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:22Z"
+    },
+    {
+      "id": "kick-xqc-0056",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:22.400000Z"
+    },
+    {
+      "id": "kick-xqc-0057",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:22.800000Z"
+    },
+    {
+      "id": "kick-xqc-0058",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:23.200000Z"
+    },
+    {
+      "id": "kick-xqc-0059",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:23.600000Z"
+    },
+    {
+      "id": "kick-xqc-0060",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:24Z"
+    },
+    {
+      "id": "kick-xqc-0061",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:24.400000Z"
+    },
+    {
+      "id": "kick-xqc-0062",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:24.800000Z"
+    },
+    {
+      "id": "kick-xqc-0063",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:25.200000Z"
+    },
+    {
+      "id": "kick-xqc-0064",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:25.600000Z"
+    },
+    {
+      "id": "kick-xqc-0065",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:26Z"
+    },
+    {
+      "id": "kick-xqc-0066",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:26.400000Z"
+    },
+    {
+      "id": "kick-xqc-0067",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:26.800000Z"
+    },
+    {
+      "id": "kick-xqc-0068",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:27.200000Z"
+    },
+    {
+      "id": "kick-xqc-0069",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:27.600000Z"
+    },
+    {
+      "id": "kick-xqc-0070",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:28Z"
+    },
+    {
+      "id": "kick-xqc-0071",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:28.400000Z"
+    },
+    {
+      "id": "kick-xqc-0072",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:28.800000Z"
+    },
+    {
+      "id": "kick-xqc-0073",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:29.200000Z"
+    },
+    {
+      "id": "kick-xqc-0074",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:29.600000Z"
+    },
+    {
+      "id": "kick-xqc-0075",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:30Z"
+    },
+    {
+      "id": "kick-xqc-0076",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:30.400000Z"
+    },
+    {
+      "id": "kick-xqc-0077",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:30.800000Z"
+    },
+    {
+      "id": "kick-xqc-0078",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:31.200000Z"
+    },
+    {
+      "id": "kick-xqc-0079",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:31.600000Z"
+    },
+    {
+      "id": "kick-xqc-0080",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:32Z"
+    },
+    {
+      "id": "kick-xqc-0081",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:32.400000Z"
+    },
+    {
+      "id": "kick-xqc-0082",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:32.800000Z"
+    },
+    {
+      "id": "kick-xqc-0083",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:33.200000Z"
+    },
+    {
+      "id": "kick-xqc-0084",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:33.600000Z"
+    },
+    {
+      "id": "kick-xqc-0085",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:34Z"
+    },
+    {
+      "id": "kick-xqc-0086",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:34.400000Z"
+    },
+    {
+      "id": "kick-xqc-0087",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:34.800000Z"
+    },
+    {
+      "id": "kick-xqc-0088",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:35.200000Z"
+    },
+    {
+      "id": "kick-xqc-0089",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:35.600000Z"
+    },
+    {
+      "id": "kick-xqc-0090",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:36Z"
+    },
+    {
+      "id": "kick-xqc-0091",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:36.400000Z"
+    },
+    {
+      "id": "kick-xqc-0092",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:36.800000Z"
+    },
+    {
+      "id": "kick-xqc-0093",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:37.200000Z"
+    },
+    {
+      "id": "kick-xqc-0094",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:37.600000Z"
+    },
+    {
+      "id": "kick-xqc-0095",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:38Z"
+    },
+    {
+      "id": "kick-xqc-0096",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:38.400000Z"
+    },
+    {
+      "id": "kick-xqc-0097",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:38.800000Z"
+    },
+    {
+      "id": "kick-xqc-0098",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:39.200000Z"
+    },
+    {
+      "id": "kick-xqc-0099",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:39.600000Z"
+    },
+    {
+      "id": "kick-xqc-0100",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:40Z"
+    },
+    {
+      "id": "kick-xqc-0101",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:40.400000Z"
+    },
+    {
+      "id": "kick-xqc-0102",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:40.800000Z"
+    },
+    {
+      "id": "kick-xqc-0103",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:41.200000Z"
+    },
+    {
+      "id": "kick-xqc-0104",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:41.600000Z"
+    },
+    {
+      "id": "kick-xqc-0105",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:42Z"
+    },
+    {
+      "id": "kick-xqc-0106",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:42.400000Z"
+    },
+    {
+      "id": "kick-xqc-0107",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:42.800000Z"
+    },
+    {
+      "id": "kick-xqc-0108",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:43.200000Z"
+    },
+    {
+      "id": "kick-xqc-0109",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:43.600000Z"
+    },
+    {
+      "id": "kick-xqc-0110",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:44Z"
+    },
+    {
+      "id": "kick-xqc-0111",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:44.400000Z"
+    },
+    {
+      "id": "kick-xqc-0112",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:44.800000Z"
+    },
+    {
+      "id": "kick-xqc-0113",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:45.200000Z"
+    },
+    {
+      "id": "kick-xqc-0114",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:45.600000Z"
+    },
+    {
+      "id": "kick-xqc-0115",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:46Z"
+    },
+    {
+      "id": "kick-xqc-0116",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:46.400000Z"
+    },
+    {
+      "id": "kick-xqc-0117",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:46.800000Z"
+    },
+    {
+      "id": "kick-xqc-0118",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:47.200000Z"
+    },
+    {
+      "id": "kick-xqc-0119",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:47.600000Z"
+    },
+    {
+      "id": "kick-xqc-0120",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:48Z"
+    },
+    {
+      "id": "kick-xqc-0121",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:48.400000Z"
+    },
+    {
+      "id": "kick-xqc-0122",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:48.800000Z"
+    },
+    {
+      "id": "kick-xqc-0123",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:49.200000Z"
+    },
+    {
+      "id": "kick-xqc-0124",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:49.600000Z"
+    },
+    {
+      "id": "kick-xqc-0125",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:50Z"
+    },
+    {
+      "id": "kick-xqc-0126",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:50.400000Z"
+    },
+    {
+      "id": "kick-xqc-0127",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:50.800000Z"
+    },
+    {
+      "id": "kick-xqc-0128",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:51.200000Z"
+    },
+    {
+      "id": "kick-xqc-0129",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:51.600000Z"
+    },
+    {
+      "id": "kick-xqc-0130",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:52Z"
+    },
+    {
+      "id": "kick-xqc-0131",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:52.400000Z"
+    },
+    {
+      "id": "kick-xqc-0132",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:52.800000Z"
+    },
+    {
+      "id": "kick-xqc-0133",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:53.200000Z"
+    },
+    {
+      "id": "kick-xqc-0134",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:53.600000Z"
+    },
+    {
+      "id": "kick-xqc-0135",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:54Z"
+    },
+    {
+      "id": "kick-xqc-0136",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:54.400000Z"
+    },
+    {
+      "id": "kick-xqc-0137",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:54.800000Z"
+    },
+    {
+      "id": "kick-xqc-0138",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "L take fr",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:55.200000Z"
+    },
+    {
+      "id": "kick-xqc-0139",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "skill issue lmao",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:55.600000Z"
+    },
+    {
+      "id": "kick-xqc-0140",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat diff",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:56Z"
+    },
+    {
+      "id": "kick-xqc-0141",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "this game is mid",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:56.400000Z"
+    },
+    {
+      "id": "kick-xqc-0142",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "speedrun incoming",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:56.800000Z"
+    },
+    {
+      "id": "kick-xqc-0143",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "let him cook",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:57.200000Z"
+    },
+    {
+      "id": "kick-xqc-0144",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "xqc is goated",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:57.600000Z"
+    },
+    {
+      "id": "kick-xqc-0145",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2001",
+        "username": "xqcfan1",
+        "displayName": "xQcFan1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "OMEGALUL that was trash",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:58Z"
+    },
+    {
+      "id": "kick-xqc-0146",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2002",
+        "username": "streambro",
+        "displayName": "streamBro",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "actual world record",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:58.400000Z"
+    },
+    {
+      "id": "kick-xqc-0147",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2003",
+        "username": "madchatter",
+        "displayName": "madChatter",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "chat is cooked",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:58.800000Z"
+    },
+    {
+      "id": "kick-xqc-0148",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2004",
+        "username": "kickviewer",
+        "displayName": "kickViewer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bro is griefing",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:59.200000Z"
+    },
+    {
+      "id": "kick-xqc-0149",
+      "platform": "kick",
+      "channelExternalId": "xqc",
+      "channelName": "xqc",
+      "user": {
+        "externalId": "k2005",
+        "username": "pogkick",
+        "displayName": "pogKick",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "W streamer",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T22:00:59.600000Z"
+    }
+  ]
+}

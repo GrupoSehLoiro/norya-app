@@ -1,0 +1,4554 @@
+{
+  "viewerCount": 12500,
+  "messages": [
+    {
+      "id": "twitch-val-0000",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa Kappa esse round foi insano",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:00Z"
+    },
+    {
+      "id": "twitch-val-0001",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp que aim incrível",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:00.500000Z"
+    },
+    {
+      "id": "twitch-val-0002",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp perdeu de novo",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:01Z"
+    },
+    {
+      "id": "twitch-val-0003",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL LUL errou o clutch",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:01.500000Z"
+    },
+    {
+      "id": "twitch-val-0004",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara tem aim hacker",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:02Z"
+    },
+    {
+      "id": "twitch-val-0005",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "valorant é péssimo hoje",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:02.500000Z"
+    },
+    {
+      "id": "twitch-val-0006",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp drop aqui por favor",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:03Z"
+    },
+    {
+      "id": "twitch-val-0007",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "vamos de full rush",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:03.500000Z"
+    },
+    {
+      "id": "twitch-val-0008",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "defuse rápido!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:04Z"
+    },
+    {
+      "id": "twitch-val-0009",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp site tomado B",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:04.500000Z"
+    },
+    {
+      "id": "twitch-val-0010",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "smoke aqui please",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:05Z"
+    },
+    {
+      "id": "twitch-val-0011",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "flash na entrada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:05.500000Z"
+    },
+    {
+      "id": "twitch-val-0012",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa pistol round perdido",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:06Z"
+    },
+    {
+      "id": "twitch-val-0013",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "eco round agora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:06.500000Z"
+    },
+    {
+      "id": "twitch-val-0014",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "ult guardada?",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:07Z"
+    },
+    {
+      "id": "twitch-val-0015",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "LUL onde você tá???",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:07.500000Z"
+    },
+    {
+      "id": "twitch-val-0016",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "primeiro mapa fácil",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:08Z"
+    },
+    {
+      "id": "twitch-val-0017",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse valorant me estressou",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:08.500000Z"
+    },
+    {
+      "id": "twitch-val-0018",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp bom jogo galera",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:09Z"
+    },
+    {
+      "id": "twitch-val-0019",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "próximo round vai",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:09.500000Z"
+    },
+    {
+      "id": "twitch-val-0020",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa esse round foi insano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:10Z"
+    },
+    {
+      "id": "twitch-val-0021",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp PogChamp que aim incrível",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:10.500000Z"
+    },
+    {
+      "id": "twitch-val-0022",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp perdeu de novo",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:11Z"
+    },
+    {
+      "id": "twitch-val-0023",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL errou o clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:11.500000Z"
+    },
+    {
+      "id": "twitch-val-0024",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa esse cara tem aim hacker",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:12Z"
+    },
+    {
+      "id": "twitch-val-0025",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "valorant é péssimo hoje",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:12.500000Z"
+    },
+    {
+      "id": "twitch-val-0026",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "drop aqui por favor",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:13Z"
+    },
+    {
+      "id": "twitch-val-0027",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL vamos de full rush",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:13.500000Z"
+    },
+    {
+      "id": "twitch-val-0028",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "defuse rápido!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:14Z"
+    },
+    {
+      "id": "twitch-val-0029",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "site tomado B",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:14.500000Z"
+    },
+    {
+      "id": "twitch-val-0030",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "cringeChamp smoke aqui please",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:15Z"
+    },
+    {
+      "id": "twitch-val-0031",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "flash na entrada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:15.500000Z"
+    },
+    {
+      "id": "twitch-val-0032",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pistol round perdido",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:16Z"
+    },
+    {
+      "id": "twitch-val-0033",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp eco round agora",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:16.500000Z"
+    },
+    {
+      "id": "twitch-val-0034",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "ult guardada?",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:17Z"
+    },
+    {
+      "id": "twitch-val-0035",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "onde você tá???",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:17.500000Z"
+    },
+    {
+      "id": "twitch-val-0036",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa primeiro mapa fácil",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:18Z"
+    },
+    {
+      "id": "twitch-val-0037",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse valorant me estressou",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:18.500000Z"
+    },
+    {
+      "id": "twitch-val-0038",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bom jogo galera",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:19Z"
+    },
+    {
+      "id": "twitch-val-0039",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL próximo round vai",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:19.500000Z"
+    },
+    {
+      "id": "twitch-val-0040",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa esse round foi insano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:20Z"
+    },
+    {
+      "id": "twitch-val-0041",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp que aim incrível",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:20.500000Z"
+    },
+    {
+      "id": "twitch-val-0042",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp cringeChamp perdeu de novo",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:21Z"
+    },
+    {
+      "id": "twitch-val-0043",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL errou o clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:21.500000Z"
+    },
+    {
+      "id": "twitch-val-0044",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara tem aim hacker",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:22Z"
+    },
+    {
+      "id": "twitch-val-0045",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "PogChamp valorant é péssimo hoje",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:22.500000Z"
+    },
+    {
+      "id": "twitch-val-0046",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "drop aqui por favor",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:23Z"
+    },
+    {
+      "id": "twitch-val-0047",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "vamos de full rush",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:23.500000Z"
+    },
+    {
+      "id": "twitch-val-0048",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa defuse rápido!",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:24Z"
+    },
+    {
+      "id": "twitch-val-0049",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "site tomado B",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:24.500000Z"
+    },
+    {
+      "id": "twitch-val-0050",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "smoke aqui please",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:25Z"
+    },
+    {
+      "id": "twitch-val-0051",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL flash na entrada",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:25.500000Z"
+    },
+    {
+      "id": "twitch-val-0052",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pistol round perdido",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:26Z"
+    },
+    {
+      "id": "twitch-val-0053",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "eco round agora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:26.500000Z"
+    },
+    {
+      "id": "twitch-val-0054",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp ult guardada?",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:27Z"
+    },
+    {
+      "id": "twitch-val-0055",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "onde você tá???",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:27.500000Z"
+    },
+    {
+      "id": "twitch-val-0056",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "primeiro mapa fácil",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:28Z"
+    },
+    {
+      "id": "twitch-val-0057",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp esse valorant me estressou",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:28.500000Z"
+    },
+    {
+      "id": "twitch-val-0058",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bom jogo galera",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:29Z"
+    },
+    {
+      "id": "twitch-val-0059",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "próximo round vai",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:29.500000Z"
+    },
+    {
+      "id": "twitch-val-0060",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa Kappa esse round foi insano",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:30Z"
+    },
+    {
+      "id": "twitch-val-0061",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp que aim incrível",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:30.500000Z"
+    },
+    {
+      "id": "twitch-val-0062",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp perdeu de novo",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:31Z"
+    },
+    {
+      "id": "twitch-val-0063",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL LUL errou o clutch",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:31.500000Z"
+    },
+    {
+      "id": "twitch-val-0064",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara tem aim hacker",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:32Z"
+    },
+    {
+      "id": "twitch-val-0065",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "valorant é péssimo hoje",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:32.500000Z"
+    },
+    {
+      "id": "twitch-val-0066",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp drop aqui por favor",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:33Z"
+    },
+    {
+      "id": "twitch-val-0067",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "vamos de full rush",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:33.500000Z"
+    },
+    {
+      "id": "twitch-val-0068",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "defuse rápido!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:34Z"
+    },
+    {
+      "id": "twitch-val-0069",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp site tomado B",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:34.500000Z"
+    },
+    {
+      "id": "twitch-val-0070",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "smoke aqui please",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:35Z"
+    },
+    {
+      "id": "twitch-val-0071",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "flash na entrada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:35.500000Z"
+    },
+    {
+      "id": "twitch-val-0072",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa pistol round perdido",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:36Z"
+    },
+    {
+      "id": "twitch-val-0073",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "eco round agora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:36.500000Z"
+    },
+    {
+      "id": "twitch-val-0074",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "ult guardada?",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:37Z"
+    },
+    {
+      "id": "twitch-val-0075",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "LUL onde você tá???",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:37.500000Z"
+    },
+    {
+      "id": "twitch-val-0076",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "primeiro mapa fácil",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:38Z"
+    },
+    {
+      "id": "twitch-val-0077",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse valorant me estressou",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:38.500000Z"
+    },
+    {
+      "id": "twitch-val-0078",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp bom jogo galera",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:39Z"
+    },
+    {
+      "id": "twitch-val-0079",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "próximo round vai",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:39.500000Z"
+    },
+    {
+      "id": "twitch-val-0080",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa esse round foi insano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:40Z"
+    },
+    {
+      "id": "twitch-val-0081",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp PogChamp que aim incrível",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:40.500000Z"
+    },
+    {
+      "id": "twitch-val-0082",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp perdeu de novo",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:41Z"
+    },
+    {
+      "id": "twitch-val-0083",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL errou o clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:41.500000Z"
+    },
+    {
+      "id": "twitch-val-0084",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa esse cara tem aim hacker",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:42Z"
+    },
+    {
+      "id": "twitch-val-0085",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "valorant é péssimo hoje",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:42.500000Z"
+    },
+    {
+      "id": "twitch-val-0086",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "drop aqui por favor",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:43Z"
+    },
+    {
+      "id": "twitch-val-0087",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL vamos de full rush",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:43.500000Z"
+    },
+    {
+      "id": "twitch-val-0088",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "defuse rápido!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:44Z"
+    },
+    {
+      "id": "twitch-val-0089",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "site tomado B",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:44.500000Z"
+    },
+    {
+      "id": "twitch-val-0090",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "cringeChamp smoke aqui please",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:45Z"
+    },
+    {
+      "id": "twitch-val-0091",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "flash na entrada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:45.500000Z"
+    },
+    {
+      "id": "twitch-val-0092",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pistol round perdido",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:46Z"
+    },
+    {
+      "id": "twitch-val-0093",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp eco round agora",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:46.500000Z"
+    },
+    {
+      "id": "twitch-val-0094",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "ult guardada?",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:47Z"
+    },
+    {
+      "id": "twitch-val-0095",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "onde você tá???",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:47.500000Z"
+    },
+    {
+      "id": "twitch-val-0096",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa primeiro mapa fácil",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:48Z"
+    },
+    {
+      "id": "twitch-val-0097",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse valorant me estressou",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:48.500000Z"
+    },
+    {
+      "id": "twitch-val-0098",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bom jogo galera",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:49Z"
+    },
+    {
+      "id": "twitch-val-0099",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL próximo round vai",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:49.500000Z"
+    },
+    {
+      "id": "twitch-val-0100",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa esse round foi insano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:50Z"
+    },
+    {
+      "id": "twitch-val-0101",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp que aim incrível",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:50.500000Z"
+    },
+    {
+      "id": "twitch-val-0102",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp cringeChamp perdeu de novo",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:51Z"
+    },
+    {
+      "id": "twitch-val-0103",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL errou o clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:51.500000Z"
+    },
+    {
+      "id": "twitch-val-0104",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara tem aim hacker",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:52Z"
+    },
+    {
+      "id": "twitch-val-0105",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "PogChamp valorant é péssimo hoje",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:52.500000Z"
+    },
+    {
+      "id": "twitch-val-0106",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "drop aqui por favor",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:53Z"
+    },
+    {
+      "id": "twitch-val-0107",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "vamos de full rush",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:53.500000Z"
+    },
+    {
+      "id": "twitch-val-0108",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa defuse rápido!",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:54Z"
+    },
+    {
+      "id": "twitch-val-0109",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "site tomado B",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:54.500000Z"
+    },
+    {
+      "id": "twitch-val-0110",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "smoke aqui please",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:55Z"
+    },
+    {
+      "id": "twitch-val-0111",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL flash na entrada",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:55.500000Z"
+    },
+    {
+      "id": "twitch-val-0112",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pistol round perdido",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:56Z"
+    },
+    {
+      "id": "twitch-val-0113",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "eco round agora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:56.500000Z"
+    },
+    {
+      "id": "twitch-val-0114",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp ult guardada?",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:57Z"
+    },
+    {
+      "id": "twitch-val-0115",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "onde você tá???",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:57.500000Z"
+    },
+    {
+      "id": "twitch-val-0116",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "primeiro mapa fácil",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:58Z"
+    },
+    {
+      "id": "twitch-val-0117",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp esse valorant me estressou",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:58.500000Z"
+    },
+    {
+      "id": "twitch-val-0118",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bom jogo galera",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:59Z"
+    },
+    {
+      "id": "twitch-val-0119",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "próximo round vai",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:00:59.500000Z"
+    },
+    {
+      "id": "twitch-val-0120",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa Kappa esse round foi insano",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:00Z"
+    },
+    {
+      "id": "twitch-val-0121",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp que aim incrível",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:00.500000Z"
+    },
+    {
+      "id": "twitch-val-0122",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp perdeu de novo",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:01Z"
+    },
+    {
+      "id": "twitch-val-0123",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL LUL errou o clutch",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:01.500000Z"
+    },
+    {
+      "id": "twitch-val-0124",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara tem aim hacker",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:02Z"
+    },
+    {
+      "id": "twitch-val-0125",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "valorant é péssimo hoje",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:02.500000Z"
+    },
+    {
+      "id": "twitch-val-0126",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp drop aqui por favor",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:03Z"
+    },
+    {
+      "id": "twitch-val-0127",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "vamos de full rush",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:03.500000Z"
+    },
+    {
+      "id": "twitch-val-0128",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "defuse rápido!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:04Z"
+    },
+    {
+      "id": "twitch-val-0129",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp site tomado B",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:04.500000Z"
+    },
+    {
+      "id": "twitch-val-0130",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "smoke aqui please",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:05Z"
+    },
+    {
+      "id": "twitch-val-0131",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "flash na entrada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:05.500000Z"
+    },
+    {
+      "id": "twitch-val-0132",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa pistol round perdido",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:06Z"
+    },
+    {
+      "id": "twitch-val-0133",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "eco round agora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:06.500000Z"
+    },
+    {
+      "id": "twitch-val-0134",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "ult guardada?",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:07Z"
+    },
+    {
+      "id": "twitch-val-0135",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "LUL onde você tá???",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:07.500000Z"
+    },
+    {
+      "id": "twitch-val-0136",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "primeiro mapa fácil",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:08Z"
+    },
+    {
+      "id": "twitch-val-0137",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse valorant me estressou",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:08.500000Z"
+    },
+    {
+      "id": "twitch-val-0138",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp bom jogo galera",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:09Z"
+    },
+    {
+      "id": "twitch-val-0139",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "próximo round vai",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:09.500000Z"
+    },
+    {
+      "id": "twitch-val-0140",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa esse round foi insano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:10Z"
+    },
+    {
+      "id": "twitch-val-0141",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp PogChamp que aim incrível",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:10.500000Z"
+    },
+    {
+      "id": "twitch-val-0142",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp perdeu de novo",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:11Z"
+    },
+    {
+      "id": "twitch-val-0143",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL errou o clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:11.500000Z"
+    },
+    {
+      "id": "twitch-val-0144",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa esse cara tem aim hacker",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:12Z"
+    },
+    {
+      "id": "twitch-val-0145",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "valorant é péssimo hoje",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:12.500000Z"
+    },
+    {
+      "id": "twitch-val-0146",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "drop aqui por favor",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:13Z"
+    },
+    {
+      "id": "twitch-val-0147",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL vamos de full rush",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:13.500000Z"
+    },
+    {
+      "id": "twitch-val-0148",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "defuse rápido!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:14Z"
+    },
+    {
+      "id": "twitch-val-0149",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "site tomado B",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:14.500000Z"
+    },
+    {
+      "id": "twitch-val-0150",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "cringeChamp smoke aqui please",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:15Z"
+    },
+    {
+      "id": "twitch-val-0151",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "flash na entrada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:15.500000Z"
+    },
+    {
+      "id": "twitch-val-0152",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pistol round perdido",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:16Z"
+    },
+    {
+      "id": "twitch-val-0153",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp eco round agora",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:16.500000Z"
+    },
+    {
+      "id": "twitch-val-0154",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "ult guardada?",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:17Z"
+    },
+    {
+      "id": "twitch-val-0155",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "onde você tá???",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:17.500000Z"
+    },
+    {
+      "id": "twitch-val-0156",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa primeiro mapa fácil",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:18Z"
+    },
+    {
+      "id": "twitch-val-0157",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse valorant me estressou",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:18.500000Z"
+    },
+    {
+      "id": "twitch-val-0158",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bom jogo galera",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:19Z"
+    },
+    {
+      "id": "twitch-val-0159",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL próximo round vai",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:19.500000Z"
+    },
+    {
+      "id": "twitch-val-0160",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa esse round foi insano",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:20Z"
+    },
+    {
+      "id": "twitch-val-0161",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp que aim incrível",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:20.500000Z"
+    },
+    {
+      "id": "twitch-val-0162",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp cringeChamp perdeu de novo",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:21Z"
+    },
+    {
+      "id": "twitch-val-0163",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL errou o clutch",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:21.500000Z"
+    },
+    {
+      "id": "twitch-val-0164",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara tem aim hacker",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:22Z"
+    },
+    {
+      "id": "twitch-val-0165",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "PogChamp valorant é péssimo hoje",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:22.500000Z"
+    },
+    {
+      "id": "twitch-val-0166",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "drop aqui por favor",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:23Z"
+    },
+    {
+      "id": "twitch-val-0167",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "vamos de full rush",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:23.500000Z"
+    },
+    {
+      "id": "twitch-val-0168",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa defuse rápido!",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:24Z"
+    },
+    {
+      "id": "twitch-val-0169",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "site tomado B",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:24.500000Z"
+    },
+    {
+      "id": "twitch-val-0170",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "smoke aqui please",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:25Z"
+    },
+    {
+      "id": "twitch-val-0171",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL flash na entrada",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:25.500000Z"
+    },
+    {
+      "id": "twitch-val-0172",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "pistol round perdido",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:26Z"
+    },
+    {
+      "id": "twitch-val-0173",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "eco round agora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:26.500000Z"
+    },
+    {
+      "id": "twitch-val-0174",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp ult guardada?",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:27Z"
+    },
+    {
+      "id": "twitch-val-0175",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "onde você tá???",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:27.500000Z"
+    },
+    {
+      "id": "twitch-val-0176",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "primeiro mapa fácil",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:28Z"
+    },
+    {
+      "id": "twitch-val-0177",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp esse valorant me estressou",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:28.500000Z"
+    },
+    {
+      "id": "twitch-val-0178",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "bom jogo galera",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:29Z"
+    },
+    {
+      "id": "twitch-val-0179",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "próximo round vai",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:29.500000Z"
+    },
+    {
+      "id": "twitch-val-0180",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": true,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "Kappa Kappa esse round foi insano",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:30Z"
+    },
+    {
+      "id": "twitch-val-0181",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp que aim incrível",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:30.500000Z"
+    },
+    {
+      "id": "twitch-val-0182",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp perdeu de novo",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:31Z"
+    },
+    {
+      "id": "twitch-val-0183",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "LUL LUL errou o clutch",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:31.500000Z"
+    },
+    {
+      "id": "twitch-val-0184",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse cara tem aim hacker",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:32Z"
+    },
+    {
+      "id": "twitch-val-0185",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "valorant é péssimo hoje",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:32.500000Z"
+    },
+    {
+      "id": "twitch-val-0186",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp drop aqui por favor",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:33Z"
+    },
+    {
+      "id": "twitch-val-0187",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "vamos de full rush",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:33.500000Z"
+    },
+    {
+      "id": "twitch-val-0188",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "defuse rápido!",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:34Z"
+    },
+    {
+      "id": "twitch-val-0189",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "PogChamp site tomado B",
+      "emotes": [
+        {
+          "code": "PogChamp",
+          "start": 0,
+          "end": 7,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:34.500000Z"
+    },
+    {
+      "id": "twitch-val-0190",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1001",
+        "username": "valorantpro99",
+        "displayName": "ValorantPro99",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "smoke aqui please",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:35Z"
+    },
+    {
+      "id": "twitch-val-0191",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1002",
+        "username": "chatspammer",
+        "displayName": "chatSpammer",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "flash na entrada",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:35.500000Z"
+    },
+    {
+      "id": "twitch-val-0192",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1003",
+        "username": "sniperkid",
+        "displayName": "sniperKid",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kappa pistol round perdido",
+      "emotes": [
+        {
+          "code": "Kappa",
+          "start": 0,
+          "end": 4,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:36Z"
+    },
+    {
+      "id": "twitch-val-0193",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1004",
+        "username": "prohelpers",
+        "displayName": "proHelpers",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "eco round agora",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:36.500000Z"
+    },
+    {
+      "id": "twitch-val-0194",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1005",
+        "username": "brpride",
+        "displayName": "brPride",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "ult guardada?",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:37Z"
+    },
+    {
+      "id": "twitch-val-0195",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1006",
+        "username": "streamnerd",
+        "displayName": "streamNerd",
+        "isSubscriber": true,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": [
+          "subscriber/6"
+        ]
+      },
+      "text": "LUL onde você tá???",
+      "emotes": [
+        {
+          "code": "LUL",
+          "start": 0,
+          "end": 2,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:37.500000Z"
+    },
+    {
+      "id": "twitch-val-0196",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1007",
+        "username": "pogmaster",
+        "displayName": "PogMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "primeiro mapa fácil",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:38Z"
+    },
+    {
+      "id": "twitch-val-0197",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1008",
+        "username": "lurker99",
+        "displayName": "lurker99",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "esse valorant me estressou",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:38.500000Z"
+    },
+    {
+      "id": "twitch-val-0198",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1009",
+        "username": "duelmaster",
+        "displayName": "duelMaster",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "cringeChamp bom jogo galera",
+      "emotes": [
+        {
+          "code": "cringeChamp",
+          "start": 0,
+          "end": 10,
+          "provider": "twitch"
+        }
+      ],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:39Z"
+    },
+    {
+      "id": "twitch-val-0199",
+      "platform": "twitch",
+      "channelExternalId": "valorant_br",
+      "channelName": "valorant_br",
+      "user": {
+        "externalId": "u1010",
+        "username": "hypebot",
+        "displayName": "hypeBot",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "próximo round vai",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T21:01:39.500000Z"
+    }
+  ]
+}

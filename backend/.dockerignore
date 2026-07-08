@@ -1,0 +1,14 @@
+# Mantém o build context enxuto e sem segredos.
+.env
+.env.*
+!.env.example
+node_modules
+**/node_modules
+**/dist
+.pnpm-store
+.git
+# Estado incremental do tsc: se um *.tsbuildinfo entrar no contexto mas o dist
+# correspondente (acima) não, o tsc julga "up to date" e NÃO emite — libs/domain
+# fica sem dist e libs/infra falha com TS2307 @sehloro/domain. Excluir todos.
+tsconfig.tsbuildinfo
+**/*.tsbuildinfo

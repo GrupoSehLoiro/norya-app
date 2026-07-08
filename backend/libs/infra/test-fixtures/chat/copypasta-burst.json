@@ -1,0 +1,1005 @@
+{
+  "viewerCount": 800,
+  "messages": [
+    {
+      "id": "pasta-0000",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer0",
+        "username": "spammer0",
+        "displayName": "Spammer0",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:00Z"
+    },
+    {
+      "id": "pasta-0001",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer1",
+        "username": "spammer1",
+        "displayName": "Spammer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:00.200000Z"
+    },
+    {
+      "id": "pasta-0002",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer2",
+        "username": "spammer2",
+        "displayName": "Spammer2",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:00.400000Z"
+    },
+    {
+      "id": "pasta-0003",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer3",
+        "username": "spammer3",
+        "displayName": "Spammer3",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:00.600000Z"
+    },
+    {
+      "id": "pasta-0004",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer4",
+        "username": "spammer4",
+        "displayName": "Spammer4",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:00.800000Z"
+    },
+    {
+      "id": "pasta-0005",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer5",
+        "username": "spammer5",
+        "displayName": "Spammer5",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:01Z"
+    },
+    {
+      "id": "pasta-0006",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer6",
+        "username": "spammer6",
+        "displayName": "Spammer6",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:01.200000Z"
+    },
+    {
+      "id": "pasta-0007",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer7",
+        "username": "spammer7",
+        "displayName": "Spammer7",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:01.400000Z"
+    },
+    {
+      "id": "pasta-0008",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer8",
+        "username": "spammer8",
+        "displayName": "Spammer8",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:01.600000Z"
+    },
+    {
+      "id": "pasta-0009",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer9",
+        "username": "spammer9",
+        "displayName": "Spammer9",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:01.800000Z"
+    },
+    {
+      "id": "pasta-0010",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer0",
+        "username": "spammer0",
+        "displayName": "Spammer0",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:02Z"
+    },
+    {
+      "id": "pasta-0011",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer1",
+        "username": "spammer1",
+        "displayName": "Spammer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:02.200000Z"
+    },
+    {
+      "id": "pasta-0012",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer2",
+        "username": "spammer2",
+        "displayName": "Spammer2",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:02.400000Z"
+    },
+    {
+      "id": "pasta-0013",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer3",
+        "username": "spammer3",
+        "displayName": "Spammer3",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:02.600000Z"
+    },
+    {
+      "id": "pasta-0014",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer4",
+        "username": "spammer4",
+        "displayName": "Spammer4",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:02.800000Z"
+    },
+    {
+      "id": "pasta-0015",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer5",
+        "username": "spammer5",
+        "displayName": "Spammer5",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:03Z"
+    },
+    {
+      "id": "pasta-0016",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer6",
+        "username": "spammer6",
+        "displayName": "Spammer6",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:03.200000Z"
+    },
+    {
+      "id": "pasta-0017",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer7",
+        "username": "spammer7",
+        "displayName": "Spammer7",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:03.400000Z"
+    },
+    {
+      "id": "pasta-0018",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer8",
+        "username": "spammer8",
+        "displayName": "Spammer8",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:03.600000Z"
+    },
+    {
+      "id": "pasta-0019",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer9",
+        "username": "spammer9",
+        "displayName": "Spammer9",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:03.800000Z"
+    },
+    {
+      "id": "pasta-0020",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer0",
+        "username": "spammer0",
+        "displayName": "Spammer0",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:04Z"
+    },
+    {
+      "id": "pasta-0021",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer1",
+        "username": "spammer1",
+        "displayName": "Spammer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:04.200000Z"
+    },
+    {
+      "id": "pasta-0022",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer2",
+        "username": "spammer2",
+        "displayName": "Spammer2",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:04.400000Z"
+    },
+    {
+      "id": "pasta-0023",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer3",
+        "username": "spammer3",
+        "displayName": "Spammer3",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:04.600000Z"
+    },
+    {
+      "id": "pasta-0024",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer4",
+        "username": "spammer4",
+        "displayName": "Spammer4",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:04.800000Z"
+    },
+    {
+      "id": "pasta-0025",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer5",
+        "username": "spammer5",
+        "displayName": "Spammer5",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:05Z"
+    },
+    {
+      "id": "pasta-0026",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer6",
+        "username": "spammer6",
+        "displayName": "Spammer6",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:05.200000Z"
+    },
+    {
+      "id": "pasta-0027",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer7",
+        "username": "spammer7",
+        "displayName": "Spammer7",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:05.400000Z"
+    },
+    {
+      "id": "pasta-0028",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer8",
+        "username": "spammer8",
+        "displayName": "Spammer8",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:05.600000Z"
+    },
+    {
+      "id": "pasta-0029",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer9",
+        "username": "spammer9",
+        "displayName": "Spammer9",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:05.800000Z"
+    },
+    {
+      "id": "pasta-0030",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer0",
+        "username": "spammer0",
+        "displayName": "Spammer0",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:06Z"
+    },
+    {
+      "id": "pasta-0031",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer1",
+        "username": "spammer1",
+        "displayName": "Spammer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:06.200000Z"
+    },
+    {
+      "id": "pasta-0032",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer2",
+        "username": "spammer2",
+        "displayName": "Spammer2",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:06.400000Z"
+    },
+    {
+      "id": "pasta-0033",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer3",
+        "username": "spammer3",
+        "displayName": "Spammer3",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:06.600000Z"
+    },
+    {
+      "id": "pasta-0034",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer4",
+        "username": "spammer4",
+        "displayName": "Spammer4",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:06.800000Z"
+    },
+    {
+      "id": "pasta-0035",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer5",
+        "username": "spammer5",
+        "displayName": "Spammer5",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:07Z"
+    },
+    {
+      "id": "pasta-0036",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer6",
+        "username": "spammer6",
+        "displayName": "Spammer6",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:07.200000Z"
+    },
+    {
+      "id": "pasta-0037",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer7",
+        "username": "spammer7",
+        "displayName": "Spammer7",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:07.400000Z"
+    },
+    {
+      "id": "pasta-0038",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer8",
+        "username": "spammer8",
+        "displayName": "Spammer8",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:07.600000Z"
+    },
+    {
+      "id": "pasta-0039",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer9",
+        "username": "spammer9",
+        "displayName": "Spammer9",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:07.800000Z"
+    },
+    {
+      "id": "pasta-0040",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer0",
+        "username": "spammer0",
+        "displayName": "Spammer0",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:08Z"
+    },
+    {
+      "id": "pasta-0041",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer1",
+        "username": "spammer1",
+        "displayName": "Spammer1",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:08.200000Z"
+    },
+    {
+      "id": "pasta-0042",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer2",
+        "username": "spammer2",
+        "displayName": "Spammer2",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:08.400000Z"
+    },
+    {
+      "id": "pasta-0043",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer3",
+        "username": "spammer3",
+        "displayName": "Spammer3",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:08.600000Z"
+    },
+    {
+      "id": "pasta-0044",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer4",
+        "username": "spammer4",
+        "displayName": "Spammer4",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:08.800000Z"
+    },
+    {
+      "id": "pasta-0045",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer5",
+        "username": "spammer5",
+        "displayName": "Spammer5",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:09Z"
+    },
+    {
+      "id": "pasta-0046",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer6",
+        "username": "spammer6",
+        "displayName": "Spammer6",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:09.200000Z"
+    },
+    {
+      "id": "pasta-0047",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer7",
+        "username": "spammer7",
+        "displayName": "Spammer7",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:09.400000Z"
+    },
+    {
+      "id": "pasta-0048",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer8",
+        "username": "spammer8",
+        "displayName": "Spammer8",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:09.600000Z"
+    },
+    {
+      "id": "pasta-0049",
+      "platform": "twitch",
+      "channelExternalId": "testchannel",
+      "channelName": "testchannel",
+      "user": {
+        "externalId": "spammer9",
+        "username": "spammer9",
+        "displayName": "Spammer9",
+        "isSubscriber": false,
+        "isMod": false,
+        "isBroadcaster": false,
+        "badges": []
+      },
+      "text": "Kreygasm THIS STREAM IS AMAZING Kreygasm 5Head just like that Kreygasm",
+      "emotes": [],
+      "mentions": [],
+      "rawPayload": null,
+      "receivedAt": "2026-05-01T23:00:09.800000Z"
+    }
+  ]
+}
