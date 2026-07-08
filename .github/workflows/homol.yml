@@ -7,14 +7,13 @@
 #   - push        -> homol  : roda testes + builda/push imagens + deploy na VPS.
 #     (push na homol acontece quando o PR é MERGEADO.)
 #
-# Segredos necessários (Settings > Secrets and variables > Actions):
+# Vars necessários (Settings > Secrets and variables > Actions):
 #   DROPLET_HOST      IP/host da droplet
 #   DROPLET_USER      usuário SSH (ex.: root ou deploy)
 #   DROPLET_SSH_KEY   chave PRIVADA SSH (conteúdo do id_ed25519)
 #   DROPLET_APP_DIR   caminho do repo na droplet (ex.: /root/norya-app) [opcional]
 #   MAIL_USER         usuário SMTP (ex.: seu Gmail)
 #   MAIL_PASS         senha de app SMTP (Gmail App Password, 16 chars)
-# =============================================================================
 name: homol-ci-cd
 
 on:
