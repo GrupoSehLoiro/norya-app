@@ -1,0 +1,29 @@
+# Borda da homolog SEHLORO — TLS automático (Let's Encrypt) + split de rotas.
+#
+#   /api/*  -> nest-api:3000   (inclui SSE em /api/v2/social-listening/stream/*
+#                               e callbacks OAuth /api/v2/auth/{twitch,kick}/callback)
+#   /       -> console:3000    (Next.js)
+#
+# DOMAIN e ACME_EMAIL vêm do environment do container (ver docker-compose.yml).
+#
+# SSE: flush_interval -1 desliga buffering na resposta — equivalente ao
+# proxy_buffering off do nginx de dev. Não aplicar `encode` no ramo da API
+# (compressão atrasaria eventos SSE).
+
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	@api path /api/*
+	handle @api {
+		reverse_proxy nest-api:3000 {
+			flush_interval -1
+		}
+	}
+
+	handle {
+		encode gzip
+		reverse_proxy console:3000
+	}
+}

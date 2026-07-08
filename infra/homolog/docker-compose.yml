@@ -1,0 +1,297 @@
+# =============================================================================
+# Stack de HOMOLOGAÇÃO — SEHLORO / SLMOD — DigitalOcean (1 Droplet).
+#
+# Diferenças em relação ao infra/docker-compose.yml (dev local):
+#   - SEM SLMOD-api (Express legado) e SEM SLMOD-platform (SPA Vite):
+#     homolog valida o núcleo novo (nest-api + worker + console).
+#   - SEM seed automático (dados sintéticos poluiriam a validação M4/M5).
+#     Rodar sob demanda: docker compose --profile seed up seed
+#   - Caddy na borda (80/443) com TLS automático via Let's Encrypt, no lugar
+#     do nginx sem TLS. Roteia /api/* -> nest-api e / -> console.
+#   - NENHUMA porta de banco publicada na interface pública: Mongo e
+#     ClickHouse só em 127.0.0.1 (inspeção via túnel SSH), Redis só na rede
+#     interna (usar `docker exec sehloro-redis redis-cli`).
+#   - NODE_ENV=production; sem defaults de segredo — tudo vem do .env
+#     (variáveis sem default aqui FALHAM o boot se ausentes; intencional).
+#
+# Uso (na droplet, a partir de ~/sh/infra/homolog):
+#   cp .env.example .env   # e preencher — ver docs/technical/homolog-digitalocean.md
+#   docker compose build
+#   docker compose up -d
+# =============================================================================
+
+name: sehloro-homolog
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: sehloro-mongo
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 64000
+        hard: 64000
+    # Só loopback — inspeção via túnel: ssh -L 27017:localhost:27017 <droplet>
+    ports:
+      - "127.0.0.1:27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: sehloirostudios
+    volumes:
+      - mongo_data:/data/db
+    networks: [sehloro-net]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: sehloro-redis
+    restart: unless-stopped
+    # AOF para durabilidade (buffers de chat / sliding windows sobrevivem a
+    # restart) + LRU para o uso como cache.
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - "512mb"
+      - --maxmemory-policy
+      - allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks: [sehloro-net]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3
+    container_name: sehloro-clickhouse
+    restart: unless-stopped
+    # Só loopback — inspeção via túnel: ssh -L 8123:localhost:8123 <droplet>
+    ports:
+      - "127.0.0.1:8123:8123"
+    environment:
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-sehloro}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      # Reusa o override de dev (limita memória, baixa log level) — adequado
+      # para droplet de 8 GB dividida com Mongo + apps.
+      - ../clickhouse/config.d:/etc/clickhouse-server/config.d:ro
+    networks: [sehloro-net]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # One-shot: aplica infra/clickhouse/migrations/*.sql (mesmo runner de dev).
+  clickhouse-migrate:
+    image: node:20-alpine
+    container_name: sehloro-clickhouse-migrate
+    working_dir: /app
+    volumes:
+      - ../../backend/scripts:/app/scripts:ro
+      - ../clickhouse/migrations:/migrations:ro
+    environment:
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-sehloro}
+      MIGRATIONS_DIR: /migrations
+    command:
+      - sh
+      - -c
+      - >
+        mkdir -p /tmp/ch-migrate &&
+        cp /app/scripts/migrate-clickhouse.ts /tmp/ch-migrate/migrate-clickhouse.ts &&
+        cd /tmp/ch-migrate &&
+        npm install --silent --no-save --no-package-lock
+        tsx@4.20.5 @clickhouse/client@1.10.0 &&
+        ./node_modules/.bin/tsx migrate-clickhouse.ts
+    networks: [sehloro-net]
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    restart: "no"
+
+  nest-api:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    image: sehloro-backend:homolog
+    container_name: sehloro-nest-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      API_PORT: "3000"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/sehloirostudios?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      CRYPTO_MASTER_KEY: ${CRYPTO_MASTER_KEY}
+      REDIS_URL: redis://redis:6379
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-sehloro}
+      # IA Core — começar com mock; flipar para real quando validar tier-2.
+      LLM_DRIVER: ${LLM_DRIVER:-mock}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      LLM_MODEL_TIER2: ${LLM_MODEL_TIER2:-claude-haiku-4-5-20251001}
+      SOCIAL_LISTENING_CHANNELS: ${SOCIAL_LISTENING_CHANNELS:-}
+      SOCIAL_LISTENING_TICK_MS: ${SOCIAL_LISTENING_TICK_MS:-15000}
+      SOCIAL_LISTENING_WINDOW_MS: ${SOCIAL_LISTENING_WINDOW_MS:-15000}
+      TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID:-}
+      TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET:-}
+      TWITCH_BOT_USER_ID: ${TWITCH_BOT_USER_ID:-}
+      TWITCH_WEBHOOK_SECRET: ${TWITCH_WEBHOOK_SECRET:-}
+      KICK_CLIENT_ID: ${KICK_CLIENT_ID:-}
+      KICK_CLIENT_SECRET: ${KICK_CLIENT_SECRET:-}
+      # Base pública — usada nos redirect_uri de OAuth (Twitch/Kick) e links.
+      PUBLIC_API_URL: https://${DOMAIN}
+      CONSOLE_URL: https://${DOMAIN}
+      CORS_ORIGIN: https://${DOMAIN}
+      # Verificação de e-mail do signup: log = código aparece no log do
+      # container (suficiente p/ homolog); resend = e-mail real.
+      EMAIL_DRIVER: ${EMAIL_DRIVER:-log}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      # Access logs (console /logs + GET /api/v2/logs) — Basic Auth do .env.
+      LOGS_USER: ${LOGS_USER:-}
+      LOGS_PASSWORD: ${LOGS_PASSWORD:-}
+      # Bootstrap do primeiro admin (gestão de acesso) — idempotente.
+      INITIAL_ADMIN_EMAIL: ${INITIAL_ADMIN_EMAIL:-}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:-}
+    expose:
+      - "3000"
+    networks: [sehloro-net]
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clickhouse-migrate:
+        condition: service_completed_successfully
+
+  # Worker — shard EventSub via WebSocket (conexão OUTBOUND com a Twitch; não
+  # precisa de porta pública), bridge -> ChatBuffer/EventBus. Mesma imagem do
+  # nest-api com entrypoint do worker.
+  worker:
+    image: sehloro-backend:homolog
+    container_name: sehloro-worker
+    restart: unless-stopped
+    command: ["node", "apps/worker/dist/main.js"]
+    # O worker NÃO é HTTP (só shard EventSub + bridge). O HEALTHCHECK herdado da
+    # imagem bate em /api/identity/ping:3000 → sempre falharia ("unhealthy"
+    # enganoso e sem consumidor). Desabilita para o status refletir a realidade.
+    healthcheck:
+      disable: true
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/sehloirostudios?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      CRYPTO_MASTER_KEY: ${CRYPTO_MASTER_KEY}
+      REDIS_URL: redis://redis:6379
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-sehloro}
+      TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID:-}
+      TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET:-}
+      TWITCH_BOT_USER_ID: ${TWITCH_BOT_USER_ID:-}
+      TWITCH_WEBHOOK_SECRET: ${TWITCH_WEBHOOK_SECRET:-}
+      KICK_CLIENT_ID: ${KICK_CLIENT_ID:-}
+      KICK_CLIENT_SECRET: ${KICK_CLIENT_SECRET:-}
+    networks: [sehloro-net]
+    depends_on:
+      nest-api:
+        condition: service_started
+
+  # Console Next.js. O navegador só fala com https://${DOMAIN}: o Caddy manda
+  # /api/* direto ao nest-api (o rewrite do next.config.js vale apenas para
+  # chamadas server-side, que usam SEHLORO_API_URL interno). NEXT_PUBLIC_API_URL
+  # fica VAZIO no build => hooks SSE usam URL relativa (same-origin).
+  console:
+    build:
+      context: ../../sehloro-console
+      dockerfile: Dockerfile
+    image: sehloro-console:homolog
+    container_name: sehloro-console
+    restart: unless-stopped
+    environment:
+      SEHLORO_API_URL: http://nest-api:3000
+    expose:
+      - "3000"
+    networks: [sehloro-net]
+    depends_on:
+      nest-api:
+        condition: service_started
+
+  # Borda: TLS automático (Let's Encrypt) + roteamento /api/* vs /.
+  caddy:
+    image: caddy:2-alpine
+    container_name: sehloro-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [sehloro-net]
+    depends_on:
+      console:
+        condition: service_started
+      nest-api:
+        condition: service_started
+
+  # Opcional (profile `seed`): dados sintéticos de demo (3 usuários, 5 canais,
+  # 500 msgs). NÃO roda por padrão em homolog.
+  #   docker compose --profile seed up seed
+  seed:
+    build:
+      context: ../seeds
+      dockerfile: Dockerfile
+    container_name: sehloro-seed
+    profiles: [seed]
+    environment:
+      MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/sehloirostudios?authSource=admin
+    networks: [sehloro-net]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  mongo_data:
+  redis_data:
+  clickhouse_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  sehloro-net:
+    name: sehloro-homolog-net
+    driver: bridge

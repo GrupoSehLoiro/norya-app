@@ -1,0 +1,63 @@
+# =============================================================================
+# Overlay LOCAL — roda a MESMA stack da VPS na sua máquina, um comando só.
+# NÃO faz parte do deploy: só é lido quando você passa -f explicitamente.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+#
+# Ajustes vs. VPS (todo o resto é idêntico — mesmos serviços, mesma imagem):
+#
+#  1) container_name REMOVIDO (!reset): o compose da VPS fixa nomes globais
+#     (`sehloro-mongo`, etc.) que colidem com QUALQUER outra stack nesta máquina
+#     (a de dev em SOFTWARE/infra, ou runs antigas do mirror). Com !reset, o
+#     Compose nomeia por projeto -> `sehloro-homolog-<serviço>-1`, único e à
+#     prova de colisão. Continua self-contained: cada stack sobe o próprio
+#     Mongo/Redis/CH. Na VPS (sem overlay) os nomes originais permanecem.
+#     Para um shell num serviço:  docker compose exec nest-api sh   (usa o NOME
+#     DO SERVIÇO, não o do container — funciona independente do nome gerado).
+#
+#  2) ClickHouse não publica 8123 no host (porta ocupada por outra stack). O
+#     acesso interno segue por `clickhouse:8123` (nest-api/worker/migrate não
+#     mudam). Inspeção do host:
+#       docker compose -f docker-compose.yml -f docker-compose.local.yml exec \
+#         clickhouse clickhouse-client --password "$CLICKHOUSE_PASSWORD" -q "SHOW TABLES FROM sehloro"
+#
+#  3) Reconciler DESLIGADO (espelha SOFTWARE/backend/.env): senão o nest-api
+#     forka 1 worker por canal ativo e todos disputam o shard 0 do EventSub
+#     junto do container `worker` dedicado (storm de reassign + leak de RAM).
+#
+# A borda (Caddy) sobe em 80/443 como na VPS; com DOMAIN=localhost no .env o
+# Caddy emite um certificado interno (sem Let's Encrypt) — o browser mostra um
+# aviso de cert, que é esperado. Ou acesse por http://localhost.
+#
+# Requer Docker Compose >= 2.24 (tags !reset / !override). Confirmado: v5.1.1.
+# =============================================================================
+services:
+  mongo:
+    container_name: !reset null
+
+  redis:
+    container_name: !reset null
+
+  clickhouse:
+    container_name: !reset null
+    ports: !override []
+
+  clickhouse-migrate:
+    container_name: !reset null
+
+  nest-api:
+    container_name: !reset null
+    environment:
+      RECONCILER_ENABLED: "false"
+
+  worker:
+    container_name: !reset null
+
+  console:
+    container_name: !reset null
+
+  caddy:
+    container_name: !reset null
+
+  seed:
+    container_name: !reset null

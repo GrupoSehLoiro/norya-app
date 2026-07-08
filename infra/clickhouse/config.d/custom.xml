@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+  Overrides do ClickHouse para o ambiente SEHLORO/SLMOD.
+  Os defaults da imagem cobrem produção pequena; aqui só limitamos memória
+  para evitar OOM em dev (VPS / laptop) e baixamos verbosidade de log.
+-->
+<clickhouse>
+  <!--
+    Override do default da imagem (que escuta só em 127.0.0.1 / ::1) para
+    que outros containers do compose acessem em http://clickhouse:8123.
+    Usamos 0.0.0.0 explícito (IPv4) porque o host de dev tem IPv6
+    desabilitado no kernel. `listen_try=1` é defensivo.
+  -->
+  <listen_host>0.0.0.0</listen_host>
+  <listen_try>1</listen_try>
+
+  <logger>
+    <level>warning</level>
+  </logger>
+
+  <!--
+    Default profile aplicado a TODOS os users (inclusive default e o
+    sehloro_app criado via env CLICKHOUSE_USER). 2 GB cobre janelas de
+    agregação do MVP com folga.
+  -->
+  <profiles>
+    <default>
+      <max_memory_usage>2000000000</max_memory_usage>
+      <max_threads>4</max_threads>
+      <load_balancing>random</load_balancing>
+    </default>
+  </profiles>
+</clickhouse>
