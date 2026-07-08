@@ -135,7 +135,10 @@ services:
     build:
       context: ../../backend
       dockerfile: Dockerfile
-    image: sehloro-backend:homolog
+    # Opção B (CI/CD): a imagem é buildada no GitHub Actions e enviada ao GHCR;
+    # na droplet o deploy faz `docker compose pull` (não builda). O bloco
+    # `build:` acima segue válido para build local. Override via BACKEND_IMAGE.
+    image: ${BACKEND_IMAGE:-ghcr.io/gruposehloiro/norya-backend:homolog}
     container_name: sehloro-nest-api
     restart: unless-stopped
     environment:
@@ -193,7 +196,7 @@ services:
   # precisa de porta pública), bridge -> ChatBuffer/EventBus. Mesma imagem do
   # nest-api com entrypoint do worker.
   worker:
-    image: sehloro-backend:homolog
+    image: ${BACKEND_IMAGE:-ghcr.io/gruposehloiro/norya-backend:homolog}
     container_name: sehloro-worker
     restart: unless-stopped
     command: ["node", "apps/worker/dist/main.js"]
@@ -230,9 +233,9 @@ services:
   # fica VAZIO no build => hooks SSE usam URL relativa (same-origin).
   console:
     build:
-      context: ../../sehloro-console
+      context: ../../norya-front
       dockerfile: Dockerfile
-    image: sehloro-console:homolog
+    image: ${CONSOLE_IMAGE:-ghcr.io/gruposehloiro/norya-console:homolog}
     container_name: sehloro-console
     restart: unless-stopped
     environment:
