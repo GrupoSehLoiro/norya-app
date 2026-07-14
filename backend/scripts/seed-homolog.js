@@ -358,88 +358,111 @@ async function main() {
   const db = mongoose.connection.db;
   const passwordHash = bcrypt.hashSync(PASSWORD, 10);
 
-  // ---- Contas (users + workspaces + memberships + channels) --------------
+  // ---- Limpa QUALQUER conta pré-existente com esses e-mails/slugs (ex.: um
+  //      signup antigo criou workspace com o mesmo slug e outro _id) pra
+  //      evitar colisão de índice único e garantir idempotência total. -------
+  const emails = ACCOUNTS.map((a) => a.email);
+  const slugs = ACCOUNTS.map((a) => a.local);
+  const userIds = ACCOUNTS.map((a) => a.userId);
+  const wsIds = ACCOUNTS.map((a) => a.workspaceId);
+
+  const existingUsers = await db
+    .collection('users')
+    .find({ $or: [{ email: { $in: emails } }, { _id: { $in: userIds } }] })
+    .project({ _id: 1 })
+    .toArray();
+  const existingUserIds = existingUsers.map((u) => u._id);
+
+  const existingWs = await db
+    .collection('workspaces')
+    .find({
+      $or: [
+        { ownerUserId: { $in: existingUserIds } },
+        { slug: { $in: slugs } },
+        { _id: { $in: wsIds } },
+      ],
+    })
+    .project({ _id: 1 })
+    .toArray();
+  const existingWsIds = existingWs.map((w) => w._id);
+
+  await db.collection('memberships').deleteMany({
+    $or: [
+      { userId: { $in: existingUserIds } },
+      { workspaceId: { $in: [...wsIds, ...existingWsIds] } },
+    ],
+  });
+  await db.collection('workspaces').deleteMany({ _id: { $in: [...wsIds, ...existingWsIds] } });
+  await db.collection('users').deleteMany({
+    $or: [{ email: { $in: emails } }, { _id: { $in: userIds } }],
+  });
+  await db.collection('channels').deleteMany({
+    $or: [{ _id: { $in: CH_IDS } }, { ownerId: { $in: existingUserIds } }],
+  });
+
+  // ---- Cria as contas fresh (user + workspace + membership + canal) -------
+  const userDocs = [];
+  const wsDocs = [];
+  const memDocs = [];
+  const chanDocs = [];
   for (const a of ACCOUNTS) {
-    await db.collection('users').updateOne(
-      { _id: a.userId },
-      {
-        $set: {
-          _id: a.userId,
-          username: a.email,
-          email: a.email,
-          password: passwordHash,
-          role: 'admin',
-          status: 'active',
-          emailVerifiedAt: now,
-          onboardingCompletedAt: now,
-          displayName: a.display,
-          avatarUrl: null,
-          locale: 'pt-BR',
-        },
-      },
-      { upsert: true },
-    );
-
-    await db.collection('workspaces').updateOne(
-      { _id: a.workspaceId },
-      {
-        $set: {
-          _id: a.workspaceId,
-          name: a.display,
-          slug: a.local,
-          type: 'creator',
-          ownerUserId: a.userId,
-          planKey: 'free',
-          subscriptionStatus: 'active',
-          subscriptionStartedAt: now,
-          document: null,
-          documentType: null,
-          createdAt: now,
-        },
-      },
-      { upsert: true },
-    );
-
-    await db.collection('memberships').updateOne(
-      { workspaceId: a.workspaceId, userId: a.userId },
-      {
-        $set: {
-          _id: a.membershipId,
-          workspaceId: a.workspaceId,
-          userId: a.userId,
-          role: 'owner',
-          status: 'active',
-          invitedEmail: null,
-          createdAt: now,
-        },
-      },
-      { upsert: true },
-    );
-
-    await db.collection('channels').updateOne(
-      { _id: a.channelId },
-      {
-        $set: {
-          _id: a.channelId,
-          channel: a.channelName,
-          channelWithPrefix: `#${a.channelName}`,
-          created_at: now,
-          active: true,
-          platform: 'twitch',
-          externalId: a.externalId,
-          displayName: a.display,
-          ownerId: a.userId,
-          creatorId: null,
-          workspaceId: a.workspaceId,
-          flags: {},
-          metadata: {},
-          updatedAt: now,
-        },
-      },
-      { upsert: true },
-    );
+    userDocs.push({
+      _id: a.userId,
+      username: a.email,
+      email: a.email,
+      password: passwordHash,
+      role: 'admin',
+      status: 'active',
+      emailVerifiedAt: now,
+      onboardingCompletedAt: now,
+      displayName: a.display,
+      avatarUrl: null,
+      locale: 'pt-BR',
+    });
+    wsDocs.push({
+      _id: a.workspaceId,
+      name: a.display,
+      slug: a.local,
+      type: 'creator',
+      ownerUserId: a.userId,
+      planKey: 'free',
+      subscriptionStatus: 'active',
+      subscriptionStartedAt: now,
+      document: null,
+      documentType: null,
+      createdAt: now,
+    });
+    memDocs.push({
+      _id: a.membershipId,
+      workspaceId: a.workspaceId,
+      userId: a.userId,
+      role: 'owner',
+      status: 'active',
+      invitedEmail: null,
+      createdAt: now,
+    });
+    chanDocs.push({
+      _id: a.channelId,
+      channel: a.channelName,
+      channelWithPrefix: `#${a.channelName}`,
+      created_at: now,
+      active: true,
+      platform: 'twitch',
+      externalId: a.externalId,
+      displayName: a.display,
+      ownerId: a.userId,
+      creatorId: null,
+      workspaceId: a.workspaceId,
+      flags: {},
+      metadata: {},
+      updatedAt: now,
+    });
   }
-  console.log(`[seed] contas/canais: ${ACCOUNTS.length} upsertados`);
+  await db.collection('users').insertMany(userDocs);
+  await db.collection('workspaces').insertMany(wsDocs);
+  await db.collection('memberships').insertMany(memDocs);
+  await db.collection('channels').insertMany(chanDocs);
+  console.log(`[seed] contas/canais: ${ACCOUNTS.length} criados (limpeza de ${existingUserIds.length} conta(s) antiga(s))`);
 
   // ---- Mongo: limpa dados-demo antigos dos canais e reinsere -------------
   const mongoData = {
