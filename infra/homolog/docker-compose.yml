@@ -175,6 +175,14 @@ services:
       EMAIL_DRIVER: ${EMAIL_DRIVER:-log}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       MAIL_FROM: ${MAIL_FROM:-}
+      # SMTP (EMAIL_DRIVER=smtp) — ex.: Resend via SMTP (smtp.resend.com,
+      # user=resend, pass=RESEND_API_KEY) ou Gmail. Sem estas linhas as vars
+      # do .env não chegam no container e o sender cai no default localhost:1025.
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_SECURE: ${SMTP_SECURE:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
       # Access logs (console /logs + GET /api/v2/logs) — Basic Auth do .env.
       LOGS_USER: ${LOGS_USER:-}
       LOGS_PASSWORD: ${LOGS_PASSWORD:-}
