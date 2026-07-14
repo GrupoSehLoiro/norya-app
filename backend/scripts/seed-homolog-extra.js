@@ -336,6 +336,16 @@ function buildAdSegmentsMongo(account) {
 // ---------------------------------------------------------------------------
 async function main() {
   console.log('[seed-extra] senha das contas:', PASSWORD);
+
+  // Preflight: falha cedo e claro se ClickHouse não responder.
+  console.log('[seed-extra] testando ClickHouse em', CH_URL, '...');
+  try {
+    await chQuery('SELECT 1');
+    console.log('[seed-extra] ClickHouse OK.');
+  } catch (e) {
+    throw new Error(`ClickHouse inacessível (${CH_URL}): ${e.message}`);
+  }
+
   console.log('[seed-extra] conectando ao Mongo...');
   await mongoose.connect(MONGODB_URI);
   const db = mongoose.connection.db;
@@ -486,6 +496,16 @@ async function main() {
   console.log(`[seed-extra] clickhouse chat_messages: ${chatRows.length} inseridos`);
   await chInsert('ad_segments', adRows);
   console.log(`[seed-extra] clickhouse ad_segments: ${adRows.length} inseridos`);
+
+  // Verificação: relê o que ficou gravado (prova que funcionou).
+  const usersOk = await db.collection('users').countDocuments({ email: { $in: emails } });
+  const chansOk = await db.collection('channels').countDocuments({ _id: { $in: CH_IDS } });
+  const chCount = (await chQuery(
+    `SELECT count() FROM ${CH_DB}.batch_analysis WHERE channel_id IN (${idList})`,
+  )).trim();
+  console.log(
+    `[seed-extra] verificação: users=${usersOk}/${ACCOUNTS.length} channels=${chansOk}/${ACCOUNTS.length} batch_analysis=${chCount}`,
+  );
 
   await mongoose.disconnect();
   console.log('\n[seed-extra] CONCLUÍDO. Contas (senha "%s"):', PASSWORD);
