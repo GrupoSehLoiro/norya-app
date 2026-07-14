@@ -16,8 +16,10 @@ build/
 # Scratch
 r.txt
 
-# Logs
+# Logs (runtime). ATENÇÃO: `logs/` casa também com o código-fonte
+# apps/api/src/logs/ (LogsModule) — exceção explícita abaixo pra versioná-lo.
 logs/
+!apps/api/src/logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
