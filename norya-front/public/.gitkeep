@@ -1,0 +1,2 @@
+# Mantém o diretório public/ versionado (Next serve estáticos daqui;
+# o Dockerfile do console faz COPY /app/public). Git não versiona dir vazio.
