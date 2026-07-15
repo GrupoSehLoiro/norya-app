@@ -99,6 +99,9 @@ export class TwitchEventSubBridge {
         path: `/eventsub/${type}`,
         statusCode: 200,
         userAgent: `broadcaster=${String(ev['broadcaster_user_login'] ?? ev['broadcaster_user_id'] ?? '?')}`,
+        // O payload do evento é o "request" aqui — é o que se quer inspecionar
+        // na página /logs (sanitizado/truncado pelo AccessLogService).
+        requestBody: payload.event,
       });
     }
 
@@ -135,6 +138,7 @@ export class TwitchEventSubBridge {
       path: `/eventsub/revocation/${sub.type ?? 'unknown'}`,
       statusCode: 410,
       userAgent: `status=${sub.status ?? 'unknown'}`,
+      requestBody: payload.subscription,
     });
     await this.subscriptions.markRevoked(sub.id, sub.status ?? 'unknown');
   }

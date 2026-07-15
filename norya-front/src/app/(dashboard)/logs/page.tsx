@@ -29,6 +29,11 @@ interface AccessLogItem {
   userAgent: string;
   userId: string | null;
   traceId: string;
+  /** Query/body da request e body da response — sanitizados no backend
+   *  ([REDACTED] em campos sensíveis) e ausentes quando vazios. */
+  query?: unknown;
+  requestBody?: unknown;
+  responseBody?: unknown;
   at: string;
 }
 

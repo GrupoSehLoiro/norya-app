@@ -8,10 +8,13 @@
  *
  * TTL de 14 dias via índice `expireAfterSeconds` em `at` — access log é
  * dado operacional, não histórico de produto. O path é gravado SEM query
- * string (callbacks OAuth carregam code/state na query).
+ * string; a query vai no campo `query`, sanitizada (callbacks OAuth
+ * carregam code/state — viram [REDACTED]). Payloads de request/response
+ * vão em requestBody/responseBody, redigidos e truncados
+ * (ver logging/access-log-payload.ts).
  */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 export const AccessLogSchemaName = 'AccessLog';
 
@@ -57,6 +60,20 @@ export class AccessLogPersistence {
   /** traceId propagado pelo pino/CLS — correlaciona com o log JSON. */
   @Prop({ type: String, default: '' })
   traceId!: string;
+
+  /** Query string sanitizada (code/state/token → [REDACTED]). Ausente se vazia. */
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  query?: unknown;
+
+  /** O que o usuário enviou: body da request (ou payload do evento no worker),
+   *  sanitizado e truncado por sanitizeLogPayload. Ausente quando vazio. */
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  requestBody?: unknown;
+
+  /** O que o servidor respondeu: body JSON da response, sanitizado e truncado.
+   *  Ausente para respostas sem corpo (304, SSE, binário). */
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  responseBody?: unknown;
 
   @Prop({ type: Date, required: true, default: () => new Date() })
   at!: Date;

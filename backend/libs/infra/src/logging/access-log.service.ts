@@ -13,6 +13,7 @@ import {
   AccessLogSchemaName,
   type AccessLogSource,
 } from '../persistence/mongoose/schemas/access-log.schema';
+import { sanitizeLogPayload } from './access-log-payload';
 
 export interface AccessLogEntry {
   service: AccessLogSource;
@@ -24,6 +25,12 @@ export interface AccessLogEntry {
   userAgent?: string;
   userId?: string | null;
   traceId?: string;
+  /** Query params da request — sanitizados aqui, não pelo chamador. */
+  query?: unknown;
+  /** Body da request (ou payload do evento) — sanitizado aqui. */
+  requestBody?: unknown;
+  /** Body JSON da response — sanitizado aqui. */
+  responseBody?: unknown;
   at?: Date;
 }
 
@@ -49,6 +56,11 @@ export class AccessLogService {
         userAgent: entry.userAgent ?? '',
         userId: entry.userId ?? null,
         traceId: entry.traceId ?? '',
+        // sanitizeLogPayload devolve undefined para payload vazio → o campo
+        // nem entra no doc (Mongoose ignora undefined).
+        query: sanitizeLogPayload(entry.query),
+        requestBody: sanitizeLogPayload(entry.requestBody),
+        responseBody: sanitizeLogPayload(entry.responseBody),
         at: entry.at ?? new Date(),
       })
       .catch((err: Error) => {

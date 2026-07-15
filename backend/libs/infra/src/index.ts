@@ -93,6 +93,7 @@ export * from './cache/llm-rate-limiter';
 // Access logs — persistência consultável de "quem acessou o quê"
 export * from './logging/access-log.service';
 export * from './logging/access-log.module';
+export * from './logging/access-log-payload';
 
 // Analytics — M4 IA core (Fase 1: CH-01/02/03 base)
 export * from './analytics/clickhouse';
