@@ -141,9 +141,18 @@ services:
     image: ${BACKEND_IMAGE:-ghcr.io/gruposehloiro/norya-backend:homolog}
     container_name: sehloro-nest-api
     restart: unless-stopped
+    # Teto de recursos: no incidente de 2026-07-15 um vazamento de processos
+    # filhos levou o nest-api a 7 GiB / 2400 PIDs, o OOM killer matou o mongod
+    # e o host inteiro travou. Com limite, só o nest-api reinicia.
+    mem_limit: 2g
+    pids_limit: 256
     environment:
       NODE_ENV: production
       API_PORT: "3000"
+      # Orquestração por canal (fork de workers por canal ativo). Em homolog
+      # fica OFF por padrão: o container `worker` já roda a ingestão completa
+      # e os filhos forkados a duplicariam (cada um abre WS EventSub → 429).
+      RECONCILER_ENABLED: ${RECONCILER_ENABLED:-false}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       MONGODB_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/sehloirostudios?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
@@ -207,6 +216,8 @@ services:
     image: ${BACKEND_IMAGE:-ghcr.io/gruposehloiro/norya-backend:homolog}
     container_name: sehloro-worker
     restart: unless-stopped
+    mem_limit: 1g
+    pids_limit: 128
     command: ["node", "apps/worker/dist/main.js"]
     # O worker NÃO é HTTP (só shard EventSub + bridge). O HEALTHCHECK herdado da
     # imagem bate em /api/identity/ping:3000 → sempre falharia ("unhealthy"

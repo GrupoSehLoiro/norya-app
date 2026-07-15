@@ -9,9 +9,9 @@
  * Controlado pela feature flag `reconciler.enabled` (default true).
  * Desabilitar via env RECONCILER_ENABLED=false em dev se necessário.
  *
- * Heartbeat: workers publicarão no Redis `worker:heartbeat:{channelId}`
- * (TTL 45 s, M3). Até M3, o ReconcilerService usa o campo `lastHeartbeatAt`
- * do Mongo e considera stalled se nulo e estado for 'running' há > 60 s.
+ * Heartbeat: o processo filho renova `lastHeartbeatAt` em `worker_states`
+ * a cada 15 s (WorkerHeartbeatService em apps/worker). O Orchestrator semeia
+ * o campo no spawn; stalled = heartbeat mais velho que HEARTBEAT_STALE_MS.
  */
 import { Injectable, Logger } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
@@ -73,14 +73,19 @@ export class ReconcilerService {
         }
       }
 
-      // Worker stalled (running mas sem heartbeat recente) → restart
+      // Worker stalled (running mas sem heartbeat recente) → restart.
+      // O critério é o lastHeartbeatAt (semeado no spawn e renovado pelo
+      // WorkerHeartbeatService do processo filho) — NUNCA startedAt: idade não
+      // é sinal de travamento, e usar startedAt aqui reiniciava todo worker
+      // saudável com >60s de vida a cada tick, vazando processos órfãos.
+      // Docs legados sem lastHeartbeatAt são ignorados (sem churn).
       const staleThreshold = new Date(Date.now() - HEARTBEAT_STALE_MS);
       for (const worker of runningWorkers) {
         if (
           worker.state === 'running' &&
           activeIds.has(worker.channelId) &&
-          worker.startedAt &&
-          worker.startedAt < staleThreshold
+          worker.lastHeartbeatAt &&
+          worker.lastHeartbeatAt < staleThreshold
         ) {
           this.logger.warn(`Reconciler: worker stalled ${worker.channelId} → restart`);
           await this.orchestrator

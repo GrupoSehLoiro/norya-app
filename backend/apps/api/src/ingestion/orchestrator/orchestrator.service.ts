@@ -33,11 +33,13 @@ export interface WorkerHandle {
   state: WorkerRunState;
   backend: OrchestratorBackend;
   startedAt?: Date;
+  lastHeartbeatAt?: Date;
   pid?: number;
   containerId?: string;
 }
 
 const WORKER_CRASH_TIMEOUT_MS = 5_000;
+const WORKER_STOP_GRACE_MS = 5_000;
 
 @Injectable()
 export class OrchestratorService implements OnModuleDestroy {
@@ -84,7 +86,10 @@ export class OrchestratorService implements OnModuleDestroy {
             backend: this.backend,
             pid: undefined,
             containerId: undefined,
-            lastHeartbeatAt: undefined,
+            // Heartbeat "otimista" do spawn: dá ao processo filho a janela de
+            // HEARTBEAT_STALE_MS para publicar o primeiro heartbeat real antes
+            // de o Reconciler poder considerá-lo stalled.
+            lastHeartbeatAt: new Date(),
           },
         },
         { upsert: true, new: true, setDefaultsOnInsert: true },
@@ -104,30 +109,31 @@ export class OrchestratorService implements OnModuleDestroy {
     this.logger.log(`Parando worker para canal ${channelId}`);
 
     const proc = this.procs.get(channelId);
-    if (proc && !proc.killed) {
-      proc.kill('SIGTERM');
-      this.procs.delete(channelId);
-    }
+    this.procs.delete(channelId);
 
+    // Marca 'stopping' ANTES de sinalizar, para o handler de 'exit' do spawn
+    // não classificar este encerramento como crash.
     await this.workerStateModel
       .findOneAndUpdate({ channelId }, { $set: { state: 'stopping' as WorkerRunState } })
       .exec();
 
-    // Aguarda processo encerrar ou força após timeout
-    await new Promise<void>((resolve) => {
-      if (!proc || proc.killed) {
-        resolve();
-        return;
-      }
-      const t = setTimeout(() => {
-        proc.kill('SIGKILL');
-        resolve();
-      }, 5_000);
-      proc.once('exit', () => {
-        clearTimeout(t);
-        resolve();
+    // `proc.killed` só indica que um sinal foi ENVIADO, não que o processo
+    // morreu — testá-lo aqui anularia o fallback. O critério de "já morto" é
+    // exitCode/signalCode; caso contrário espera o 'exit' real e escala para
+    // SIGKILL se o graceful shutdown travar (ex.: Mongo fora, WS em reconnect).
+    if (proc && proc.exitCode === null && proc.signalCode === null) {
+      await new Promise<void>((resolve) => {
+        const t = setTimeout(() => {
+          proc.kill('SIGKILL');
+          resolve();
+        }, WORKER_STOP_GRACE_MS);
+        proc.once('exit', () => {
+          clearTimeout(t);
+          resolve();
+        });
+        proc.kill('SIGTERM');
       });
-    });
+    }
 
     await this.workerStateModel.deleteOne({ channelId }).exec();
   }
@@ -213,6 +219,7 @@ export class OrchestratorService implements OnModuleDestroy {
       state: doc.state,
       backend: doc.backend,
       startedAt: (doc as { startedAt?: Date }).startedAt,
+      lastHeartbeatAt: doc.lastHeartbeatAt,
       pid: doc.pid,
       containerId: doc.containerId,
     };

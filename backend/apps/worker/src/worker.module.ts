@@ -4,6 +4,7 @@ import { zodValidate } from '@sehloro/infra';
 import { TwitchConduitWorkerModule } from './ingestion/twitch-conduit/twitch-conduit.module';
 import { KickIngestionModule } from './ingestion/kick/kick-ingestion.module';
 import { ChatIngestModule } from './ingestion/chat-ingest/chat-ingest.module';
+import { WorkerHeartbeatModule } from './heartbeat/worker-heartbeat.module';
 import { WorkerLoggerModule } from './logger/logger.module';
 
 /**
@@ -26,6 +27,7 @@ import { WorkerLoggerModule } from './logger/logger.module';
     TwitchConduitWorkerModule,
     KickIngestionModule,
     ChatIngestModule,
+    WorkerHeartbeatModule,
   ],
 })
 export class WorkerModule {}
