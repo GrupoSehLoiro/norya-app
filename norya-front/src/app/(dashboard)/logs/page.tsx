@@ -64,6 +64,41 @@ function statusTone(status: number): 'positive' | 'warn' | 'negative' | 'neutral
   return 'neutral';
 }
 
+const CSV_COLUMNS = [
+  'at',
+  'service',
+  'method',
+  'path',
+  'statusCode',
+  'responseTimeMs',
+  'ip',
+  'userAgent',
+  'userId',
+  'traceId',
+  'query',
+  'requestBody',
+  'responseBody',
+] as const;
+
+function toCsv(items: AccessLogItem[]): string {
+  const esc = (value: unknown): string => {
+    if (value === null || value === undefined) return '';
+    const s = typeof value === 'string' ? value : typeof value === 'number' ? String(value) : JSON.stringify(value);
+    return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const rows = items.map((item) => CSV_COLUMNS.map((col) => esc(item[col])).join(','));
+  return [CSV_COLUMNS.join(','), ...rows].join('\n');
+}
+
+function saveBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function LogsPage() {
   return (
     <AdminGate>
@@ -76,6 +111,8 @@ function LogsInner() {
   const [cred, setCred] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [downloading, setDownloading] = useState<'json' | 'csv' | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   // Snapshot da lista no momento do clique: o auto-refresh de 5s pode
   // reordenar/trocar os itens, e a navegação ←/→ do modal deve seguir a
   // ordem que o usuário estava vendo quando abriu.
@@ -117,6 +154,39 @@ function LogsInner() {
       return res.json() as Promise<LogsResponse>;
     },
   });
+
+  // Refaz a mesma consulta filtrada (mesmo query string da listagem) e baixa
+  // o resultado como arquivo — o que se vê no filtro é o que sai no download.
+  const downloadLogs = useCallback(
+    async (format: 'json' | 'csv') => {
+      if (!cred) return;
+      setDownloading(format);
+      setDownloadError(null);
+      try {
+        const res = await fetch(`/api/v2/logs?${query}`, {
+          headers: { Authorization: `Basic ${cred}`, Accept: 'application/json' },
+        });
+        if (res.status === 401) {
+          handleUnauthorized();
+          return;
+        }
+        if (!res.ok) throw new Error(`Falha ao baixar logs (HTTP ${res.status})`);
+        const data = (await res.json()) as LogsResponse;
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        const blob =
+          format === 'json'
+            ? new Blob([JSON.stringify(data.items, null, 2)], { type: 'application/json' })
+            : // BOM para o Excel abrir o UTF-8 corretamente.
+              new Blob(['\ufeff' + toCsv(data.items)], { type: 'text/csv;charset=utf-8' });
+        saveBlob(blob, `access-logs-${stamp}.${format}`);
+      } catch (err) {
+        setDownloadError(err instanceof Error ? err.message : 'Falha ao baixar logs');
+      } finally {
+        setDownloading(null);
+      }
+    },
+    [cred, query, handleUnauthorized],
+  );
 
   if (!cred) {
     return <CredentialGate onSubmit={(value) => setCred(value)} />;
@@ -186,12 +256,36 @@ function LogsInner() {
           <Button variant="secondary" size="md" onClick={() => void logs.refetch()} loading={logs.isFetching}>
             Atualizar
           </Button>
+          <Button
+            variant="ghost"
+            size="md"
+            onClick={() => void downloadLogs('json')}
+            loading={downloading === 'json'}
+            disabled={downloading !== null}
+          >
+            Baixar JSON
+          </Button>
+          <Button
+            variant="ghost"
+            size="md"
+            onClick={() => void downloadLogs('csv')}
+            loading={downloading === 'csv'}
+            disabled={downloading !== null}
+          >
+            Baixar CSV
+          </Button>
         </div>
       </Card>
 
       {logs.error && (
         <div className="rounded-2xl border border-err/30 bg-err/[0.08] px-4 py-3 text-sm text-err">
           {(logs.error as Error).message}
+        </div>
+      )}
+
+      {downloadError && (
+        <div className="rounded-2xl border border-err/30 bg-err/[0.08] px-4 py-3 text-sm text-err">
+          {downloadError}
         </div>
       )}
 
