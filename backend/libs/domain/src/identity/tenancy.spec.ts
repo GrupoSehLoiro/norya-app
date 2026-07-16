@@ -91,9 +91,9 @@ describe('EmailVerificationCode', () => {
 });
 
 describe('Plans / entitlements', () => {
-  it('free é o plano default e mais restrito', () => {
-    expect(getPlan('free').maxCreators).toBe(1);
-    expect(getPlan('free').maxIntegrationsPerCreator).toBe(1);
+  it('free é o plano default (limites temporariamente ilimitados — ver TODO em plans.ts)', () => {
+    expect(getPlan('free').maxCreators).toBe(-1);
+    expect(getPlan('free').maxIntegrationsPerCreator).toBe(-1);
   });
 
   it('agency permite múltiplos creators e marcas ilimitadas', () => {

@@ -41,8 +41,12 @@ export const PLANS: Record<PlanKey, Plan> = {
   free: {
     key: 'free',
     label: 'Free',
-    maxCreators: 1,
-    maxIntegrationsPerCreator: 1,
+    // TODO(billing): limites do Free temporariamente ilimitados (-1) durante a
+    // homologação — sem cobrança real ainda, o paywall só atrapalhava os testes
+    // com múltiplos canais/creators. Restaurar (1 creator / 1 integração)
+    // quando o billing entrar.
+    maxCreators: -1,
+    maxIntegrationsPerCreator: -1,
     maxBrands: 3,
     historyRetentionDays: 7,
     features: [FEATURES.INSIGHTS_REALTIME, FEATURES.REPORTS_CSV],

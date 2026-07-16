@@ -172,20 +172,20 @@ describe('Auth / onboarding flow (Fase 1)', () => {
     });
   });
 
-  it('7. Entitlements: free permite 1 creator; o 2º estoura PLAN_LIMIT', async () => {
+  it('7. Entitlements: limites do Free ilimitados por enquanto (TODO em plans.ts)', async () => {
     // Nenhum creator ainda → pode adicionar.
     await expect(entitlements.assertCanAddCreator(activeWorkspaceId)).resolves.toBeUndefined();
 
     await creators.save(Creator.create({ workspaceId: activeWorkspaceId, name: 'Canal 1' }));
 
-    // Já no limite (maxCreators=1) → estoura.
-    await expect(entitlements.assertCanAddCreator(activeWorkspaceId)).rejects.toMatchObject({
-      response: { code: 'PLAN_LIMIT' },
-    });
+    // Free está temporariamente sem limites (-1) — um 2º creator NÃO estoura.
+    // Quando o billing restaurar os limites, reverter para o
+    // `rejects.toMatchObject({ response: { code: 'PLAN_LIMIT' } })` original.
+    await expect(entitlements.assertCanAddCreator(activeWorkspaceId)).resolves.toBeUndefined();
 
     const ent = await entitlements.getEntitlements(activeWorkspaceId);
     expect(ent.usage.creators).toBe(1);
-    expect(ent.limits.maxCreators).toBe(1);
+    expect(ent.limits.maxCreators).toBe(-1);
   });
 
   it('8. resendCode invalida o código antigo e emite um novo', async () => {

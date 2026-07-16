@@ -101,15 +101,17 @@ describe('Creator onboarding flow (Fase 2)', () => {
     await mongo?.stop();
   });
 
-  it('1. cria creator (e o 2º estoura limite do plano free)', async () => {
+  it('1. cria creator (limites do Free ilimitados por enquanto — TODO em plans.ts)', async () => {
     const c = await creators.create(workspaceId, { name: 'YoDa' });
     creatorId = c.id;
     expect(c.workspaceId).toBe(workspaceId);
     expect(c.profileComplete).toBe(false);
 
-    await expect(creators.create(workspaceId, { name: 'Outro' })).rejects.toMatchObject({
-      response: { code: 'PLAN_LIMIT' },
-    });
+    // Com o Free temporariamente sem limites, um 2º creator NÃO estoura
+    // PLAN_LIMIT. Quando o billing restaurar os limites, reverter para o
+    // `rejects.toMatchObject({ response: { code: 'PLAN_LIMIT' } })` original.
+    const second = await creators.create(workspaceId, { name: 'Outro' });
+    expect(second.id).toBeDefined();
   });
 
   it('2. upsert profile com categoria marca completo', async () => {
