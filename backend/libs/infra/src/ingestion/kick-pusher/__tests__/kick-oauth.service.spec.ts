@@ -50,6 +50,13 @@ describe('KickOAuthService — state CSRF', () => {
     const result = svc.verifyState(state);
     expect(result.userId).toBe('user-1');
     expect(result.redirect).toBe('/integrations/kick');
+    expect(result.workspaceId).toBeNull();
+  });
+
+  it('workspaceId viaja no state e volta no verifyState', () => {
+    const svc = makeService();
+    const state = svc.generateState('user-1', undefined, undefined, 'ws-9');
+    expect(svc.verifyState(state).workspaceId).toBe('ws-9');
   });
 
   it('rejeita state adulterado', () => {

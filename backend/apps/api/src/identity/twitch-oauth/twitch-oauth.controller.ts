@@ -45,6 +45,7 @@ import {
 } from '@sehloro/infra';
 import { Public } from '../auth/decorators/public.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CreatorService } from '../../creator/creator.service';
 import type { AppConfig } from '../../config/config.schema';
 
 const TWITCH_AUTH_URL = 'https://id.twitch.tv/oauth2/authorize';
@@ -112,6 +113,7 @@ export class TwitchOAuthController {
     private readonly tokens: ChannelOAuthTokenRepository,
     private readonly conduit: TwitchConduitService,
     private readonly subscriptions: TwitchConduitSubscriptionsService,
+    private readonly creators: CreatorService,
   ) {}
 
   // ── /start  (precisa de auth — JWT via header OU ?token=) ─────────────────
@@ -124,12 +126,12 @@ export class TwitchOAuthController {
     @Req() req: Request,
     @Res() res: Response,
   ): void {
-    const userId = this._extractUserId(req, queryToken);
+    const { userId, workspaceId } = this._extractPrincipal(req, queryToken);
     const clientId = this.config.get('TWITCH_CLIENT_ID', { infer: true });
     if (!clientId) {
       throw new BadRequestException('TWITCH_CLIENT_ID não configurado no backend');
     }
-    const state = this.twitchOAuth.generateState(userId, redirect);
+    const state = this.twitchOAuth.generateState(userId, redirect, workspaceId ?? undefined);
     const url = new URL(TWITCH_AUTH_URL);
     url.searchParams.set('client_id', clientId);
     url.searchParams.set('redirect_uri', this._redirectUri());
@@ -165,7 +167,7 @@ export class TwitchOAuthController {
       return res.redirect(`${consoleUrl}/integrations/twitch?error=missing_code_or_state`);
     }
     try {
-      const { userId, redirect } = this.twitchOAuth.verifyState(state);
+      const { userId, redirect, workspaceId } = this.twitchOAuth.verifyState(state);
       const { token, user } = await this.twitchOAuth.exchangeCode({
         code,
         redirectUri: this._redirectUri(),
@@ -173,7 +175,8 @@ export class TwitchOAuthController {
 
       // Cria ou recupera o Channel do streamer (twitch user_id).
       // Reconexão: se já existe, reativa + transfere ownerId pro user
-      // atual (caso o seed/recriação tenha mudado o _id do user).
+      // atual (caso o seed/recriação tenha mudado o _id do user),
+      // preservando o vínculo creator/workspace existente.
       const existing = await this.channels.findByName(user.login);
       const channel = existing
         ? await this.channels.save(
@@ -186,6 +189,8 @@ export class TwitchOAuthController {
               externalId: user.id,
               displayName: user.display_name,
               ownerId: userId,
+              creatorId: existing.getCreatorId(),
+              workspaceId: existing.getWorkspaceId(),
               flags: existing.getFlags(),
             }),
           )
@@ -205,6 +210,31 @@ export class TwitchOAuthController {
         token,
       });
 
+      // Auto-vincula o canal ao creator do workspace ativo — é o vínculo
+      // (creatorId + workspaceId) que faz o canal aparecer em /api/v2/channels
+      // (lista escopada por tenant) e no picker "Canal ativo" do console.
+      // Falha aqui NÃO derruba o OAuth: canal + token já persistidos.
+      const subWarning: string[] = [];
+      if (workspaceId) {
+        try {
+          const linkResult = await this.creators.autoLinkIntegration(
+            workspaceId,
+            userId,
+            channel.getId(),
+          );
+          if (linkResult === 'no-creator') subWarning.push('noCreator');
+          else if (linkResult === 'choose-creator') subWarning.push('chooseCreator');
+          this.logger.log(`Auto-link channel=${channel.getId()} ws=${workspaceId} → ${linkResult}`);
+        } catch (e) {
+          this.logger.error(`Auto-link falhou (canal segue sem vínculo): ${(e as Error).message}`);
+          subWarning.push('autoLinkFailed');
+        }
+      } else {
+        // Token sem workspace ativo (ex.: admin legado) — sem como escolher
+        // o tenant; o vínculo fica pra UI de integrações.
+        subWarning.push('chooseCreator');
+      }
+
       // Ativa o pipeline conduit pra esse canal. O service decide quais
       // subscriptions cria com base em `botUserId`:
       //   - vazio → só `stream.online` + `stream.offline` (banner on/off
@@ -212,7 +242,6 @@ export class TwitchOAuthController {
       //   - presente → as 3 (inclui `channel.chat.message` via conduit)
       // Erro aqui NÃO derruba o OAuth — token já salvo, redirect com aviso.
       const botUserId = this.config.get('TWITCH_BOT_USER_ID', { infer: true });
-      const subWarning: string[] = [];
       try {
         const { conduitId } = await this.conduit.ensureConduit();
         const subs = await this.subscriptions.subscribeChannel({
@@ -296,7 +325,8 @@ export class TwitchOAuthController {
       );
     }
     // Inativa o channel (não deletamos — pode haver batch_analysis em CH
-    // apontando para ele). Reconstrói o entity com active=false.
+    // apontando para ele). Reconstrói o entity com active=false, preservando
+    // vínculo creator/workspace e flags — reconectar depois só reativa.
     const inactive = Channel.reconstitute({
       id: ch.getId(),
       name: ch.getName(),
@@ -306,6 +336,9 @@ export class TwitchOAuthController {
       externalId: ch.getExternalId(),
       displayName: ch.getDisplayName(),
       ownerId: ch.getOwnerId(),
+      creatorId: ch.getCreatorId(),
+      workspaceId: ch.getWorkspaceId(),
+      flags: ch.getFlags(),
     });
     await this.channels.save(inactive);
     this.logger.log(`OAuth desconectado user=${user.sub} channel=${channelId}`);
@@ -314,17 +347,24 @@ export class TwitchOAuthController {
 
   // ── helpers ──────────────────────────────────────────────────────────────
 
-  private _extractUserId(req: Request, queryToken: string | undefined): string {
+  private _extractPrincipal(
+    req: Request,
+    queryToken: string | undefined,
+  ): { userId: string; workspaceId: string | null } {
     const header = req.headers.authorization;
     const bearer = header?.startsWith('Bearer ') ? header.slice(7) : null;
     const token = bearer ?? queryToken;
     if (!token) throw new UnauthorizedException('Token não fornecido');
     try {
       // Aceita ambos os formatos: legacy `{ userId, ... }` E novo `{ sub, ... }`.
-      const decoded = this.jwt.verify<{ userId?: string; sub?: string }>(token);
+      const decoded = this.jwt.verify<{
+        userId?: string;
+        sub?: string;
+        activeWorkspaceId?: string;
+      }>(token);
       const userId = decoded.userId ?? decoded.sub;
       if (!userId) throw new Error('payload sem userId/sub');
-      return userId;
+      return { userId, workspaceId: decoded.activeWorkspaceId ?? null };
     } catch {
       throw new UnauthorizedException('Token inválido');
     }

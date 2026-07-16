@@ -115,9 +115,13 @@ export class CreatorService {
 
   // ── Integrações (canais de plataforma vinculados ao creator) ──────────
 
-  /** Canais do usuário ainda sem creator vinculado (para o onboarding linkar). */
-  async listUnlinkedForUser(userId: string): Promise<IntegrationView[]> {
-    const channels = await this.channelRepo.findUnlinkedByOwner(userId);
+  /**
+   * Canais do usuário que o onboarding pode vincular ao creator do workspace
+   * atual: os sem creator E os presos a um workspace antigo (link órfão de uma
+   * conta/onboarding anterior — o wizard revincula ao workspace corrente).
+   */
+  async listUnlinkedForUser(userId: string, workspaceId: string): Promise<IntegrationView[]> {
+    const channels = await this.channelRepo.findClaimableByOwner(userId, workspaceId);
     return channels.map((c) => this.integrationView(c));
   }
 
@@ -157,6 +161,28 @@ export class CreatorService {
     channel.linkToCreator(id, workspaceId);
     const saved = await this.channelRepo.save(channel);
     return this.integrationView(saved);
+  }
+
+  /**
+   * Auto-vínculo pós-OAuth: se o workspace ativo tem exatamente um creator,
+   * vincula o canal recém-conectado a ele (mesmas validações do
+   * `linkIntegration`). Com 0 ou 2+ creators não adivinha — devolve o status
+   * pro caller decidir o fallback (UI de vínculo manual).
+   */
+  async autoLinkIntegration(
+    workspaceId: string,
+    userId: string,
+    channelId: string,
+  ): Promise<'linked' | 'already-linked' | 'no-creator' | 'choose-creator'> {
+    const channel = await this.channelRepo.findById(channelId);
+    if (channel?.getWorkspaceId() === workspaceId && channel.getCreatorId()) {
+      return 'already-linked';
+    }
+    const creators = await this.creatorRepo.findByWorkspaceId(workspaceId);
+    const only = creators.length === 1 ? creators[0] : undefined;
+    if (!only) return creators.length === 0 ? 'no-creator' : 'choose-creator';
+    await this.linkIntegration(only.getId(), workspaceId, userId, channelId);
+    return 'linked';
   }
 
   /** Garante que o creator existe E pertence ao workspace ativo. */

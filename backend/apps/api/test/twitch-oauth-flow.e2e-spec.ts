@@ -38,6 +38,7 @@ import {
   type ChannelRepository,
 } from '@sehloro/domain';
 import { TwitchOAuthController } from '../src/identity/twitch-oauth/twitch-oauth.controller';
+import { CreatorService } from '../src/creator/creator.service';
 import { JwtAuthGuard } from '../src/identity/auth/guards/jwt-auth.guard';
 import { APP_GUARD, Reflector } from '@nestjs/core';
 import { PassportModule } from '@nestjs/passport';
@@ -61,6 +62,10 @@ class MockSubscriptionsService {
     { _id: 's3', type: 'stream.offline', status: 'enabled' },
   ]);
   unsubscribeChannel = jest.fn().mockResolvedValue(undefined);
+}
+
+class MockCreatorService {
+  autoLinkIntegration = jest.fn().mockResolvedValue('linked');
 }
 
 // External IDs únicos por execução do arquivo — evita colisão com o
@@ -99,6 +104,7 @@ describe('TwitchOAuthController (e2e)', () => {
   let jwt: JwtService;
   let conduit: MockConduitService;
   let subs: MockSubscriptionsService;
+  let creators: MockCreatorService;
   let userJwt: string;
   let secondUserJwt: string;
 
@@ -134,6 +140,7 @@ describe('TwitchOAuthController (e2e)', () => {
         { provide: TwitchOAuthService, useExisting: StubbedTwitchOAuth },
         { provide: TwitchConduitService, useClass: MockConduitService },
         { provide: TwitchConduitSubscriptionsService, useClass: MockSubscriptionsService },
+        { provide: CreatorService, useClass: MockCreatorService },
         JwtStrategy,
         { provide: APP_GUARD, useClass: JwtAuthGuard },
         Reflector,
@@ -147,6 +154,7 @@ describe('TwitchOAuthController (e2e)', () => {
     jwt = module.get(JwtService);
     conduit = module.get(TwitchConduitService) as unknown as MockConduitService;
     subs = module.get(TwitchConduitSubscriptionsService) as unknown as MockSubscriptionsService;
+    creators = module.get(CreatorService) as unknown as MockCreatorService;
 
     userJwt = jwt.sign({ sub: 'user-A', username: 'alice', email: 'a@x', role: 'admin' });
     secondUserJwt = jwt.sign({ sub: 'user-B', username: 'bob', email: 'b@x', role: 'user' });
@@ -177,6 +185,7 @@ describe('TwitchOAuthController (e2e)', () => {
     conduit.ensureConduit.mockClear();
     subs.subscribeChannel.mockClear();
     subs.unsubscribeChannel.mockClear();
+    creators.autoLinkIntegration.mockClear();
   });
 
   // ── /start ────────────────────────────────────────────────────────────────
@@ -310,10 +319,36 @@ describe('TwitchOAuthController (e2e)', () => {
       expect(subs.subscribeChannel).toHaveBeenCalledTimes(1);
       const arg = subs.subscribeChannel.mock.calls[0][0];
       expect(arg.botUserId).toBeNull();
-      expect(res.headers['location']).toMatch(/warning=chatViaIrcOnly/);
+      expect(res.headers['location']).toMatch(/warning=[^&]*chatViaIrcOnly/);
     } finally {
       (cfg.get as jest.Mock).mockRestore();
     }
+  });
+
+  it('GET /callback com workspace no state → autoLinkIntegration chamado', async () => {
+    const oauth = module.get(StubbedTwitchOAuth);
+    const state = oauth.generateState('user-A', undefined, 'ws-1');
+    const res = await request(app.getHttpServer())
+      .get(`/api/v2/auth/twitch/callback?code=c&state=${encodeURIComponent(state)}`)
+      .expect(302);
+    expect(res.headers['location']).toContain('connected=1');
+    // linked → sem warning de vínculo
+    expect(res.headers['location']).not.toMatch(/warning=[^&]*chooseCreator/);
+    expect(creators.autoLinkIntegration).toHaveBeenCalledTimes(1);
+    const [ws, userId] = creators.autoLinkIntegration.mock.calls[0];
+    expect(ws).toBe('ws-1');
+    expect(userId).toBe('user-A');
+  });
+
+  it('GET /callback sem workspace no state → warning=chooseCreator, sem auto-link', async () => {
+    const oauth = module.get(StubbedTwitchOAuth);
+    const state = oauth.generateState('user-A');
+    const res = await request(app.getHttpServer())
+      .get(`/api/v2/auth/twitch/callback?code=c&state=${encodeURIComponent(state)}`)
+      .expect(302);
+    expect(res.headers['location']).toContain('connected=1');
+    expect(res.headers['location']).toMatch(/warning=[^&]*chooseCreator/);
+    expect(creators.autoLinkIntegration).not.toHaveBeenCalled();
   });
 
   // ── /integrations ─────────────────────────────────────────────────────────

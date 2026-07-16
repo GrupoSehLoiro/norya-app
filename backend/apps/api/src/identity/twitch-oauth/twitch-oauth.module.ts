@@ -12,12 +12,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PersistenceModule, TwitchOAuthService } from '@sehloro/infra';
 import { TwitchConduitApiModule } from '../../ingestion/twitch-conduit/twitch-conduit-api.module';
+import { CreatorModule } from '../../creator/creator.module';
 import { TwitchOAuthController } from './twitch-oauth.controller';
 
 @Module({
   imports: [
     PersistenceModule,
     TwitchConduitApiModule,
+    // CreatorService.autoLinkIntegration — vincula o canal ao creator do
+    // workspace ativo ao fim do callback OAuth.
+    CreatorModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

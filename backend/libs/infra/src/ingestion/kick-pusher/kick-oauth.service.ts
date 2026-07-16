@@ -79,17 +79,36 @@ export class KickOAuthService {
   // identidade Kick que autorizou (ver fetchAuthenticatedChannel). Carrega
   // também o `codeVerifier` (PKCE) pra reconstruí-lo no callback sem estado
   // server-side. State é HMAC-assinado; cliente confidencial (usa client_secret).
-  generateState(userId: string, redirect?: string, codeVerifier?: string): string {
+  generateState(
+    userId: string,
+    redirect?: string,
+    codeVerifier?: string,
+    workspaceId?: string,
+  ): string {
     const nonce = randomBytes(16).toString('hex');
     const exp = Date.now() + STATE_TTL_MS;
+    // `workspaceId` viaja no state pro callback (@Public, sem JWT) conseguir
+    // auto-vincular o canal ao creator do workspace ativo.
     const payload = Buffer.from(
-      JSON.stringify({ userId, redirect, codeVerifier, nonce, exp }),
+      JSON.stringify({
+        userId,
+        redirect,
+        codeVerifier,
+        workspaceId: workspaceId ?? null,
+        nonce,
+        exp,
+      }),
     ).toString('base64url');
     const sig = this._sign(payload);
     return `${payload}.${sig}`;
   }
 
-  verifyState(state: string): { userId: string; redirect?: string; codeVerifier?: string } {
+  verifyState(state: string): {
+    userId: string;
+    redirect?: string;
+    codeVerifier?: string;
+    workspaceId: string | null;
+  } {
     const dot = state.lastIndexOf('.');
     if (dot === -1) throw new UnauthorizedException('state inválido');
 
@@ -101,7 +120,13 @@ export class KickOAuthService {
       throw new UnauthorizedException('state adulterado');
     }
 
-    let parsed: { userId: string; redirect?: string; codeVerifier?: string; exp: number };
+    let parsed: {
+      userId: string;
+      redirect?: string;
+      codeVerifier?: string;
+      workspaceId?: string | null;
+      exp: number;
+    };
     try {
       parsed = JSON.parse(Buffer.from(payload, 'base64url').toString());
     } catch {
@@ -112,7 +137,12 @@ export class KickOAuthService {
       throw new UnauthorizedException('state expirado');
     }
 
-    return { userId: parsed.userId, redirect: parsed.redirect, codeVerifier: parsed.codeVerifier };
+    return {
+      userId: parsed.userId,
+      redirect: parsed.redirect,
+      codeVerifier: parsed.codeVerifier,
+      workspaceId: parsed.workspaceId ?? null,
+    };
   }
 
   // ─── token exchange ───────────────────────────────────────────────────────

@@ -67,6 +67,18 @@ describe('TwitchOAuthService — state HMAC', () => {
     expect(svc.verifyState(state).redirect).toBeNull();
   });
 
+  it('workspaceId viaja no state e volta no verifyState', () => {
+    const svc = makeService();
+    const state = svc.generateState('user-1', undefined, 'ws-9');
+    expect(svc.verifyState(state).workspaceId).toBe('ws-9');
+  });
+
+  it('workspaceId default = null quando não passado', () => {
+    const svc = makeService();
+    const state = svc.generateState('user-2');
+    expect(svc.verifyState(state).workspaceId).toBeNull();
+  });
+
   it('payload adulterado → UnauthorizedException', () => {
     const svc = makeService();
     const original = svc.generateState('user-1');

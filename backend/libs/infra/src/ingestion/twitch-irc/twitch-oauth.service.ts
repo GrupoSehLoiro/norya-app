@@ -60,17 +60,29 @@ export class TwitchOAuthService {
 
   // ─── state CSRF ──────────────────────────────────────────────────────────
 
-  generateState(userId: string, postLoginRedirect?: string): string {
+  generateState(userId: string, postLoginRedirect?: string, workspaceId?: string): string {
     const nonce = randomBytes(16).toString('hex');
     const exp = Date.now() + STATE_TTL_MS;
+    // `workspaceId` viaja no state pro callback (que é @Public, sem JWT)
+    // conseguir auto-vincular o canal ao creator do workspace ativo.
     const payload = Buffer.from(
-      JSON.stringify({ userId, nonce, exp, redirect: postLoginRedirect ?? null }),
+      JSON.stringify({
+        userId,
+        nonce,
+        exp,
+        redirect: postLoginRedirect ?? null,
+        workspaceId: workspaceId ?? null,
+      }),
     ).toString('base64url');
     const sig = this._sign(payload);
     return `${payload}.${sig}`;
   }
 
-  verifyState(state: string): { userId: string; redirect: string | null } {
+  verifyState(state: string): {
+    userId: string;
+    redirect: string | null;
+    workspaceId: string | null;
+  } {
     const dot = state.lastIndexOf('.');
     if (dot === -1) throw new UnauthorizedException('state inválido');
     const payload = state.slice(0, dot);
@@ -82,14 +94,24 @@ export class TwitchOAuthService {
     ) {
       throw new UnauthorizedException('state adulterado');
     }
-    let parsed: { userId: string; nonce: string; exp: number; redirect: string | null };
+    let parsed: {
+      userId: string;
+      nonce: string;
+      exp: number;
+      redirect: string | null;
+      workspaceId?: string | null;
+    };
     try {
       parsed = JSON.parse(Buffer.from(payload, 'base64url').toString());
     } catch {
       throw new UnauthorizedException('state inválido');
     }
     if (Date.now() > parsed.exp) throw new UnauthorizedException('state expirado');
-    return { userId: parsed.userId, redirect: parsed.redirect };
+    return {
+      userId: parsed.userId,
+      redirect: parsed.redirect,
+      workspaceId: parsed.workspaceId ?? null,
+    };
   }
 
   // ─── exchange code → tokens + helix user info ─────────────────────────────

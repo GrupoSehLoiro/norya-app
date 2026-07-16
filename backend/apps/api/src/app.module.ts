@@ -13,6 +13,7 @@ import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { TwitchWebhookModule } from './ingestion/twitch-webhook/twitch-webhook.module';
 import { TwitchConduitApiModule } from './ingestion/twitch-conduit/twitch-conduit-api.module';
 import { TwitchOAuthModule } from './identity/twitch-oauth/twitch-oauth.module';
+import { KickOAuthModule } from './identity/kick-oauth/kick-oauth.module';
 import { CreatorModule } from './creator/creator.module';
 import { LegacyModule } from './legacy/legacy.module';
 import { LogsModule } from './logs/logs.module';
@@ -44,6 +45,7 @@ import { LogsModule } from './logs/logs.module';
     TwitchWebhookModule,
     TwitchConduitApiModule,
     TwitchOAuthModule,
+    KickOAuthModule,
     CreatorModule,
     LegacyModule,
     LogsModule,

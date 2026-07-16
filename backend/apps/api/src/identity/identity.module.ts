@@ -30,7 +30,6 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { WorkspaceRoleGuard } from './auth/guards/workspace-role.guard';
 import { EntitlementsService } from './billing/entitlements.service';
 import { EntitlementsController } from './billing/entitlements.controller';
-import { KickOAuthController } from './kick-oauth/kick-oauth.controller';
 import { KickOAuthService } from '@sehloro/infra';
 import { AdminUsersController } from './admin-users/admin-users.controller';
 import { AdminUsersService } from './admin-users/admin-users.service';
@@ -53,13 +52,9 @@ import { AdminUsersBootstrap } from './admin-users/admin-users.bootstrap';
       }),
     }),
   ],
-  controllers: [
-    IdentityController,
-    AuthController,
-    KickOAuthController,
-    EntitlementsController,
-    AdminUsersController,
-  ],
+  // KickOAuthController vive no KickOAuthModule (precisa do CreatorModule,
+  // que importa este módulo — declará-lo aqui criaria ciclo).
+  controllers: [IdentityController, AuthController, EntitlementsController, AdminUsersController],
   providers: [
     IdentityService,
     AuthService,

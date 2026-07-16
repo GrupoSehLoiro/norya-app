@@ -30,6 +30,7 @@ import { Request } from 'express';
 import { Public } from '../auth/decorators/public.decorator';
 import { KickOAuthService } from '@sehloro/infra';
 import { CHANNEL_REPOSITORY, Channel, type ChannelRepository } from '@sehloro/domain';
+import { CreatorService } from '../../creator/creator.service';
 import type { AppConfig } from '../../config/config.schema';
 
 const KICK_AUTH_URL = 'https://id.kick.com/oauth/authorize';
@@ -46,6 +47,7 @@ export class KickOAuthController {
     private readonly config: ConfigService<AppConfig, true>,
     @Inject(CHANNEL_REPOSITORY)
     private readonly channels: ChannelRepository,
+    private readonly creators: CreatorService,
   ) {}
 
   /**
@@ -61,7 +63,7 @@ export class KickOAuthController {
     @Query('redirect') redirect: string | undefined,
     @Req() req: Request,
   ) {
-    const userId = this._extractUserId(req, queryToken);
+    const { userId, workspaceId } = this._extractPrincipal(req, queryToken);
 
     const clientId = this.config.get('KICK_CLIENT_ID', { infer: true });
     if (!clientId) {
@@ -71,7 +73,12 @@ export class KickOAuthController {
     // PKCE (OAuth 2.1): o Kick exige code_challenge no authorize — sem ele o
     // IdP faz 307 pra raiz (404). O verifier viaja no state assinado.
     const { codeVerifier, codeChallenge } = this.kickOAuth.createPkcePair();
-    const state = this.kickOAuth.generateState(userId, redirect, codeVerifier);
+    const state = this.kickOAuth.generateState(
+      userId,
+      redirect,
+      codeVerifier,
+      workspaceId ?? undefined,
+    );
 
     const params = new URLSearchParams({
       response_type: 'code',
@@ -109,7 +116,7 @@ export class KickOAuthController {
       throw new BadRequestException('code e state são obrigatórios');
     }
 
-    const { userId, redirect, codeVerifier } = this.kickOAuth.verifyState(state);
+    const { userId, redirect, codeVerifier, workspaceId } = this.kickOAuth.verifyState(state);
 
     try {
       const tokens = await this.kickOAuth.exchangeCodeForTokens(
@@ -120,7 +127,8 @@ export class KickOAuthController {
       const identity = await this.kickOAuth.fetchAuthenticatedChannel(tokens.access_token);
 
       // Cria ou recupera o Channel do streamer (kick slug). Reconexão:
-      // reativa + transfere ownerId pro user atual (mesmo padrão do Twitch).
+      // reativa + transfere ownerId pro user atual (mesmo padrão do Twitch),
+      // preservando o vínculo creator/workspace existente.
       const existing = await this.channels.findByName(identity.slug);
       const channel = existing
         ? await this.channels.save(
@@ -133,6 +141,8 @@ export class KickOAuthController {
               externalId: identity.broadcasterUserId || existing.getExternalId(),
               displayName: identity.displayName,
               ownerId: userId,
+              creatorId: existing.getCreatorId(),
+              workspaceId: existing.getWorkspaceId(),
               flags: existing.getFlags(),
             }),
           )
@@ -147,13 +157,39 @@ export class KickOAuthController {
           );
 
       await this.kickOAuth.storeToken(channel.getId(), tokens);
+
+      // Auto-vincula o canal ao creator do workspace ativo — é o vínculo
+      // (creatorId + workspaceId) que faz o canal aparecer em /api/v2/channels
+      // (lista escopada por tenant) e no picker "Canal ativo" do console.
+      // Falha aqui NÃO derruba o OAuth: canal + token já persistidos.
+      let warning: string | null = null;
+      if (workspaceId) {
+        try {
+          const linkResult = await this.creators.autoLinkIntegration(
+            workspaceId,
+            userId,
+            channel.getId(),
+          );
+          if (linkResult === 'no-creator') warning = 'noCreator';
+          else if (linkResult === 'choose-creator') warning = 'chooseCreator';
+          this.logger.log(`Auto-link channel=${channel.getId()} ws=${workspaceId} → ${linkResult}`);
+        } catch (err) {
+          this.logger.error(
+            `Auto-link falhou (canal segue sem vínculo): ${(err as Error).message}`,
+          );
+          warning = 'autoLinkFailed';
+        }
+      } else {
+        warning = 'chooseCreator';
+      }
+
       this.logger.log(
         `OAuth Kick concluído user=${userId} kick=${identity.slug} (channelId=${channel.getId()})`,
       );
 
-      const target =
-        redirect ??
-        `${consoleUrl}/integrations/kick?kick=ok&channelId=${encodeURIComponent(channel.getId())}`;
+      const okQs = new URLSearchParams({ kick: 'ok', channelId: channel.getId() });
+      if (warning) okQs.set('warning', warning);
+      const target = redirect ?? `${consoleUrl}/integrations/kick?${okQs.toString()}`;
       return {
         url: target.startsWith('http') ? target : `${consoleUrl}${target}`,
         statusCode: 302,
@@ -166,17 +202,24 @@ export class KickOAuthController {
 
   // ── helpers ────────────────────────────────────────────────────────────────
 
-  private _extractUserId(req: Request, queryToken: string | undefined): string {
+  private _extractPrincipal(
+    req: Request,
+    queryToken: string | undefined,
+  ): { userId: string; workspaceId: string | null } {
     const header = req.headers.authorization;
     const bearer = header?.startsWith('Bearer ') ? header.slice(7) : null;
     const token = bearer ?? queryToken;
     if (!token) throw new UnauthorizedException('Token não fornecido');
     try {
       // Aceita ambos os formatos: legacy `{ userId }` e novo `{ sub }`.
-      const decoded = this.jwt.verify<{ userId?: string; sub?: string }>(token);
+      const decoded = this.jwt.verify<{
+        userId?: string;
+        sub?: string;
+        activeWorkspaceId?: string;
+      }>(token);
       const userId = decoded.userId ?? decoded.sub;
       if (!userId) throw new Error('payload sem userId/sub');
-      return userId;
+      return { userId, workspaceId: decoded.activeWorkspaceId ?? null };
     } catch {
       throw new UnauthorizedException('Token inválido');
     }

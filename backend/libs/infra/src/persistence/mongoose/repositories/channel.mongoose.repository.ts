@@ -60,8 +60,28 @@ export class ChannelMongooseRepository implements ChannelRepository {
     return docs.map(toDomain);
   }
 
-  async findUnlinkedByOwner(ownerId: string): Promise<Channel[]> {
-    const docs = await this.model.find({ ownerId, creatorId: { $in: [null, undefined] } }).exec();
+  async findClaimableByOwner(ownerId: string, workspaceId: string): Promise<Channel[]> {
+    // Canais do dono que NÃO estão devidamente vinculados no workspace atual:
+    //  - sem creator (unlinked), OU
+    //  - vinculados a um workspace diferente (link órfão de um onboarding antigo).
+    // O reconnect OAuth transfere o `ownerId` mas pode preservar um `creatorId`/
+    // `workspaceId` antigo — sem este $or o wizard nunca enxergava esse canal.
+    const docs = await this.model
+      .find({
+        ownerId,
+        $or: [{ creatorId: { $in: [null, undefined] } }, { workspaceId: { $ne: workspaceId } }],
+      })
+      .exec();
+    return docs.map(toDomain);
+  }
+
+  async findUnlinkedOwned(): Promise<Channel[]> {
+    const docs = await this.model
+      .find({
+        ownerId: { $exists: true, $nin: [null, ''] },
+        creatorId: { $in: [null, undefined] },
+      })
+      .exec();
     return docs.map(toDomain);
   }
 

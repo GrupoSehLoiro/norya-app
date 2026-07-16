@@ -49,7 +49,9 @@ describe('Bounded contexts — /ping de cada módulo', () => {
   });
 
   it.each(contexts)('GET /api/%s/ping retorna { context, status: alive }', async (ctx) => {
-    const res = await request(app.getHttpServer()).get(`/api/${ctx}/ping`);
+    // monitoring é o único cujo controller vive sob o prefixo v2.
+    const path = ctx === 'monitoring' ? '/api/v2/monitoring/ping' : `/api/${ctx}/ping`;
+    const res = await request(app.getHttpServer()).get(path);
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ context: ctx, status: 'alive' });
   });

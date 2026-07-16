@@ -1,17 +1,39 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/page-header';
+import { UnlinkedChannelsCard } from '@/components/integrations/unlinked-channels-card';
 import { getToken } from '@/lib/api-client';
 import { fetchChannels } from '@/lib/queries';
 
+/** Mensagens dos avisos que o callback OAuth devolve em `?warning=`. */
+const WARNING_MESSAGES: Record<string, string> = {
+  noCreator:
+    'Canal conectado, mas o workspace ainda não tem creator — complete o onboarding para vinculá-lo.',
+  chooseCreator:
+    'Canal conectado. Vincule-o a um creator abaixo para ele aparecer no seletor de canais.',
+  autoLinkFailed:
+    'Canal conectado, mas o vínculo automático com o creator falhou — vincule manualmente abaixo.',
+};
+
 export default function KickPage() {
+  const qc = useQueryClient();
   const params = useSearchParams();
   const status = params.get('kick'); // ok | error | denied | null
+  const warning = params.get('warning');
+
+  // Pós-OAuth o backend criou/vinculou canal — derruba caches pra sidebar
+  // ("Canal ativo") e as listas daqui refletirem na hora.
+  useEffect(() => {
+    if (status !== 'ok') return;
+    void qc.invalidateQueries({ queryKey: ['channels-v2'] });
+    void qc.invalidateQueries({ queryKey: ['unlinked-integrations'] });
+  }, [status, qc]);
 
   const channels = useQuery({
     queryKey: ['channels-v2', 'kick'],
@@ -41,6 +63,12 @@ export default function KickPage() {
       {status === 'ok' && (
         <div className="rounded-xl border border-ok/30 bg-ok/10 p-3 text-sm text-ok">
           Conta Kick conectada — canal criado/atualizado e refresh_token cifrado persistido (AES-256-GCM).
+          {!warning && ' Vinculado ao creator — já aparece no seletor de canais.'}
+        </div>
+      )}
+      {warning && (
+        <div className="rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm text-warn">
+          {WARNING_MESSAGES[warning] ?? `Aviso: ${warning}`}
         </div>
       )}
       {status === 'error' && (
@@ -78,6 +106,8 @@ KICK_CLIENT_SECRET=...`}
           Conectar conta Kick
         </Button>
       </Card>
+
+      <UnlinkedChannelsCard platform="kick" />
 
       <Card>
         <CardHeader eyebrow="Canais" title="Canais Kick conectados" />

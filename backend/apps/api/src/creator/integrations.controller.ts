@@ -27,7 +27,7 @@ export class IntegrationsController {
   /** Canais do usuário ainda não vinculados a nenhum creator. */
   @Get('unlinked')
   unlinked(@CurrentUser() user: AuthUser): Promise<IntegrationView[]> {
-    return this.creators.listUnlinkedForUser(user.sub);
+    return this.creators.listUnlinkedForUser(user.sub, wsId(user));
   }
 
   /** Integrações de um creator. */

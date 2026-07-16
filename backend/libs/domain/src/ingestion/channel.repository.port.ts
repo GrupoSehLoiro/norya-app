@@ -29,8 +29,18 @@ export interface ChannelRepository {
   countByCreatorId(creatorId: string): Promise<number>;
   /** Integrações de um Creator. */
   findByCreatorId(creatorId: string): Promise<Channel[]>;
-  /** Canais do dono ainda sem Creator vinculado (para o onboarding linkar). */
-  findUnlinkedByOwner(ownerId: string): Promise<Channel[]>;
+  /**
+   * Canais que o dono pode "reivindicar" no onboarding do workspace atual:
+   * ainda sem Creator vinculado OU vinculados a um Creator de OUTRO workspace
+   * (ex.: o mesmo streamer foi reconectado por uma conta nova). Estes últimos
+   * ficam órfãos pro workspace atual, então o wizard precisa poder revinculá-los.
+   */
+  findClaimableByOwner(ownerId: string, workspaceId: string): Promise<Channel[]>;
+  /**
+   * Canais com dono (OAuth feito) mas sem Creator vinculado — órfãos de
+   * quando o OAuth ainda não auto-vinculava. Consumido pelo backfill de boot.
+   */
+  findUnlinkedOwned(): Promise<Channel[]>;
   save(channel: Channel): Promise<Channel>;
   delete(id: string): Promise<void>;
 }

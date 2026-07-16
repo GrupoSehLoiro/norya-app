@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/layout/page-header';
+import { UnlinkedChannelsCard } from '@/components/integrations/unlinked-channels-card';
 import { api, getToken } from '@/lib/api-client';
 import { fetchChannels } from '@/lib/queries';
 import { formatDate } from '@/lib/utils';
@@ -22,11 +24,35 @@ interface TwitchIntegration {
   createdAt?: string;
 }
 
+/** Mensagens dos avisos que o callback OAuth devolve em `?warning=`. */
+const WARNING_MESSAGES: Record<string, string> = {
+  noCreator:
+    'Canal conectado, mas o workspace ainda não tem creator — complete o onboarding para vinculá-lo.',
+  chooseCreator:
+    'Canal conectado. Vincule-o a um creator abaixo para ele aparecer no seletor de canais.',
+  autoLinkFailed:
+    'Canal conectado, mas o vínculo automático com o creator falhou — vincule manualmente abaixo.',
+  subscribeFailed:
+    'Canal conectado, mas as subscriptions EventSub falharam — chat/lifecycle podem ficar degradados.',
+  chatViaIrcOnly:
+    'TWITCH_BOT_USER_ID não configurado — chat será lido via IRC (fallback).',
+};
+
 export default function TwitchPage() {
   const qc = useQueryClient();
   const params = useSearchParams();
   const justConnected = params.get('connected') === '1';
   const errorParam = params.get('error');
+  const warnings = (params.get('warning') ?? '').split(',').filter(Boolean);
+
+  // Pós-OAuth o backend criou/vinculou canal — derruba caches pra sidebar
+  // ("Canal ativo") e as listas daqui refletirem na hora.
+  useEffect(() => {
+    if (!justConnected) return;
+    void qc.invalidateQueries({ queryKey: ['channels-v2'] });
+    void qc.invalidateQueries({ queryKey: ['twitch-integrations'] });
+    void qc.invalidateQueries({ queryKey: ['unlinked-integrations'] });
+  }, [justConnected, qc]);
 
   const integrations = useQuery({
     queryKey: ['twitch-integrations'],
@@ -74,8 +100,17 @@ export default function TwitchPage() {
       {justConnected && (
         <div className="rounded-2xl border border-ok/30 bg-ok/[0.08] px-4 py-3 text-sm text-ok">
           ✓ Conta Twitch conectada. Canal cadastrado e tokens persistidos.
+          {warnings.length === 0 && ' Vinculado ao creator — já aparece no seletor de canais.'}
         </div>
       )}
+      {warnings.map((w) => (
+        <div
+          key={w}
+          className="rounded-2xl border border-warn/30 bg-warn/[0.08] px-4 py-3 text-sm text-warn"
+        >
+          {WARNING_MESSAGES[w] ?? `Aviso: ${w}`}
+        </div>
+      ))}
       {errorParam && (
         <div className="rounded-2xl border border-err/30 bg-err/[0.08] px-4 py-3 text-sm text-err">
           Falha na conexão: {errorParam}
@@ -156,10 +191,12 @@ export default function TwitchPage() {
         )}
       </Card>
 
+      <UnlinkedChannelsCard platform="twitch" />
+
       <Card>
         <CardHeader
-          title="Outros canais Twitch no banco"
-          description="Canais sem ownerId (legacy / seed). OAuth não foi feito por aqui."
+          title="Canais Twitch do workspace"
+          description="Canais já vinculados a um creator deste workspace — são estes que aparecem no seletor de canais."
         />
         {channels.isLoading ? (
           <p className="text-sm text-ink-400">…</p>

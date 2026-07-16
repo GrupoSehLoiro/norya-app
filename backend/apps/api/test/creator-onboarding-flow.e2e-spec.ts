@@ -143,7 +143,7 @@ describe('Creator onboarding flow (Fase 2)', () => {
       }),
     );
 
-    const unlinked = await creators.listUnlinkedForUser(userId);
+    const unlinked = await creators.listUnlinkedForUser(userId, workspaceId);
     expect(unlinked.map((i) => i.id)).toContain(channel.getId());
 
     const linked = await creators.linkIntegration(creatorId, workspaceId, userId, channel.getId());
