@@ -4,10 +4,12 @@
  * e por isso não apareciam em /api/v2/channels nem no picker "Canal ativo".
  *
  * Idempotente: só olha canais órfãos; quem já tem vínculo não é tocado.
- * Conservador: só vincula quando a resolução é inequívoca — dono com
- * exatamente 1 membership ativa E workspace com exatamente 1 creator
- * (regra do CreatorService.autoLinkIntegration). Ambiguidade → skip com log;
- * a UI "Canais aguardando vínculo" cobre o resto.
+ * Regras por workspace do dono (dono precisa ter exatamente 1 membership
+ * ativa — senão skip):
+ *  - 1 creator  → vincula (regra do CreatorService.autoLinkIntegration);
+ *  - 0 creators → CRIA um creator com o nome do canal e vincula (o OAuth
+ *    foi feito antes do onboarding — não faz sentido deixar o canal em limbo);
+ *  - 2+ creators → skip com log; a UI "Canais aguardando vínculo" resolve.
  *
  * Erro aqui nunca derruba o boot.
  */
@@ -58,14 +60,19 @@ export class ChannelLinkBackfill implements OnApplicationBootstrap {
         );
         continue;
       }
+      const workspaceId = only.getWorkspaceId();
       try {
-        const result = await this.creators.autoLinkIntegration(
-          only.getWorkspaceId(),
-          ownerId,
-          ch.getId(),
-        );
+        let result = await this.creators.autoLinkIntegration(workspaceId, ownerId, ch.getId());
+        if (result === 'no-creator') {
+          const created = await this.creators.create(workspaceId, {
+            name: ch.getDisplayName() ?? ch.getName(),
+          });
+          await this.creators.linkIntegration(created.id, workspaceId, ownerId, ch.getId());
+          this.logger.log(`creator "${created.name}" criado para ws=${workspaceId}`);
+          result = 'linked';
+        }
         if (result === 'linked') {
-          this.logger.log(`linked channel=${ch.getName()} ws=${only.getWorkspaceId()}`);
+          this.logger.log(`linked channel=${ch.getName()} ws=${workspaceId}`);
         } else {
           this.logger.warn(`skip channel=${ch.getName()}: ${result}`);
         }
