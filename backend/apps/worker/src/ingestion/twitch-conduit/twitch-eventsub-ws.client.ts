@@ -111,26 +111,36 @@ export class TwitchEventSubWsClient extends EventEmitter {
     if (this.closing) return;
 
     this.logger.log(`Conectando em ${this.url}`);
-    this.ws = this.wsFactory(this.url);
+    const socket = this.wsFactory(this.url);
+    this.ws = socket;
 
-    this.ws.on('open', () => {
+    socket.on('open', () => {
       this.logger.log('WS aberto, aguardando session_welcome');
     });
 
-    this.ws.on('message', (raw) => {
+    socket.on('message', (raw) => {
+      // Socket antigo pós-handoff de session_reconnect: ignora frames tardios.
+      if (this.ws !== socket) return;
       this._resetHeartbeat();
       this._handleFrame(raw);
     });
 
-    this.ws.on('close', (code, reason) => {
+    socket.on('close', (code, reason) => {
       this.logger.warn(`WS fechou (code=${code} reason=${reason?.toString() ?? '-'})`);
+      // Close do socket ANTIGO do handoff (session_reconnect): o novo já está
+      // vivo — reagendar aqui criava uma 2ª conexão na reconnect_url já usada,
+      // que a Twitch rejeita com 4007 em loop infinito.
+      if (this.ws !== socket) return;
       this._clearHeartbeat();
       if (!this.closing) {
+        // reconnect_url é de uso único — qualquer retry volta pra URL base
+        // (welcome novo → onWelcome reatribui o shard ao conduit).
+        this.url = DEFAULT_EVENTSUB_WS_URL;
         this._scheduleReconnect();
       }
     });
 
-    this.ws.on('error', (err) => {
+    socket.on('error', (err) => {
       this.logger.error('WS error', err.stack ?? err.message);
     });
   }

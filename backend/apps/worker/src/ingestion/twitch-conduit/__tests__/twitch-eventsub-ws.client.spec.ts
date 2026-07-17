@@ -107,6 +107,7 @@ describe('TwitchEventSubWsClient', () => {
   function makeClient(opts: { url?: string } = {}): {
     client: TwitchEventSubWsClient;
     nextSocket: () => FakeWs;
+    factory: jest.Mock;
   } {
     const factory = jest.fn().mockImplementation(() => {
       const ws = new FakeWs();
@@ -114,7 +115,7 @@ describe('TwitchEventSubWsClient', () => {
       return ws;
     });
     const client = new TwitchEventSubWsClient(handlers, factory, opts);
-    return { client, nextSocket: () => createdSockets[createdSockets.length - 1]! };
+    return { client, nextSocket: () => createdSockets[createdSockets.length - 1]!, factory };
   }
 
   it('chama onWelcome com o session_id e expõe currentSessionId', async () => {
@@ -212,6 +213,48 @@ describe('TwitchEventSubWsClient', () => {
     expect(createdSockets).toHaveLength(2);
     expect(createdSockets[0]!.closed).toBe(true);
     expect(createdSockets[0]!.closeReason).toBe('session_reconnect');
+
+    client.close();
+  });
+
+  it('close do socket antigo pós-session_reconnect NÃO agenda reconexão extra', async () => {
+    const { client, nextSocket } = makeClient();
+    client.connect();
+    nextSocket().emitOpen();
+    nextSocket().emitMessage(welcomeFrame('sess-old'));
+    await Promise.resolve();
+
+    nextSocket().emitMessage(reconnectFrame('wss://eventsub.wss.twitch.tv/ws?reconnect=token'));
+    expect(createdSockets).toHaveLength(2);
+
+    // Regressão do loop 4007: o close do socket ANTIGO (handoff) agendava um
+    // reconnect (~500ms de backoff) na reconnect_url já consumida. Avança além
+    // do backoff mas AQUÉM do heartbeat (15s, que legitimamente reconecta se o
+    // welcome não vier) — nenhuma conexão extra pode surgir nessa janela.
+    jest.advanceTimersByTime(10_000);
+    expect(createdSockets).toHaveLength(2);
+
+    client.close();
+  });
+
+  it('queda após session_reconnect volta para a URL base (reconnect_url é single-use)', async () => {
+    const { client, nextSocket, factory } = makeClient();
+    client.connect();
+    nextSocket().emitOpen();
+    nextSocket().emitMessage(welcomeFrame('sess-old'));
+    await Promise.resolve();
+
+    nextSocket().emitMessage(reconnectFrame('wss://eventsub.wss.twitch.tv/ws?reconnect=token'));
+    const handoffSocket = nextSocket();
+    expect(factory).toHaveBeenLastCalledWith('wss://eventsub.wss.twitch.tv/ws?reconnect=token');
+
+    // A conexão do handoff cai (ex.: 4007 invalid reconnect attempt).
+    handoffSocket.close(4007, 'invalid reconnect attempt');
+    jest.advanceTimersByTime(120_000);
+
+    // O retry deve ir para a URL default, nunca repetir a reconnect_url.
+    expect(createdSockets.length).toBeGreaterThanOrEqual(3);
+    expect(factory).toHaveBeenLastCalledWith('wss://eventsub.wss.twitch.tv/ws');
 
     client.close();
   });
