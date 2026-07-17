@@ -21,19 +21,26 @@ function range(preset: Preset): { from: string; to: string } {
     x.setHours(0, 0, 0, 0);
     return x;
   };
+  // Fim do dia como limite superior — não o `now` do mount. O `range` é
+  // memoizado por `preset`, então usar `now` congelava o `to` no instante em
+  // que o painel montou: batches que chegavam DEPOIS (live em andamento)
+  // ficavam fora da janela e "Assuntos do chat" seguia vazio mesmo com dados.
+  const endOf = (d: Date) => {
+    const x = new Date(d);
+    x.setHours(23, 59, 59, 999);
+    return x;
+  };
   if (preset === 'today') {
-    return { from: startOf(now).toISOString(), to: now.toISOString() };
+    return { from: startOf(now).toISOString(), to: endOf(now).toISOString() };
   }
   if (preset === 'yesterday') {
     const y = new Date(now);
     y.setDate(y.getDate() - 1);
-    const start = startOf(y);
-    const end = startOf(now);
-    return { from: start.toISOString(), to: end.toISOString() };
+    return { from: startOf(y).toISOString(), to: endOf(y).toISOString() };
   }
   const week = new Date(now);
   week.setDate(week.getDate() - 7);
-  return { from: week.toISOString(), to: now.toISOString() };
+  return { from: startOf(week).toISOString(), to: endOf(now).toISOString() };
 }
 
 const PRESETS: { key: Preset; label: string }[] = [
