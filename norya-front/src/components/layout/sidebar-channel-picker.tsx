@@ -24,9 +24,9 @@ export function SidebarChannelPicker() {
   const sessions = useQuery({
     queryKey: ['monitoring-sessions'],
     queryFn: fetchSessions,
-    // Fallback lento — o realtime via SSE (use-monitoring-realtime) já
-    // empurra os flips de online/offline no cache instantaneamente.
-    refetchInterval: 30_000,
+    // Fallback — o realtime via SSE (use-monitoring-realtime) já empurra os
+    // flips de online/offline no cache instantaneamente; 10s limita o pior caso.
+    refetchInterval: 10_000,
   });
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);

@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { PersistenceModule } from '@sehloro/infra';
+import { PersistenceModule, TwitchHelixService } from '@sehloro/infra';
 import { FeatureFlagsModule } from '../feature-flags/feature-flags.module';
 import { TwitchStreamLifecycleHandler } from './event-handlers/twitch-stream-lifecycle.handler';
 import { MonitoringController } from './monitoring.controller';
 import { MonitoringStreamController } from './monitoring-stream.controller';
 import { MonitoringService } from './monitoring.service';
+import { SessionHelixReconcilerCron } from './session-helix-reconciler.cron';
 import { SessionStaleCloserCron } from './session-stale-closer.cron';
 
 /**
@@ -34,7 +35,23 @@ import { SessionStaleCloserCron } from './session-stale-closer.cron';
     }),
   ],
   controllers: [MonitoringController, MonitoringStreamController],
-  providers: [MonitoringService, TwitchStreamLifecycleHandler, SessionStaleCloserCron],
+  providers: [
+    MonitoringService,
+    TwitchStreamLifecycleHandler,
+    SessionStaleCloserCron,
+    SessionHelixReconcilerCron,
+    // Mesmo factory do TwitchWebhookModule — o service é stateless (app token
+    // próprio) e barato de instanciar por módulo.
+    {
+      provide: TwitchHelixService,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const clientId = config.get<string>('TWITCH_CLIENT_ID') ?? '';
+        const clientSecret = config.get<string>('TWITCH_CLIENT_SECRET') ?? '';
+        return new TwitchHelixService(clientId, clientSecret);
+      },
+    },
+  ],
   exports: [MonitoringService],
 })
 export class MonitoringModule {}

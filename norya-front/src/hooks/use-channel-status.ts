@@ -24,7 +24,7 @@ export function useChannelStatus(channelId: string | null) {
       `/api/v2/monitoring/channel-status/${encodeURIComponent(channelId!)}`,
     ),
     // SSE (use-monitoring-realtime) empurra os flips instantaneamente; este
-    // poll é só um fallback lento caso a conexão SSE caia.
-    refetchInterval: 30_000,
+    // poll é fallback caso a conexão SSE caia — 10s limita o pior caso.
+    refetchInterval: 10_000,
   });
 }
