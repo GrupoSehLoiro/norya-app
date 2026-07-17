@@ -17,6 +17,9 @@ export function SidebarChannelPicker() {
   const { data, isLoading } = useQuery({
     queryKey: ['channels-v2'],
     queryFn: fetchChannels,
+    // Canal desconectado (active=false, ex.: disconnect na página de
+    // integrações) sai do picker na hora.
+    select: (xs) => xs.filter((c) => c.active !== false),
   });
   const sessions = useQuery({
     queryKey: ['monitoring-sessions'],

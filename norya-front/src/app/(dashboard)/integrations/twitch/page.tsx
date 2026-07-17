@@ -65,7 +65,8 @@ export default function TwitchPage() {
   const channels = useQuery({
     queryKey: ['channels-v2', 'twitch'],
     queryFn: fetchChannels,
-    select: (xs) => xs.filter((c) => c.platform === 'twitch'),
+    // Só ativos: canal desconectado sai daqui (e do picker) na hora.
+    select: (xs) => xs.filter((c) => c.platform === 'twitch' && c.active !== false),
   });
 
   const disconnect = useMutation({

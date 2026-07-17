@@ -88,7 +88,8 @@ echo "$CHANNELS_JSON" | jq -r '.[] | "   \(.ch)  id=\(.id)  ext=\(.ext)  active=
 
 N_CHAT_SUBS=$(echo "$SUBS_JSON" | jq '[.[] | select(.type=="channel.chat.message")] | length' 2>/dev/null || echo 0)
 if [[ "${N_CHAT_SUBS:-0}" -gt 0 ]]; then
-  ok "$N_CHAT_SUBS subscription(s) channel.chat.message no Mongo"
+  ok "$N_CHAT_SUBS subscription(s) channel.chat.message no Mongo:"
+  echo "$SUBS_JSON" | jq -r '.[] | select(.type=="channel.chat.message") | "   chat → channelId=\(.channelId) (\(.status))"' 2>/dev/null
 else
   fail "NENHUMA subscription channel.chat.message no Mongo — chat nunca vai chegar"
   hint "causa típica: TWITCH_BOT_USER_ID vazio na hora do OAuth (ver seção 3)"
@@ -118,15 +119,18 @@ fi
 
 # ── 6. redis: buffer ao vivo ─────────────────────────────────────────────────
 section "6/7 Redis — buffer de chat ao vivo"
+# O buffer é TRANSIENTE por design: o orchestrator drena (LRANGE+DEL) a cada
+# batch e a key tem TTL de 60s. Vazio aqui NÃO é problema — a prova de fluxo é
+# a seção 7. Só é suspeito se o chat está bombando AGORA e a seção 7 está zerada.
 BUFFERS=$("${DC[@]}" exec -T redis redis-cli --scan --pattern 'chat:buffer:*' 2>/dev/null)
 if [[ -n "$BUFFERS" ]]; then
   while read -r key; do
     len=$("${DC[@]}" exec -T redis redis-cli LLEN "$key" | tr -d '\r')
     echo "   $key → $len msg(s)"
   done <<<"$BUFFERS"
-  ok "buffer(s) presentes"
+  ok "buffer(s) com mensagens aguardando o próximo batch"
 else
-  warn "nenhum chat:buffer:* no Redis (normal se não há live com chat AGORA; ruim se há)"
+  echo "   (vazio — normal: o orchestrator consome e apaga a key a cada batch)"
 fi
 
 # ── 7. clickhouse: dados reais chegando ──────────────────────────────────────

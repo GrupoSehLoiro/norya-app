@@ -38,7 +38,8 @@ export default function KickPage() {
   const channels = useQuery({
     queryKey: ['channels-v2', 'kick'],
     queryFn: fetchChannels,
-    select: (xs) => xs.filter((c) => c.platform === 'kick'),
+    // Só ativos: canal desconectado sai daqui (e do picker) na hora.
+    select: (xs) => xs.filter((c) => c.platform === 'kick' && c.active !== false),
   });
 
   // Paridade com o Twitch: aperta o botão → OAuth. O backend descobre o canal

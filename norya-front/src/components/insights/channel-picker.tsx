@@ -12,6 +12,8 @@ export function ChannelPicker({ value, onChange }: Props) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['channels-v2'],
     queryFn: fetchChannels,
+    // Canal desconectado (active=false) não é opção de análise.
+    select: (xs) => xs.filter((c) => c.active !== false),
   });
 
   return (
