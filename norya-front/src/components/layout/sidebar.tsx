@@ -222,23 +222,6 @@ export function Sidebar() {
         );
       })}
 
-      <div className="mt-auto border-t border-white/[0.06] pt-4">
-        <div className="flex flex-col gap-1.5 px-1.5">
-          <MetaRow label="API"        value="v2.4.1"    tone="ok" />
-          <MetaRow label="Worker"     value="healthy"   tone="ok" />
-          <MetaRow label="Redis"      value="12ms"      tone="ok" />
-          <MetaRow label="ClickHouse" value="degraded"  tone="warn" />
-        </div>
-      </div>
     </aside>
-  );
-}
-
-function MetaRow({ label, value, tone }: { label: string; value: string; tone: 'ok' | 'warn' }) {
-  return (
-    <div className="flex justify-between text-[11.5px] text-ink-400">
-      <span>{label}</span>
-      <span className={tone === 'ok' ? 'text-ok' : 'text-warn'}>{value}</span>
-    </div>
   );
 }

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { SseIndicator } from '@/components/ui/sse-indicator';
+import { useChannelStatus } from '@/hooks/use-channel-status';
 import { useSseInsights } from '@/hooks/use-sse-insights';
 import { fetchBatchInsight } from '@/lib/analytics';
 import { api } from '@/lib/api-client';
@@ -20,6 +21,11 @@ const STATUS_TONE = {
 
 export function LiveFeed({ channelId }: { channelId: string | null }) {
   const { status, events, lastPing, error } = useSseInsights(channelId);
+  // "Conectado" (transporte SSE) ≠ "ao vivo" (live real): o badge verde só
+  // acende com a live rolando; SSE aberto com canal offline vira "aguardando
+  // live" — senão o card parece live com o canal fora do ar.
+  const channelStatus = useChannelStatus(channelId);
+  const channelOnline = channelStatus.data?.online === true;
   const [openId, setOpenId] = useState<string | null>(null);
 
   // Lastro persistido: histórico recente de batches (ClickHouse via REST). O
@@ -54,7 +60,11 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
         </div>
         <div className="flex items-center gap-2 text-xs">
           {status === 'open' ? (
-            <SseIndicator>conectado</SseIndicator>
+            channelOnline ? (
+              <SseIndicator>ao vivo</SseIndicator>
+            ) : (
+              <Badge tone="neutral">aguardando live</Badge>
+            )
           ) : (
             <Badge tone={STATUS_TONE[status]}>{status}</Badge>
           )}
@@ -71,9 +81,11 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
 
       {merged.length === 0 ? (
         <p className="my-auto text-center text-sm text-ink-400">
-          {status === 'open'
-            ? 'Conectado — aguardando o primeiro batch do orchestrator…'
-            : 'Selecione um canal ativo para receber insights ao vivo.'}
+          {status !== 'open'
+            ? 'Selecione um canal ativo para receber insights ao vivo.'
+            : channelOnline
+            ? 'Ao vivo — aguardando o primeiro batch do orchestrator…'
+            : 'Canal offline — o feed retoma automaticamente quando a live abrir.'}
         </p>
       ) : (
         <ul className="max-h-[28rem] space-y-2 overflow-y-auto pr-1">
