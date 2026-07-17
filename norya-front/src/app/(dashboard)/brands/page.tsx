@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader } from '@/components/ui/card';
 import { PageHeader } from '@/components/layout/page-header';
@@ -53,34 +53,11 @@ export default function BrandsPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['brands', channelId] }),
   });
 
-  // Typeahead de catálogo (mesmo flow do onboarding: digitar → aparece → Enter).
-  const [query, setQuery] = useState('');
-  const [debounced, setDebounced] = useState('');
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(query.trim()), 200);
-    return () => clearTimeout(t);
-  }, [query]);
-  const results = useQuery({
-    queryKey: ['brand-catalog', debounced],
-    queryFn: () => searchBrandCatalog(debounced, 8),
-    enabled: debounced.length > 0,
-  });
   const addedNames = new Set((brands.data ?? []).map((b) => b.name.toLowerCase()));
-  const suggestions = (results.data ?? []).filter((b) => !addedNames.has(b.name.toLowerCase()));
 
   function addBrand(name: string, aliases: string[]) {
-    if (!name.trim() || addedNames.has(name.toLowerCase())) {
-      setQuery('');
-      return;
-    }
+    if (!name.trim() || addedNames.has(name.toLowerCase())) return;
     create.mutate({ name: name.trim(), aliases });
-    setQuery('');
-  }
-  function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key !== 'Enter') return;
-    e.preventDefault();
-    if (suggestions[0]) addBrand(suggestions[0].name, suggestions[0].aliases);
-    else if (query.trim()) addBrand(query.trim(), []);
   }
 
   return (
@@ -119,33 +96,15 @@ export default function BrandsPage() {
 
           {manage && (
           <Card>
-            <CardHeader title="Adicionar marca" description="Busque no catálogo e aperte Enter para adicionar. Sem match, Enter adiciona como marca custom." />
-            <div className="relative">
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={onKeyDown}
-                placeholder="Buscar marca… (ex: Red Bull, Nubank, Nike)"
-              />
-              {debounced.length > 0 && suggestions.length > 0 && (
-                <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-white/[0.1] bg-bg-1 p-1 shadow-elevated">
-                  {suggestions.map((b) => (
-                    <li key={b.slug}>
-                      <button
-                        type="button"
-                        onClick={() => addBrand(b.name, b.aliases)}
-                        className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm text-ink-800 hover:bg-white/[0.06]"
-                      >
-                        <span>{b.name}</span>
-                        <span className="text-[10px] uppercase tracking-wide text-ink-400">
-                          {b.sector}{b.country === 'br' ? ' · BR' : ''}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <CardHeader
+              title="Adicionar marca"
+              description="Busque no catálogo e navegue com ↑ ↓ · Enter adiciona · sem match, adicione como marca custom."
+            />
+            <BrandCombobox
+              addedNames={addedNames}
+              onAdd={addBrand}
+              pending={create.isPending}
+            />
             {serverError && (
               <p className="mt-2 rounded-lg border border-err/30 bg-err/[0.08] px-3 py-2 text-sm text-err">{serverError}</p>
             )}
@@ -188,6 +147,196 @@ export default function BrandsPage() {
             )}
           </Card>
         </>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Combobox de catálogo de marcas — dropdown sólido (glass-surface, mesmo
+ * padrão do picker da sidebar), navegação por teclado (↑ ↓ Enter Esc),
+ * highlight sincronizado com o mouse e opção explícita de marca custom
+ * quando a busca não tem match exato. Clique fora fecha.
+ */
+function BrandCombobox({
+  addedNames,
+  onAdd,
+  pending,
+}: {
+  addedNames: Set<string>;
+  onAdd: (name: string, aliases: string[]) => void;
+  pending: boolean;
+}) {
+  const [query, setQuery] = useState('');
+  const [debounced, setDebounced] = useState('');
+  const [open, setOpen] = useState(false);
+  const [highlight, setHighlight] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(query.trim()), 200);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const results = useQuery({
+    queryKey: ['brand-catalog', debounced],
+    queryFn: () => searchBrandCatalog(debounced, 8),
+    enabled: debounced.length > 0,
+  });
+
+  const suggestions = useMemo(
+    () => (results.data ?? []).filter((b) => !addedNames.has(b.name.toLowerCase())),
+    [results.data, addedNames],
+  );
+
+  // Opções = catálogo + "custom" (quando o texto digitado não é match exato).
+  type Option =
+    | { kind: 'catalog'; name: string; aliases: string[]; sector: string; country: string }
+    | { kind: 'custom'; name: string };
+  const options = useMemo<Option[]>(() => {
+    const list: Option[] = suggestions.map((b) => ({
+      kind: 'catalog',
+      name: b.name,
+      aliases: b.aliases,
+      sector: b.sector,
+      country: b.country,
+    }));
+    const typed = query.trim();
+    const exact = suggestions.some((b) => b.name.toLowerCase() === typed.toLowerCase());
+    if (typed.length > 0 && !exact && !addedNames.has(typed.toLowerCase())) {
+      list.push({ kind: 'custom', name: typed });
+    }
+    return list;
+  }, [suggestions, query, addedNames]);
+
+  // Highlight nunca aponta pra fora da lista quando as opções mudam.
+  useEffect(() => {
+    setHighlight((h) => Math.min(h, Math.max(0, options.length - 1)));
+  }, [options.length]);
+
+  // Clique fora fecha o painel.
+  useEffect(() => {
+    if (!open) return;
+    function onDocClick(e: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [open]);
+
+  function pick(opt: Option) {
+    onAdd(opt.name, opt.kind === 'catalog' ? opt.aliases : []);
+    setQuery('');
+    setOpen(false);
+    setHighlight(0);
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Escape') {
+      setOpen(false);
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!open) setOpen(true);
+      if (options.length === 0) return;
+      setHighlight((h) =>
+        e.key === 'ArrowDown' ? (h + 1) % options.length : (h - 1 + options.length) % options.length,
+      );
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const opt = options[highlight] ?? options[0];
+      if (opt) pick(opt);
+    }
+  }
+
+  const showPanel = open && query.trim().length > 0;
+
+  return (
+    <div ref={rootRef} className="relative">
+      <Input
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+          setHighlight(0);
+        }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={onKeyDown}
+        disabled={pending}
+        placeholder="Buscar marca… (ex: Red Bull, Nubank, Nike)"
+        role="combobox"
+        aria-expanded={showPanel}
+        aria-autocomplete="list"
+      />
+      {showPanel && (
+        <div className="glass-surface absolute left-0 right-0 top-full z-30 mt-2 max-h-72 overflow-y-auto p-1.5">
+          {results.isLoading ? (
+            <p className="px-3 py-2 text-xs text-ink-400">buscando no catálogo…</p>
+          ) : options.length === 0 ? (
+            <p className="px-3 py-2 text-xs text-ink-400">
+              nada para adicionar — marca já cadastrada ou busca vazia
+            </p>
+          ) : (
+            <ul role="listbox" className="flex flex-col gap-0.5">
+              {options.map((opt, i) => {
+                const active = i === highlight;
+                return (
+                  <li key={opt.kind === 'catalog' ? `c-${opt.name}` : `x-${opt.name}`}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={active}
+                      onMouseEnter={() => setHighlight(i)}
+                      // onMouseDown pra ganhar do blur/click-outside do input.
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        pick(opt);
+                      }}
+                      className={
+                        'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ease-glass ' +
+                        (active
+                          ? 'bg-gradient-to-br from-accent-300 to-accent-400 text-bg-0'
+                          : 'text-ink-700 hover:text-ink-800')
+                      }
+                    >
+                      {opt.kind === 'catalog' ? (
+                        <>
+                          <span className="truncate font-medium">{opt.name}</span>
+                          <span
+                            className={
+                              'shrink-0 text-[10px] uppercase tracking-[0.1em] ' +
+                              (active ? 'text-bg-0/80' : 'text-ink-400')
+                            }
+                          >
+                            {opt.sector}
+                            {opt.country === 'br' ? ' · BR' : ''}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="truncate">
+                            adicionar <span className="font-semibold">“{opt.name}”</span>
+                          </span>
+                          <span
+                            className={
+                              'shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] ' +
+                              (active ? 'bg-bg-0/15 text-bg-0' : 'bg-white/[0.07] text-ink-400')
+                            }
+                          >
+                            custom
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       )}
     </div>
   );
