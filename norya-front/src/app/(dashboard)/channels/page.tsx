@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
-import { ChannelLiveToggle } from '@/components/monitoring/channel-live-toggle';
+import { ChannelLiveBadge } from '@/components/monitoring/channel-live-badge';
 import { api, ApiError } from '@/lib/api-client';
 import { fetchChannels } from '@/lib/queries';
 import { formatDate } from '@/lib/utils';
@@ -103,7 +103,7 @@ export default function ChannelsPage() {
                       </Link>
                     </td>
                     <td className="py-2 pr-4 text-right">
-                      <ChannelLiveToggle channelId={c.id} />
+                      <ChannelLiveBadge channelId={c.id} />
                     </td>
                   </tr>
                 ))}
