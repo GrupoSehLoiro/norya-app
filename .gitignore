@@ -1,0 +1,8 @@
+# Segredos / chaves — NUNCA commitar
+A-FAZER/norya-deploy-keys.txt
+*.pem
+*_key
+*_key.pub
+id_ed25519*
+id_rsa*
+.env
