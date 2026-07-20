@@ -15,6 +15,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CHANNEL_REPOSITORY, type ChannelRepository } from '@sehloro/domain';
 import {
+  AiContextResolverService,
   BatchMessagesMongooseRepository,
   ReportLlmService,
   type ReportNarrative,
@@ -43,6 +44,8 @@ export interface ReportData {
   narrative: ReportNarrative;
   generatedByAi: boolean;
   sampleSize: number;
+  /** Resumo IA do momento do pico (±10min em torno de metrics.peak). */
+  peakInsight: string | null;
 }
 
 const SAMPLE_TARGET = 60;
@@ -65,6 +68,7 @@ export class InsightsReportService {
     private readonly insights: InsightsService,
     private readonly batchMessages: BatchMessagesMongooseRepository,
     private readonly reportLlm: ReportLlmService,
+    private readonly aiContext: AiContextResolverService,
     @Inject(CHANNEL_REPOSITORY) private readonly channels: ChannelRepository,
   ) {}
 
@@ -79,8 +83,10 @@ export class InsightsReportService {
     const sample = await this._sampleMessages(channelId, from, to);
 
     const context = this._buildContext(metrics, from, to, sample);
-    const ai = await this.reportLlm.generate({ context, channelName });
+    const extraContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
+    const ai = await this.reportLlm.generate({ context, channelName, extraContext });
     const narrative = ai ?? this._templateNarrative(metrics, channelName);
+    const peakInsight = await this._peakInsight(channelId, channelName, metrics, extraContext);
 
     return {
       channelName,
@@ -90,7 +96,52 @@ export class InsightsReportService {
       narrative,
       generatedByAi: Boolean(ai),
       sampleSize: sample.length,
+      peakInsight,
     };
+  }
+
+  /**
+   * "O que aconteceu no pico" — mesmo recorte do drill-down da timeline
+   * (±10min em torno do pico), resumido pela IA para o relatório.
+   */
+  private async _peakInsight(
+    channelId: string,
+    channelName: string,
+    metrics: ReportMetrics,
+    extraContext?: string,
+  ): Promise<string | null> {
+    if (!metrics.peak) return null;
+    const from = new Date(metrics.peak.at.getTime() - 10 * 60_000);
+    const to = new Date(metrics.peak.at.getTime() + 10 * 60_000);
+    const rows = await this.batchMessages
+      .listByChannelInRange({ channelId, from, to, limit: 40 })
+      .catch(() => []);
+    const texts: string[] = [];
+    for (const r of rows) {
+      for (const m of r.messages) {
+        const t = (m.text ?? '').trim();
+        if (t) texts.push(`${m.username}: ${t.slice(0, 180)}`);
+        if (texts.length >= 60) break;
+      }
+      if (texts.length >= 60) break;
+    }
+    if (texts.length === 0) return null;
+    return this.reportLlm.quickInsight({
+      channelName,
+      context:
+        `Mensagens do momento de pico da live (${metrics.peak.messages} msgs na janela):\n` +
+        stripLoneSurrogates(texts.join('\n')),
+      extraContext,
+    });
+  }
+
+  /**
+   * Só as métricas agregadas do período (sem narrativa IA) — alimenta os
+   * boxes de resumo da página de análise, os mesmos números do PDF.
+   */
+  async metrics(channelId: string, from: Date, to: Date): Promise<ReportMetrics> {
+    const batches = await this.insights.history(channelId, from, to, 1000);
+    return this._aggregate(batches);
   }
 
   private _aggregate(batches: BatchAnalysis[]): ReportMetrics {
