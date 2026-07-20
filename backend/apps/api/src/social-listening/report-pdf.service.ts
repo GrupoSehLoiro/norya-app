@@ -74,6 +74,12 @@ export class ReportPdfService {
 
     this._metrics(doc, m, left, width);
     this._highlight(doc, m, left, width);
+    if (data.peakInsight) {
+      ensureSpace(doc, 60);
+      label(doc, 'O que aconteceu no pico', left);
+      body(doc, data.peakInsight, width);
+      doc.moveDown(0.6);
+    }
     this._sentiment(doc, m, left, width);
 
     // ── Conversas ──
@@ -235,11 +241,6 @@ export class ReportPdfService {
       .font('Helvetica')
       .fontSize(10)
       .text(`${compact(data.metrics.totalMessages)} mensagens`, c2, fy + 26);
-    doc
-      .fillColor(COVER_MUTE)
-      .font('Helvetica')
-      .fontSize(8.5)
-      .text(`Emitido em ${fmt(new Date())}`, left, fy + 26, { width, align: 'right' });
   }
 
   /** Quatro cartões de métrica (claros, com tick lime). */
