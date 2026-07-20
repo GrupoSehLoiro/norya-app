@@ -88,6 +88,36 @@ export const fetchChatTopicsHistory = (channelId: string, from?: string, to?: st
     `/api/v2/social-listening/insights/topics/history?${qs({ channelId, from, to })}`,
   );
 
+export interface InsightsSummary {
+  channelId: string;
+  totalMessages: number;
+  activeDays: number;
+  peakUsers: number;
+  windows: number;
+  peak: { at: string; messages: number } | null;
+  topKeywords: { word: string; count: number }[];
+}
+export const fetchInsightsSummary = (channelId: string, from?: string, to?: string) =>
+  api.get<InsightsSummary>(
+    `/api/v2/social-listening/insights/summary?${qs({ channelId, from, to })}`,
+  );
+
+export interface WindowInsight {
+  channelId: string;
+  q: string;
+  total: number;
+  insight: string;
+  aiEnabled: boolean;
+  sample: MessageHit[];
+}
+export const fetchWindowInsight = (
+  channelId: string,
+  opts: { from?: string; to?: string; q?: string },
+) =>
+  api.get<WindowInsight>(
+    `/api/v2/social-listening/insights/window-insight?${qs({ channelId, ...opts })}`,
+  );
+
 export interface BatchInsight {
   batchId: string;
   channelId: string;

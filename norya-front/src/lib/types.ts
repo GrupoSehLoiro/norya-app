@@ -85,6 +85,9 @@ export interface ChannelV2 {
   flags?: Record<string, unknown>;
   active?: boolean;
   externalId?: string | null;
+  displayName?: string | null;
+  /** Foto de perfil do canal na plataforma (quando disponível). */
+  profileImageUrl?: string | null;
   ownerId?: string | null;
   creatorId?: string | null;
   workspaceId?: string | null;
