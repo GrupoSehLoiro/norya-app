@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { InsightCards } from '@/components/insights/insight-cards';
 import type { BatchAnalysis } from '@/lib/types';
 
@@ -30,29 +31,44 @@ const baseAnalysis: BatchAnalysis = {
   insightText: 'mock test',
 };
 
+// O card de marcas usa react-query (contexto por marca + adicionar marca).
+const PERIOD = {
+  channelId: 'c1',
+  from: new Date('2026-05-19T00:00:00Z').toISOString(),
+  to: new Date('2026-05-19T23:59:59Z').toISOString(),
+};
+
+function renderCards(ui: Parameters<typeof InsightCards>[0]) {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={qc}>
+      <InsightCards {...ui} />
+    </QueryClientProvider>,
+  );
+}
+
 describe('<InsightCards />', () => {
   it('renderiza clima geral com label correto', () => {
-    render(<InsightCards analysis={baseAnalysis} />);
+    renderCards({ analysis: baseAnalysis, ...PERIOD });
     expect(screen.getByText('negativo')).toBeInTheDocument();
   });
   // O componente foi enxugado para 3 cards (clima geral, pauta mais
   // comentada, marcas) — pauta menos comentada / user tóxico / badge AD
   // saíram do design. Os testes cobrem o que existe hoje.
   it('renderiza pauta mais comentada', () => {
-    render(<InsightCards analysis={baseAnalysis} />);
+    renderCards({ analysis: baseAnalysis, ...PERIOD });
     expect(screen.getByText('gameplay-negative')).toBeInTheDocument();
   });
   it('renderiza marca mencionada', () => {
-    render(<InsightCards analysis={baseAnalysis} />);
+    renderCards({ analysis: baseAnalysis, ...PERIOD });
     expect(screen.getByText('YoDaSnacks')).toBeInTheDocument();
   });
   it('brandsOverride substitui as marcas do batch (agregado cumulativo)', () => {
-    render(
-      <InsightCards
-        analysis={baseAnalysis}
-        brandsOverride={[{ brand: 'OutraMarca', count: 12, sample: ['m9'] }]}
-      />,
-    );
+    renderCards({
+      analysis: baseAnalysis,
+      brandsOverride: [{ brand: 'OutraMarca', count: 12, sample: ['m9'] }],
+      ...PERIOD,
+    });
     expect(screen.getByText('OutraMarca')).toBeInTheDocument();
     expect(screen.queryByText('YoDaSnacks')).not.toBeInTheDocument();
   });
@@ -66,8 +82,8 @@ describe('<InsightCards />', () => {
       sentimentoAd: null,
       marcasMencionadas: [],
     };
-    render(<InsightCards analysis={empty} />);
+    renderCards({ analysis: empty, ...PERIOD });
     expect(screen.getByText('—')).toBeInTheDocument();
-    expect(screen.getByText('Nenhuma marca do allowlist apareceu')).toBeInTheDocument();
+    expect(screen.getByText('Nenhuma marca monitorada apareceu no chat ainda.')).toBeInTheDocument();
   });
 });

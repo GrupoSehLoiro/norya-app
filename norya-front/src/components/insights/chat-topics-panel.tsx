@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,65 +12,43 @@ function fmtHour(iso: string): string {
   return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
-type Preset = 'today' | 'yesterday' | '7d';
-
-function range(preset: Preset): { from: string; to: string } {
-  const now = new Date();
-  const startOf = (d: Date) => {
-    const x = new Date(d);
-    x.setHours(0, 0, 0, 0);
-    return x;
-  };
-  // Fim do dia como limite superior — não o `now` do mount. O `range` é
-  // memoizado por `preset`, então usar `now` congelava o `to` no instante em
-  // que o painel montou: batches que chegavam DEPOIS (live em andamento)
-  // ficavam fora da janela e "Assuntos do chat" seguia vazio mesmo com dados.
-  const endOf = (d: Date) => {
-    const x = new Date(d);
-    x.setHours(23, 59, 59, 999);
-    return x;
-  };
-  if (preset === 'today') {
-    return { from: startOf(now).toISOString(), to: endOf(now).toISOString() };
-  }
-  if (preset === 'yesterday') {
-    const y = new Date(now);
-    y.setDate(y.getDate() - 1);
-    return { from: startOf(y).toISOString(), to: endOf(y).toISOString() };
-  }
-  const week = new Date(now);
-  week.setDate(week.getDate() - 7);
-  return { from: startOf(week).toISOString(), to: endOf(now).toISOString() };
-}
-
-const PRESETS: { key: Preset; label: string }[] = [
-  { key: 'today', label: 'Hoje' },
-  { key: 'yesterday', label: 'Ontem' },
-  { key: '7d', label: '7 dias' },
-];
-
 /**
  * "Assuntos do chat" — labels dos assuntos mais comentados + descrição via IA
- * (Haiku) para o período escolhido. Fica ao lado do Feed ao vivo.
+ * (Haiku). O período vem do seletor no topo da página (não tem seletor
+ * próprio); assuntos podem ser ocultados individualmente pelo "×".
  */
-export function ChatTopicsPanel({ channelId }: { channelId: string | null }) {
-  const [preset, setPreset] = useState<Preset>('today');
-  const r = useMemo(() => range(preset), [preset]);
+export function ChatTopicsPanel({
+  channelId,
+  from,
+  to,
+}: {
+  channelId: string | null;
+  from: string;
+  to: string;
+}) {
+  // Assuntos ocultados pelo usuário (por sessão de visualização).
+  const [hidden, setHidden] = useState<Set<string>>(() => new Set());
 
   const topics = useQuery({
     enabled: !!channelId,
-    queryKey: ['chat-topics', channelId, preset],
-    queryFn: () => fetchChatTopics(channelId!, r.from, r.to),
+    queryKey: ['chat-topics', channelId, from, to],
+    queryFn: () => fetchChatTopics(channelId!, from, to),
     staleTime: 30_000,
     refetchInterval: 30_000, // dinâmico
   });
   const history = useQuery({
     enabled: !!channelId,
-    queryKey: ['chat-topics-history', channelId, preset],
-    queryFn: () => fetchChatTopicsHistory(channelId!, r.from, r.to),
+    queryKey: ['chat-topics-history', channelId, from, to],
+    queryFn: () => fetchChatTopicsHistory(channelId!, from, to),
     staleTime: 30_000,
     refetchInterval: 30_000,
   });
+
+  function hide(label: string) {
+    setHidden((prev) => new Set(prev).add(label));
+  }
+
+  const visibleLabels = (topics.data?.labels ?? []).filter((l) => !hidden.has(l));
 
   return (
     <Card>
@@ -79,23 +57,15 @@ export function ChatTopicsPanel({ channelId }: { channelId: string | null }) {
         title="Assuntos do chat"
         description="O que mais foi pautado no chat, descrito pela IA."
         actions={
-          <div className="flex gap-1">
-            {PRESETS.map((p) => (
-              <button
-                key={p.key}
-                type="button"
-                onClick={() => setPreset(p.key)}
-                className={
-                  'rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ' +
-                  (preset === p.key
-                    ? 'bg-accent-400 text-bg-0'
-                    : 'bg-white/[0.05] text-ink-400 hover:text-ink-700')
-                }
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+          hidden.size > 0 ? (
+            <button
+              type="button"
+              onClick={() => setHidden(new Set())}
+              className="text-[11px] text-ink-400 transition-colors hover:text-ink-700"
+            >
+              restaurar {hidden.size} oculto(s)
+            </button>
+          ) : null
         }
       />
 
@@ -104,19 +74,28 @@ export function ChatTopicsPanel({ channelId }: { channelId: string | null }) {
       ) : topics.isLoading ? (
         <p className="text-sm text-ink-400">analisando…</p>
       ) : topics.isError ? (
-        <p className="text-sm text-err">Falha ao carregar (precisa do ClickHouse no ar).</p>
+        <p className="text-sm text-err">Não foi possível carregar os assuntos agora.</p>
       ) : (topics.data?.messageCount ?? 0) === 0 ? (
         <p className="text-sm text-ink-400">Sem mensagens nesse período ainda.</p>
       ) : (
         <div className="space-y-4">
-          {topics.data!.labels.length > 0 && (
+          {visibleLabels.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {topics.data!.labels.map((l) => (
+              {visibleLabels.map((l) => (
                 <span
                   key={l}
-                  className="rounded-full border border-accent-400/30 bg-accent-400/[0.08] px-3 py-1 text-sm text-ink-800"
+                  className="group flex items-center gap-1.5 rounded-full border border-accent-400/30 bg-accent-400/[0.08] py-1 pl-3 pr-1.5 text-sm text-ink-800"
                 >
                   {l}
+                  <button
+                    type="button"
+                    onClick={() => hide(l)}
+                    aria-label={`Ocultar assunto ${l}`}
+                    title="Ocultar este assunto"
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] text-ink-400 transition-colors hover:bg-white/[0.10] hover:text-ink-800"
+                  >
+                    ✕
+                  </button>
                 </span>
               ))}
             </div>
@@ -125,7 +104,7 @@ export function ChatTopicsPanel({ channelId }: { channelId: string | null }) {
           <div className="flex items-center justify-between text-[11px] text-ink-400">
             <span>{topics.data!.messageCount} mensagens no período</span>
             <Badge tone={topics.data!.aiEnabled ? 'positive' : 'neutral'}>
-              {topics.data!.aiEnabled ? 'via Haiku' : 'heurístico'}
+              {topics.data!.aiEnabled ? 'descrito pela IA' : 'resumo básico'}
             </Badge>
           </div>
         </div>
