@@ -111,8 +111,8 @@ export class InsightsService {
       batchId: r.batch_id,
       channelId: r.channel_id,
       sessionId: r.session_id,
-      windowStart: new Date(r.window_start),
-      windowEnd: new Date(r.window_end),
+      windowStart: _utc(r.window_start),
+      windowEnd: _utc(r.window_end),
       messageCount: Number(r.message_count),
       messageCountWeighted: Number(r.message_count_weighted),
       uniqueUsers: Number(r.unique_users),
@@ -170,9 +170,20 @@ export class InsightsService {
       llmConfidence: Number(r.llm_confidence),
       needsEscalation: false,
       insightText: r.insight_text ?? '',
-      createdAt: new Date(r.created_at),
+      createdAt: _utc(r.created_at),
     };
   }
+}
+
+/**
+ * ClickHouse devolve DateTime64 como 'YYYY-MM-DD HH:mm:ss.SSS' SEM sufixo de
+ * fuso, mas o valor É UTC. `new Date(...)` interpretaria como hora local do
+ * processo — correto só por acidente quando TZ=UTC (Docker). Normaliza
+ * explicitamente para o parse ser independente do TZ do host.
+ */
+function _utc(s: string): Date {
+  if (/z$|[+-]\d\d:?\d\d$/i.test(s)) return new Date(s);
+  return new Date(s.replace(' ', 'T') + 'Z');
 }
 
 function _dt(d: Date): string {
