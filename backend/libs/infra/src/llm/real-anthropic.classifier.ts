@@ -97,10 +97,16 @@ export class RealAnthropicClassifier implements LlmClassifier {
     const start = Date.now();
     try {
       const client = await this._getClient();
+      // Contexto de treinamento por canal: SEMPRE por último e SEM
+      // cache_control — o prefixo cacheado (3 blocos fixos) fica
+      // byte-idêntico entre canais e o hit rate >80% é preservado.
+      const system = input.aiContext
+        ? [...buildSystemBlocks('v1'), { type: 'text' as const, text: input.aiContext }]
+        : buildSystemBlocks('v1');
       const response = (await client.messages.create({
         model: this.model,
         max_tokens: 600,
-        system: buildSystemBlocks('v1'),
+        system,
         tools: [CLASSIFY_BATCH_TOOL],
         tool_choice: { type: 'tool', name: 'classify_batch' },
         messages: [{ role: 'user', content: serializeAggregate(input.aggregate) }],

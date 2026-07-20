@@ -20,6 +20,16 @@ export interface ReportLlmInput {
   context: string;
   /** Nome do canal/streamer para personalizar o tom. */
   channelName: string;
+  /**
+   * Bloco "Treinamento IA" do canal (AiContextResolver) — curadoria por
+   * categoria/subcategoria/game/marca. Anexado ao system quando presente.
+   */
+  extraContext?: string;
+}
+
+/** Anexa o contexto de treinamento (quando houver) ao system base. */
+function withExtraContext(system: string, input: ReportLlmInput): string {
+  return input.extraContext ? `${system}\n\n${input.extraContext}` : system;
 }
 
 export interface ReportNarrative {
@@ -136,15 +146,17 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 3000,
-        system:
+        system: withExtraContext(
           'Você é um analista de comunidades de streaming que escreve relatórios ' +
-          'executivos em português do Brasil para marcas e streamers, no estilo de um ' +
-          'relatório de dados editorial (data storytelling). Cada frase relevante deve estar ' +
-          'ancorada num número, palavra-chave, marca ou fala real presentes nos dados. ' +
-          'Seja específico e analítico: descreva o que aconteceu e por quê. ' +
-          'NÃO escreva recomendações, conselhos nem próximos passos. ' +
-          'NÃO use frases genéricas que serviriam para qualquer live. ' +
-          'Não invente fatos além dos dados fornecidos.',
+            'executivos em português do Brasil para marcas e streamers, no estilo de um ' +
+            'relatório de dados editorial (data storytelling). Cada frase relevante deve estar ' +
+            'ancorada num número, palavra-chave, marca ou fala real presentes nos dados. ' +
+            'Seja específico e analítico: descreva o que aconteceu e por quê. ' +
+            'NÃO escreva recomendações, conselhos nem próximos passos. ' +
+            'NÃO use frases genéricas que serviriam para qualquer live. ' +
+            'Não invente fatos além dos dados fornecidos.',
+          input,
+        ),
         tools: [REPORT_TOOL],
         tool_choice: { type: 'tool', name: 'gerar_relatorio' },
         messages: [
@@ -194,9 +206,11 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 700,
-        system:
+        system: withExtraContext(
           'Você analisa o chat de lives de streaming e resume, em português do Brasil, ' +
-          'os assuntos mais comentados. Use só os dados fornecidos, não invente.',
+            'os assuntos mais comentados. Use só os dados fornecidos, não invente.',
+          input,
+        ),
         tools: [TOPICS_TOOL],
         tool_choice: { type: 'tool', name: 'descrever_assuntos' },
         messages: [
@@ -237,9 +251,11 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 400,
-        system:
+        system: withExtraContext(
           'Você analisa blocos de chat de lives e devolve um insight curto e ' +
-          'acionável em português do Brasil (2 a 4 frases). Use só os dados dados, não invente.',
+            'acionável em português do Brasil (2 a 4 frases). Use só os dados dados, não invente.',
+          input,
+        ),
         messages: [
           {
             role: 'user',

@@ -49,7 +49,7 @@ import {
 } from '@sehloro/infra';
 import { LLM_CLASSIFIER_TOKEN, type LlmClassifier, FallbackLlmClassifier } from '@sehloro/infra';
 import { AdSegmentService } from './ad-segment.service';
-import { ConfigsLoaderService } from '@sehloro/infra';
+import { AiContextResolverService, ConfigsLoaderService } from '@sehloro/infra';
 import { BatchAnalysisWriter } from './batch-analysis.writer';
 import { PublishInsightService } from './publish-insight.service';
 import { composeBatchAnalysis, type BatchAnalysis } from './batch-analysis.types';
@@ -106,6 +106,7 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
     // (sem créditos, 429, rede, resposta inválida) — nenhum batch é perdido.
     private readonly fallbackLlm: FallbackLlmClassifier,
     private readonly configs: ConfigsLoaderService,
+    private readonly aiContext: AiContextResolverService,
     private readonly brandsRepo: ChannelBrandMongooseRepository,
     private readonly ad: AdSegmentService,
     private readonly writer: BatchAnalysisWriter,
@@ -276,14 +277,16 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
     // rede, JSON inválido) caímos NA HORA na heurística — assim o batch é
     // sempre escrito (degradado), nunca perdido. O circuit breaker interno
     // do real ainda abre após N falhas e passa a curto-circuitar rápido.
+    // Contexto de "Treinamento IA" do canal (cache 60s no resolver).
+    const aiContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
     let tier2: Awaited<ReturnType<LlmClassifier['classify']>>;
     try {
-      tier2 = await this.llm.classify({ aggregate: agg, configs, brandHits });
+      tier2 = await this.llm.classify({ aggregate: agg, configs, brandHits, aiContext });
     } catch (err) {
       this.logger.warn(
         `LLM real falhou (canal=${channelId}) — fallback heurístico: ${(err as Error).message}`,
       );
-      tier2 = await this.fallbackLlm.classify({ aggregate: agg, configs, brandHits });
+      tier2 = await this.fallbackLlm.classify({ aggregate: agg, configs, brandHits, aiContext });
     }
 
     // 8. compose + persist + publish

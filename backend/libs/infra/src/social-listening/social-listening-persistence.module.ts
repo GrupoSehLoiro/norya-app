@@ -30,19 +30,29 @@ import {
   BatchMessagesSchema,
   BatchMessagesSchemaName,
 } from '../persistence/mongoose/schemas/batch-messages.schema';
+import {
+  AiTrainingContextSchema,
+  AiTrainingContextSchemaName,
+} from '../persistence/mongoose/schemas/ai-training-context.schema';
 import { AdSegmentMongooseRepository } from '../persistence/mongoose/repositories/ad-segment.mongoose.repository';
 import { ChannelBrandMongooseRepository } from '../persistence/mongoose/repositories/channel-brand.mongoose.repository';
 import { BatchMessagesMongooseRepository } from '../persistence/mongoose/repositories/batch-messages.mongoose.repository';
+import { PersistenceModule } from '../persistence/mongoose/persistence.module';
 import { ConfigsLoaderService } from './configs-loader.service';
+import { AiContextResolverService } from './ai-context-resolver.service';
 
 @Module({
   imports: [
+    // Ports de Channel/CreatorProfile para o AiContextResolver (canal →
+    // creator → perfil). Sem ciclo: o PersistenceModule não importa este.
+    PersistenceModule,
     MongooseModule.forFeature([
       { name: AdSegmentSchemaName, schema: AdSegmentSchema },
       { name: ChannelBrandSchemaName, schema: ChannelBrandSchema },
       { name: SentimentConfigurationSchemaName, schema: SentimentConfigurationSchema },
       { name: CategoryConfigurationSchemaName, schema: CategoryConfigurationSchema },
       { name: BatchMessagesSchemaName, schema: BatchMessagesSchema },
+      { name: AiTrainingContextSchemaName, schema: AiTrainingContextSchema },
     ]),
   ],
   providers: [
@@ -50,6 +60,7 @@ import { ConfigsLoaderService } from './configs-loader.service';
     ChannelBrandMongooseRepository,
     BatchMessagesMongooseRepository,
     ConfigsLoaderService,
+    AiContextResolverService,
     { provide: AD_SEGMENT_REPOSITORY, useExisting: AdSegmentMongooseRepository },
     { provide: CHANNEL_BRAND_REPOSITORY, useExisting: ChannelBrandMongooseRepository },
   ],
@@ -60,6 +71,7 @@ import { ConfigsLoaderService } from './configs-loader.service';
     ChannelBrandMongooseRepository,
     BatchMessagesMongooseRepository,
     ConfigsLoaderService,
+    AiContextResolverService,
     MongooseModule, // re-exporta forFeature dos schemas SentimentConfig/CategoryConfig
   ],
 })

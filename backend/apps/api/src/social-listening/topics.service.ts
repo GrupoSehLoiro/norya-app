@@ -6,7 +6,7 @@
  */
 import { Inject, Injectable } from '@nestjs/common';
 import { CHANNEL_REPOSITORY, ChannelRepository } from '@sehloro/domain';
-import { ClickHouseClient, ReportLlmService } from '@sehloro/infra';
+import { AiContextResolverService, ClickHouseClient, ReportLlmService } from '@sehloro/infra';
 
 export interface ChatTopics {
   channelId: string;
@@ -25,6 +25,7 @@ export class TopicsService {
   constructor(
     private readonly ch: ClickHouseClient,
     private readonly reportLlm: ReportLlmService,
+    private readonly aiContext: AiContextResolverService,
     @Inject(CHANNEL_REPOSITORY) private readonly channels: ChannelRepository,
   ) {}
 
@@ -84,7 +85,8 @@ export class TopicsService {
         `Mensagens no período: ${messageCount}\n` +
         `Categorias dominantes (por mensagens): ${topCategories.map((c) => `${c.category} (${c.messages})`).join(', ') || '—'}\n` +
         `Tokens mais frequentes: ${topTokens.map((t) => `${t.token} (${t.count})`).join(', ') || '—'}`;
-      const ai = await this.reportLlm.describeTopics({ channelName, context });
+      const extraContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
+      const ai = await this.reportLlm.describeTopics({ channelName, context, extraContext });
       if (ai) {
         aiEnabled = true;
         if (ai.labels.length) labels = ai.labels;
