@@ -15,9 +15,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <MonitoringRealtime />
         <Ambient />
         <Topbar />
-        <div className="relative z-10 mx-auto grid max-w-[1640px] grid-cols-1 gap-5 px-4 pt-[88px] pb-24 md:grid-cols-[244px_1fr] md:items-start">
+        {/* Flex (não grid fixo) — a sidebar pode recolher para 64px. */}
+        <div className="relative z-10 mx-auto flex max-w-[1640px] items-start gap-5 px-4 pt-[88px] pb-24">
           <Sidebar />
-          <main className="min-w-0">{children}</main>
+          <main className="min-w-0 flex-1">{children}</main>
         </div>
       </SelectedChannelProvider>
       </OnboardingGuard>

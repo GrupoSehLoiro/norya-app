@@ -34,13 +34,6 @@ export function Topbar() {
 
       <div className="inline-flex items-center gap-2.5">
         <ThemeToggle />
-        <span className="hidden items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs text-ink-600 lg:inline-flex">
-          <span className="relative inline-block h-[7px] w-[7px] rounded-full bg-ok">
-            <span className="absolute inset-[-3px] rounded-full bg-ok opacity-[0.18] animate-led-halo" />
-          </span>
-          Sistema operacional
-        </span>
-
         {user ? (
           <>
             <span className="hidden text-xs text-ink-600 md:inline">{user.username}</span>
