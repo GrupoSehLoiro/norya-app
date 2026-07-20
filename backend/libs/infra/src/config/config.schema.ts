@@ -129,7 +129,13 @@ export const configSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   /** SMTP (EMAIL_DRIVER=smtp) — ex.: Mailpit local em localhost:1025. */
   SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().int().positive().optional(),
+  // O compose injeta `${SMTP_PORT:-}` → a var chega como STRING VAZIA quando
+  // não está no .env; `.optional()` só cobre undefined e `coerce` faria ""→0.
+  // Trata vazio como ausente pra não derrubar o boot de quem não usa SMTP.
+  SMTP_PORT: z.preprocess(
+    (v) => (v === '' || v == null ? undefined : v),
+    z.coerce.number().int().positive().optional(),
+  ),
   SMTP_SECURE: z.string().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
