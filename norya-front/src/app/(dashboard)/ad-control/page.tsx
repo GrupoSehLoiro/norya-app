@@ -63,6 +63,7 @@ export default function AdControlPage() {
         eyebrow="Anúncios"
         title="Anúncios (AD)"
         description="Frequência e janelas de anúncios durante as lives — quantos, quando e por quanto tempo."
+        info="Registre e acompanhe as janelas de anúncio das lives: quantidade, duração e como o chat reagiu durante cada uma. (Texto provisório.)"
       />
 
       {!channelId ? (

@@ -58,7 +58,8 @@ export default function KickPage() {
       <PageHeader
         eyebrow="Integrações"
         title="Integração Kick"
-        description="Auth OAuth (autorização do streamer) — bot conecta via Pusher protocol no chat."
+        description="Conecte sua conta Kick"
+        info="Conecte sua conta Kick para a plataforma acompanhar o chat do seu canal. (Texto provisório.)"
       />
 
       {status === 'ok' && (

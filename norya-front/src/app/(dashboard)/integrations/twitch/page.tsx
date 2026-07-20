@@ -95,7 +95,8 @@ export default function TwitchPage() {
       <PageHeader
         eyebrow="Integrações"
         title="Integração Twitch"
-        description="Conecte sua conta via OAuth"
+        description="Conecte sua conta Twitch"
+        info="Conecte sua conta Twitch para a plataforma acompanhar o chat do seu canal. Você pode desconectar quando quiser. (Texto provisório.)"
       />
 
       {justConnected && (

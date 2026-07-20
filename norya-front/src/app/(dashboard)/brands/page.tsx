@@ -64,8 +64,9 @@ export default function BrandsPage() {
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
         eyebrow="IA Core"
-        title="Marcas (allowlist)"
-        description="Por canal. Detecção via regex barato; LLM enriquece quando ligado."
+        title="Marcas"
+        description="As marcas que você acompanha em cada canal."
+        info="Cadastre as marcas (e apelidos) que quer acompanhar: a plataforma conta as menções no chat e mostra a evolução ao longo dos dias. (Texto provisório.)"
       />
 
       {!channelId ? (

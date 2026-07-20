@@ -20,7 +20,8 @@ export default function SessionsPage() {
       <PageHeader
         eyebrow="Ingestão"
         title="Sessões ao vivo"
-        description="Endpoint /api/v2/monitoring/sessions — atualiza a cada 10s."
+        description="Lives monitoradas — em andamento e encerradas."
+        info="Cada live monitorada vira uma sessão: aqui você acompanha as que estão no ar e o histórico das encerradas. (Texto provisório.)"
       />
 
       {sessions.isLoading ? (
