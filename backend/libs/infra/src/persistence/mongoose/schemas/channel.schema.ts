@@ -53,6 +53,10 @@ export class ChannelPersistence {
   @Prop({ type: String })
   displayName?: string;
 
+  /** Foto de perfil do canal na plataforma (Helix profile_image_url / Kick). */
+  @Prop({ type: String })
+  profileImageUrl?: string;
+
   @Prop({ type: String, index: true })
   ownerId?: string;
 

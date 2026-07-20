@@ -140,6 +140,7 @@ export class KickOAuthController {
               createdAt: existing.getCreatedAt(),
               externalId: identity.broadcasterUserId || existing.getExternalId(),
               displayName: identity.displayName,
+              avatarUrl: existing.getAvatarUrl(),
               ownerId: userId,
               creatorId: existing.getCreatorId(),
               workspaceId: existing.getWorkspaceId(),

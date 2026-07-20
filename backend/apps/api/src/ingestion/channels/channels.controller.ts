@@ -105,6 +105,7 @@ function serializeChannel(c: Channel) {
     platform: c.getPlatform(),
     externalId: c.getExternalId(),
     displayName: c.getDisplayName(),
+    profileImageUrl: c.getAvatarUrl(),
     ownerId: c.getOwnerId(),
     creatorId: c.getCreatorId(),
     workspaceId: c.getWorkspaceId(),

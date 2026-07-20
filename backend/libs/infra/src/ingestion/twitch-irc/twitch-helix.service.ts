@@ -31,6 +31,7 @@ export interface HelixUserResult {
   id: string;
   login: string;
   displayName: string;
+  profileImageUrl?: string;
 }
 
 interface AppToken {
@@ -77,7 +78,12 @@ export class TwitchHelixService {
     const data = await this._request<{ data: HelixUserRaw[] }>('GET', '/users', { login });
     const user = data?.data?.[0];
     if (!user) return null;
-    return { id: user.id, login: user.login, displayName: user.display_name };
+    return {
+      id: user.id,
+      login: user.login,
+      displayName: user.display_name,
+      profileImageUrl: user.profile_image_url,
+    };
   }
 
   // ─── token management ────────────────────────────────────────────────────
@@ -194,6 +200,7 @@ interface HelixUserRaw {
   id: string;
   login: string;
   display_name: string;
+  profile_image_url?: string;
 }
 
 interface AppTokenResponse {

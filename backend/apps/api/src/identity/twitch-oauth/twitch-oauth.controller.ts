@@ -188,6 +188,7 @@ export class TwitchOAuthController {
               createdAt: existing.getCreatedAt(),
               externalId: user.id,
               displayName: user.display_name,
+              avatarUrl: user.profile_image_url ?? existing.getAvatarUrl(),
               ownerId: userId,
               creatorId: existing.getCreatorId(),
               workspaceId: existing.getWorkspaceId(),
@@ -200,6 +201,7 @@ export class TwitchOAuthController {
               platform: 'twitch',
               externalId: user.id,
               displayName: user.display_name,
+              avatarUrl: user.profile_image_url,
               ownerId: userId,
             }),
           );
@@ -335,6 +337,7 @@ export class TwitchOAuthController {
       createdAt: ch.getCreatedAt(),
       externalId: ch.getExternalId(),
       displayName: ch.getDisplayName(),
+      avatarUrl: ch.getAvatarUrl(),
       ownerId: ch.getOwnerId(),
       creatorId: ch.getCreatorId(),
       workspaceId: ch.getWorkspaceId(),
