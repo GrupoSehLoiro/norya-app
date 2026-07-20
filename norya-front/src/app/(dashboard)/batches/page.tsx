@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { DateRangeFilter, type DateRangeValue } from '@/components/ui/date-range';
+import { InsightText } from '@/components/ui/insight-text';
 import { BatchList } from '@/components/batches/batch-list';
 import { PageHeader } from '@/components/layout/page-header';
 import { useSelectedChannel } from '@/hooks/use-selected-channel';
@@ -115,7 +116,7 @@ export default function BatchesPage() {
                     <p className="text-sm text-err">Não foi possível gerar o resumo agora.</p>
                   ) : aiSummary.data ? (
                     <>
-                      <p className="text-sm leading-relaxed text-ink-700">{aiSummary.data.insight}</p>
+                      <InsightText text={aiSummary.data.insight} />
                       <div className="mt-2">
                         <Badge tone={aiSummary.data.aiEnabled ? 'positive' : 'neutral'}>
                           {aiSummary.data.aiEnabled ? 'resumo via IA' : 'resumo básico'}

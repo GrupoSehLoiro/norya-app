@@ -29,13 +29,34 @@ function sentimentOf(s: string): 'pos' | 'neu' | 'neg' {
   return 'neu';
 }
 
+// Cor por usuário, como no chat da Twitch: determinística pelo username,
+// paleta calibrada pra legibilidade no fundo escuro.
+const NAME_COLORS = [
+  '#ff8a8a', // coral
+  '#7cc4ff', // azul céu
+  '#8ee08e', // verde
+  '#ffb46b', // laranja
+  '#c9a2ff', // lilás
+  '#6fe0cb', // turquesa
+  '#ff9ed2', // rosa
+  '#ffd76e', // âmbar
+  '#9db8ff', // azul lavanda
+  '#b8e986', // lima
+];
+
+function nameColor(username: string): string {
+  let h = 0;
+  for (let i = 0; i < username.length; i++) h = (h * 31 + username.charCodeAt(i)) | 0;
+  return NAME_COLORS[Math.abs(h) % NAME_COLORS.length] ?? '#8ee08e';
+}
+
 function ts(m: MessageHit): number {
   const t = new Date(m.receivedAt).getTime();
   return Number.isNaN(t) ? 0 : t;
 }
 
 const WINDOW_MS = 6 * 60 * 60 * 1000; // janela de busca (6h) — atual e por página de histórico
-const POLL_MS = 12_000;
+const POLL_MS = 8_000; // poll curto: menos espera entre o flush do batch e o replay na tela
 
 /**
  * Feed ao vivo — chat real do canal, no comportamento de um chat de live:
@@ -56,6 +77,7 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
   const [noMore, setNoMore] = useState(false);
   const queueRef = useRef<MessageHit[]>([]);
   const seenRef = useRef<Set<string>>(new Set());
+  const liveIdsRef = useRef<Set<string>>(new Set());
   const bootedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const atBottomRef = useRef(true);
@@ -68,6 +90,7 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
     setNoMore(false);
     queueRef.current = [];
     seenRef.current = new Set();
+    liveIdsRef.current = new Set();
     bootedRef.current = false;
   }, [channelId]);
 
@@ -83,18 +106,20 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
     refetchInterval: POLL_MS,
   });
 
-  // Novas mensagens: primeira carga entra direto; as demais entram na fila
-  // e pingam aos poucos (efeito de chat ao vivo).
+  // Novas mensagens: só a PRIMEIRA resposta com histórico entra direto (é
+  // backdrop, sem animação). Tudo que chega depois — inclusive o primeiro
+  // flush de uma live recém-começada — entra na fila e pinga aos poucos.
   useEffect(() => {
     const items = latest.data?.items;
     if (!items) return;
+    const isBoot = !bootedRef.current;
+    bootedRef.current = true; // mesmo vazia, a 1ª resposta consome o boot
     const fresh = items
       .filter((m) => !seenRef.current.has(m.messageId))
       .sort((a, b) => ts(a) - ts(b));
     if (fresh.length === 0) return;
-    if (!bootedRef.current) {
-      bootedRef.current = true;
-      for (const m of fresh) seenRef.current.add(m.messageId);
+    for (const m of fresh) seenRef.current.add(m.messageId);
+    if (isBoot) {
       setDisplayed(fresh);
       requestAnimationFrame(() => {
         const el = scrollRef.current;
@@ -102,23 +127,40 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
       });
       return;
     }
-    for (const m of fresh) {
-      seenRef.current.add(m.messageId);
-      queueRef.current.push(m);
-    }
+    queueRef.current.push(...fresh);
   }, [latest.data]);
 
-  // Drenagem da fila: 1 mensagem por tick (2 quando a fila acumula) — o lote
-  // vira um fluxo contínuo subindo, como na live.
+  // Drenagem da fila: replay no ritmo REAL do chat — o intervalo entre uma
+  // mensagem e a próxima na tela segue o intervalo dos timestamps em que elas
+  // chegaram na Twitch. Rajada aparece como rajada, pausa como pausa. Quando a
+  // fila acumula (lote grande, chat rápido), o replay acelera em fast-forward
+  // progressivo para nunca ficar para trás — mas nunca despeja em bloco.
   useEffect(() => {
-    const id = setInterval(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      if (cancelled) return;
       const q = queueRef.current;
-      if (q.length === 0) return;
-      const take = q.length > 30 ? 2 : 1;
-      const next = q.splice(0, take);
-      setDisplayed((prev) => [...prev, ...next]);
-    }, 350);
-    return () => clearInterval(id);
+      if (q.length === 0) {
+        timer = setTimeout(tick, 150);
+        return;
+      }
+      const next = q.shift()!;
+      liveIdsRef.current.add(next.messageId);
+      setDisplayed((prev) => [...prev, next]);
+      let delay = 320; // fallback: última da fila, sem próxima como referência
+      if (q.length > 0) {
+        const gap = ts(q[0]!) - ts(next);
+        const factor = q.length > 60 ? 0.15 : q.length > 30 ? 0.3 : q.length > 12 ? 0.6 : 1;
+        delay = Math.max(70, Math.min(1600, Math.round(gap * factor)));
+      }
+      timer = setTimeout(tick, delay);
+    };
+    timer = setTimeout(tick, 150);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, []);
 
   // Auto-acompanhar quando o usuário está colado no fim.
@@ -221,27 +263,34 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
             {list.map((m) => (
               <li
                 key={m.messageId}
-                className="msg-in flex w-fit max-w-full items-center gap-2.5 rounded-2xl rounded-bl-sm border border-white/[0.05] bg-white/[0.02] px-4 py-2.5 text-[13.5px]"
+                className={`${liveIdsRef.current.has(m.messageId) ? 'msg-in ' : ''}flex w-fit max-w-full items-center gap-2.5 rounded-2xl rounded-bl-sm border border-white/[0.05] bg-white/[0.02] px-4 py-2.5 text-[13.5px]`}
               >
                 <span className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${DOT[sentimentOf(m.sentiment)]}`} />
-                <span className="flex-shrink-0 font-medium text-ink-700">{m.username}</span>
-                <span className="min-w-0 break-words text-ink-400">{m.text}</span>
+                <span className="chat-name flex-shrink-0 font-semibold" style={{ color: nameColor(m.username) }}>
+                  {m.username}
+                </span>
+                <span className="min-w-0 break-words text-ink-500">{m.text}</span>
               </li>
             ))}
           </ul>
 
           <style jsx>{`
+            /* paleta dos usernames é calibrada pro escuro; no claro, escurece */
+            :global(html.light) .chat-name {
+              filter: brightness(0.55) saturate(1.4);
+            }
+            /* mesmo easing do pin-in do /landing — chegada suave, sem estouro */
             .msg-in {
-              animation: msg-in 260ms ease-out;
+              animation: msg-in 480ms cubic-bezier(0.22, 1, 0.36, 1);
             }
             @keyframes msg-in {
               from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(14px) scale(0.97);
               }
               to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
               }
             }
           `}</style>

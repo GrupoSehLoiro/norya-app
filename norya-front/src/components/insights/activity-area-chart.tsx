@@ -29,6 +29,7 @@ import { timeFormat } from 'd3-time-format';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { InsightText } from '@/components/ui/insight-text';
 import { api, getToken } from '@/lib/api-client';
 import { searchMessages, fetchWindowInsight } from '@/lib/analytics';
 import {
@@ -514,7 +515,7 @@ function RangeDrilldown({
           ) : insight.isError ? (
             <p className="text-sm text-err">Não foi possível gerar o resumo agora.</p>
           ) : (
-            <p className="text-sm leading-relaxed text-ink-700">{insight.data?.insight}</p>
+            <InsightText text={insight.data?.insight ?? ''} />
           )}
         </div>
         <div>

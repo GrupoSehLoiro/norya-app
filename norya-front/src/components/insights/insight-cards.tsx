@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { InsightText } from '@/components/ui/insight-text';
 import { api, ApiError } from '@/lib/api-client';
 import { fetchWindowInsight } from '@/lib/analytics';
 import { classifySentiment, formatPct } from '@/lib/utils';
@@ -268,7 +269,7 @@ function BrandsCard({
             <p className="mt-2 text-sm text-err">Não foi possível gerar o contexto agora.</p>
           ) : context.data ? (
             <>
-              <p className="mt-2 text-sm leading-relaxed text-ink-700">{context.data.insight}</p>
+              <InsightText className="mt-2 space-y-2 text-sm leading-relaxed text-ink-700" text={context.data.insight} />
               <div className="mt-2">
                 <Badge tone={context.data.aiEnabled ? 'positive' : 'neutral'}>
                   {context.data.aiEnabled ? 'resumo via IA' : 'resumo básico'}

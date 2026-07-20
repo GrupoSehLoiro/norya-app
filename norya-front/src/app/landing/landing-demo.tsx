@@ -3,7 +3,7 @@
 /**
  * Peças vivas da landing (seções aprovadas — manter):
  *  - ChatRail: rio de mensagens do chat rolando no hero (CSS marquee), com
- *    sentimento por mensagem e a anotação da Norya "pinada" por cima.
+ *    sentimento por mensagem.
  *  - Ticker: fita horizontal que alterna o que o CHAT grita com o que a
  *    NORYA detecta — a história de uma live em uma linha.
  */
@@ -59,22 +59,6 @@ export function ChatRail() {
         </ul>
       </div>
 
-      {/* anotação da Norya, pinada sobre o rio — "chega" ~1s depois do load,
-          como uma detecção acontecendo em cima do chat que já corria */}
-      <div
-        className="pin-in absolute -left-6 top-1/2 w-[280px] -translate-y-1/2 rounded-2xl border border-accent-400/25 bg-bg-1/95 p-4 shadow-elevated"
-        style={{ backdropFilter: 'blur(16px)' }}
-      >
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-300">
-          norya · 21:12:44
-        </p>
-        <p className="mt-2 text-[13px] leading-relaxed text-ink-800">
-          Pico detectado: 3× o volume normal. Jogada decisiva, pedidos de clipe
-          em massa — vale cortar.
-        </p>
-        <p className="mt-2 font-mono text-[10px] text-ink-400">+212% msgs · 91% positivo</p>
-      </div>
-
       <style jsx>{`
         @keyframes rail {
           from { transform: translateY(0); }
@@ -82,20 +66,6 @@ export function ChatRail() {
         }
         .animate-rail {
           animation: rail 26s linear infinite;
-        }
-        @keyframes pin-in {
-          from {
-            opacity: 0;
-            transform: translateY(calc(-50% + 12px)) scale(0.97);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(-50%) scale(1);
-          }
-        }
-        .pin-in {
-          opacity: 0;
-          animation: pin-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
         }
       `}</style>
     </div>

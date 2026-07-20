@@ -45,7 +45,7 @@ function useInView<T extends Element>(threshold = 0.25) {
 
 /**
  * Entrada do hero (framer): o bloco de texto chega uma vez, suave — a única
- * animação de load da página além da anotação pinada.
+ * animação de load da página.
  */
 export function HeroIntro({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
@@ -155,8 +155,7 @@ export function MotionStyles() {
         .animate-rail,
         .animate-ticker,
         .pf-line,
-        .pf-area,
-        .pin-in {
+        .pf-area {
           animation: none !important;
           transition: none !important;
           stroke-dashoffset: 0 !important;

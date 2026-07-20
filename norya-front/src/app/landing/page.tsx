@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  *
  * Conceito: "a live, anotada" — layout editorial assimétrico com estética de
  * transmissão. As seções aprovadas (hero com rio de chat, ticker, "feita para
- * quem vive de live") usam a anotação pinada e o mono como assinatura; as
+ * quem vive de live") usam o mono como assinatura; as
  * demais seguem a mesma linguagem: manifesto com marca-texto, produto anotado
  * com callouts, FAQ editorial e CTA como anotação da Norya.
  */
