@@ -24,6 +24,41 @@ function mkAgg(over: Partial<BatchAggregate>): BatchAggregate {
   };
 }
 
+describe('classifyFallback — sentimentWeighted (copypasta pondera)', () => {
+  it('usa o tally ponderado quando presente e a confiança usa o volume real', () => {
+    // 20 "KKKK" (1 única com peso 20, positive) + 1 "ok" (neutral).
+    const agg = mkAgg({
+      totalMsgs: 2,
+      totalMsgsWeighted: 21,
+      sentimentWeighted: { pos: 20, neu: 1, neg: 0 },
+      perUser: [
+        {
+          username: 'a',
+          isSubscriber: false,
+          isMod: false,
+          msgCount: 1,
+          posCount: 1,
+          neuCount: 0,
+          negCount: 0,
+        },
+        {
+          username: 'b',
+          isSubscriber: false,
+          isMod: false,
+          msgCount: 1,
+          posCount: 0,
+          neuCount: 1,
+          negCount: 0,
+        },
+      ],
+    });
+    const out = classifyFallback({ aggregate: agg, configs: emptyConfigs(), brandHits: [] });
+    expect(out.sentiment.pos).toBeCloseTo(20 / 21, 3);
+    expect(out.sentiment.neu).toBeCloseTo(1 / 21, 3);
+    expect(out.confidence).toBeCloseTo(1, 3);
+  });
+});
+
 describe('classifyFallback — sentimentos do perUser', () => {
   it('ratios pos/neg/neu somando 1', () => {
     const agg = mkAgg({

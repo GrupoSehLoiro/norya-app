@@ -60,6 +60,15 @@ function stripLoneSurrogates(s: string): string {
   return s.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
 }
 
+/**
+ * Marcador nativo do Kick `[emote:123:KEKW]` → `KEKW`. O prompt da IA (e a
+ * narrativa que ela devolve) fica com o CÓDIGO limpo — que o relatório HTML
+ * depois renderiza como imagem via dicionário.
+ */
+function normalizeKickEmotes(s: string): string {
+  return s.replace(/\[emote:\d+:([^\]]+)\]/g, '$1');
+}
+
 @Injectable()
 export class InsightsReportService {
   private readonly logger = new Logger(InsightsReportService.name);
@@ -119,7 +128,7 @@ export class InsightsReportService {
     const texts: string[] = [];
     for (const r of rows) {
       for (const m of r.messages) {
-        const t = (m.text ?? '').trim();
+        const t = normalizeKickEmotes((m.text ?? '').trim());
         if (t) texts.push(`${m.username}: ${t.slice(0, 180)}`);
         if (texts.length >= 60) break;
       }
@@ -209,7 +218,7 @@ export class InsightsReportService {
     const all: string[] = [];
     for (const r of rows) {
       for (const m of r.messages) {
-        const text = (m.text ?? '').trim();
+        const text = normalizeKickEmotes((m.text ?? '').trim());
         if (text) all.push(`${m.username}: ${text.slice(0, 180)}`);
       }
     }

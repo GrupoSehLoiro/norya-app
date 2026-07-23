@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { DateRangeFilter, type DateRangeValue } from '@/components/ui/date-range';
 import { InsightText } from '@/components/ui/insight-text';
+import { EmoteText } from '@/components/ui/emote-text';
+import { useChannelEmotes } from '@/hooks/use-channel-emotes';
 import { BatchList } from '@/components/batches/batch-list';
 import { PageHeader } from '@/components/layout/page-header';
 import { useSelectedChannel } from '@/hooks/use-selected-channel';
@@ -16,6 +18,7 @@ import { searchMessages, fetchWindowInsight } from '@/lib/analytics';
 
 export default function BatchesPage() {
   const { channelId } = useSelectedChannel();
+  const emotes = useChannelEmotes(channelId);
   const [term, setTerm] = useState('');
   const [range, setRange] = useState<DateRangeValue>({ from: '', to: '' });
   const [applied, setApplied] = useState(0); // bump p/ disparar a busca
@@ -140,7 +143,7 @@ export default function BatchesPage() {
                       <p className="text-sm text-ink-800">
                         <span className="font-medium">{m.username}</span>
                         {m.isMod && <span className="ml-2 text-[10px] uppercase text-platform-twitch">mod</span>}
-                        <span className="ml-2 text-ink-700">{m.text}</span>
+                        <EmoteText text={m.text} emotes={emotes} className="ml-2 text-ink-700" />
                       </p>
                       <p className="mt-0.5 text-[11px] text-ink-400">{m.receivedAt}</p>
                     </li>

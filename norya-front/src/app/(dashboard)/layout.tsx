@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
-import { Topbar } from '@/components/layout/topbar';
+import { ProfileMenu } from '@/components/layout/profile-menu';
 import { Ambient } from '@/components/layout/ambient';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { OnboardingGuard } from '@/components/auth/onboarding-guard';
@@ -14,11 +14,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <SelectedChannelProvider>
         <MonitoringRealtime />
         <Ambient />
-        <Topbar />
-        {/* Flex (não grid fixo) — a sidebar pode recolher para 64px. */}
-        <div className="relative z-10 mx-auto flex max-w-[1640px] items-start gap-5 px-4 pt-[88px] pb-24">
+        {/* Flex (não grid fixo) — a sidebar pode recolher para 64px. O menu
+            do perfil ancora no canto superior direito do CONTEÚDO (posição
+            absoluta no container), não da viewport. */}
+        <div className="relative z-10 mx-auto flex max-w-[1640px] items-start gap-5 px-4 pt-6 pb-24">
+          <ProfileMenu />
           <Sidebar />
-          <main className="min-w-0 flex-1">{children}</main>
+          <main className="min-w-0 flex-1 pt-8">{children}</main>
         </div>
       </SelectedChannelProvider>
       </OnboardingGuard>

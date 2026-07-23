@@ -11,6 +11,7 @@ import {
 import { z } from 'zod';
 import { RequireWsRole } from '../identity/auth/decorators/require-ws-role.decorator';
 import { BrandService } from './brand.service';
+import { BrandCountsService, type BrandCount } from './brand-counts.service';
 
 const CreateSchema = z.object({
   channelId: z.string().min(1),
@@ -21,12 +22,29 @@ const CreateSchema = z.object({
 
 @Controller('v2/social-listening/brands')
 export class BrandController {
-  constructor(private readonly service: BrandService) {}
+  constructor(
+    private readonly service: BrandService,
+    private readonly counts: BrandCountsService,
+  ) {}
 
   @Get()
   async list(@Query('channelId') channelId: string) {
     if (!channelId) throw new BadRequestException('channelId obrigatório');
     return this.service.list(channelId);
+  }
+
+  /**
+   * Palavras cadastradas do canal + contagem de menções no período, contada
+   * sobre o texto real (retroativo). Base do card "Palavras-chave".
+   */
+  @Get('counts')
+  async brandCounts(
+    @Query('channelId') channelId: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ): Promise<BrandCount[]> {
+    if (!channelId) throw new BadRequestException('channelId obrigatório');
+    return this.counts.counts(channelId, from, to);
   }
 
   /**

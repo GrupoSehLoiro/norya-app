@@ -35,7 +35,9 @@ export function classifyFallback(input: FallbackInput): Tier2Output {
   const { aggregate, configs, brandHits, llmTier = 0 } = input;
   const minMsgs = input.minMsgsForToxRanking ?? DEFAULT_MIN_MSGS;
 
-  // 1. Sentiment global a partir do perUser (já preenchido pelo tier-1).
+  // 1. Sentiment global — usa o tally ponderado por copypasta do aggregate
+  //    quando presente; perUser (não ponderado, atribuição por autor) fica
+  //    como fallback para aggregates antigos/manuais.
   let totalPos = 0;
   let totalNeg = 0;
   let totalNeu = 0;
@@ -45,9 +47,19 @@ export function classifyFallback(input: FallbackInput): Tier2Output {
     totalNeu += u.neuCount;
   }
   const totalHints = totalPos + totalNeg + totalNeu;
+
+  const sw = aggregate.sentimentWeighted;
+  const wPos = sw?.pos ?? totalPos;
+  const wNeg = sw?.neg ?? totalNeg;
+  const wNeu = sw?.neu ?? totalNeu;
+  const totalHintsWeighted = wPos + wNeg + wNeu;
   const sentiment =
-    totalHints > 0
-      ? { pos: totalPos / totalHints, neg: totalNeg / totalHints, neu: totalNeu / totalHints }
+    totalHintsWeighted > 0
+      ? {
+          pos: wPos / totalHintsWeighted,
+          neg: wNeg / totalHintsWeighted,
+          neu: wNeu / totalHintsWeighted,
+        }
       : { pos: 0, neg: 0, neu: 0 };
 
   // 2. Categorias — somar match de tokenFreq contra cada category.keywords.
@@ -108,19 +120,24 @@ export function classifyFallback(input: FallbackInput): Tier2Output {
     ? {
         active: true,
         source: aggregate.adSource,
-        pos: totalPos,
-        neg: totalNeg,
-        neu: totalNeu,
-        sampleSize: aggregate.totalMsgs,
+        pos: wPos,
+        neg: wNeg,
+        neu: wNeu,
+        sampleSize: sw ? aggregate.totalMsgsWeighted : aggregate.totalMsgs,
       }
     : null;
 
-  // 7. Confidence — proporção de msgs com hint definitivo dividido por totalMsgs.
-  const confidence = aggregate.totalMsgs === 0 ? 0 : Math.min(1, totalHints / aggregate.totalMsgs);
+  // 7. Confidence — proporção de msgs com hint definitivo. Ponderada quando
+  //    o aggregate traz sentimentWeighted (denominador = volume real).
+  const confDenominator = sw ? aggregate.totalMsgsWeighted : aggregate.totalMsgs;
+  const confidence =
+    confDenominator === 0
+      ? 0
+      : Math.min(1, (sw ? totalHintsWeighted : totalHints) / confDenominator);
 
   // Heurística pode pedir escalation se confiança < 0.4 e janela
   // razoavelmente populosa.
-  const needsEscalation = confidence < 0.4 && aggregate.totalMsgs > 20;
+  const needsEscalation = confidence < 0.4 && confDenominator > 20;
 
   return {
     sentiment,
@@ -131,7 +148,9 @@ export function classifyFallback(input: FallbackInput): Tier2Output {
     adSentiment,
     confidence,
     needsEscalation,
-    reasoning: `fallback heurístico, ${totalHints}/${aggregate.totalMsgs} msgs com hint`,
+    reasoning: sw
+      ? `fallback heurístico, ${totalHintsWeighted}/${aggregate.totalMsgsWeighted} msgs com hint (ponderado por repetição)`
+      : `fallback heurístico, ${totalHints}/${aggregate.totalMsgs} msgs com hint`,
     llmTier,
     llmModel: 'fallback-keyword',
     llmCostUsd: 0,

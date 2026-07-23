@@ -62,6 +62,20 @@ export const fetchBrandAnalytics = (channelId: string, from?: string, to?: strin
     `/api/v2/social-listening/brands/analytics?${qs({ channelId, from, to })}`,
   );
 
+export interface BrandCount {
+  brand: string;
+  count: number;
+}
+/**
+ * Palavras-chave CADASTRADAS do canal + menções contadas sobre o texto real
+ * no período (retroativo). Diferente de `marcasMencionadas` (só o que o batch
+ * detectou), aqui a palavra aparece assim que é cadastrada, com o contador.
+ */
+export const fetchBrandCounts = (channelId: string, from?: string, to?: string) =>
+  api.get<BrandCount[]>(
+    `/api/v2/social-listening/brands/counts?${qs({ channelId, from, to })}`,
+  );
+
 export interface ChatTopics {
   channelId: string;
   messageCount: number;

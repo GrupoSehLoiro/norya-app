@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ChannelStatusBanner } from '@/components/insights/channel-status-banner';
 import { InsightCards } from '@/components/insights/insight-cards';
@@ -122,27 +121,6 @@ export default function InsightsPage() {
           <StatBox label="Pico de usuários" value={summary.data.peakUsers.toLocaleString('pt-BR')} foot="numa janela do dia" />
           <StatBox label="Janelas" value={summary.data.windows.toLocaleString('pt-BR')} foot="blocos analisados" />
         </section>
-      ) : null}
-
-      {/* Box de palavras-chave (standalone) */}
-      {channelId && (summary.data?.topKeywords.length ?? 0) > 0 ? (
-        <Card>
-          <div className="flex items-center justify-between gap-2">
-            <p className="eyebrow">Palavras-chave</p>
-            <span className="text-xs text-ink-400">mais usadas no período</span>
-          </div>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {summary.data!.topKeywords.slice(0, 18).map((k) => (
-              <li
-                key={k.word}
-                className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5"
-              >
-                <span className="text-sm text-ink-800">{k.word}</span>
-                <Badge tone="accent">{k.count}</Badge>
-              </li>
-            ))}
-          </ul>
-        </Card>
       ) : null}
 
       {!channelId ? (

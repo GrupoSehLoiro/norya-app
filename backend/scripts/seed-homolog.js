@@ -86,6 +86,10 @@ const TEXTS = [
   'esse main ta voando', 'pede a música dj', 'ranqueada agora?', 'streamer cracudo demais',
   'n acredito nessa jogada', 'clipa isso aí', '+1 sub aqui', 'bom demais a live hj',
   'aim absurdo', 'toma esse ace', 'que lag foi esse', 'primeiro no chat pai',
+  // Com emotes (códigos reais Twitch/BTTV/7TV — o front renderiza a imagem)
+  'LUL LUL que jogada', 'clutch demais PogChamp', 'monkaS essa ronda hein',
+  'EZ Clap', 'peepoHappy live boa demais', 'FeelsDankMan perdeu de novo',
+  'Kappa sei', 'PepePls PepePls PepePls',
 ];
 
 // ---------------------------------------------------------------------------
@@ -399,11 +403,15 @@ async function main() {
   await db.collection('channels').deleteMany({
     $or: [{ _id: { $in: CH_IDS } }, { ownerId: { $in: existingUserIds } }],
   });
+  await db.collection('creators').deleteMany({
+    workspaceId: { $in: [...wsIds, ...existingWsIds] },
+  });
 
   // ---- Cria as contas fresh (user + workspace + membership + canal) -------
   const userDocs = [];
   const wsDocs = [];
   const memDocs = [];
+  const creatorDocs = [];
   const chanDocs = [];
   for (const a of ACCOUNTS) {
     userDocs.push({
@@ -441,6 +449,16 @@ async function main() {
       invitedEmail: null,
       createdAt: now,
     });
+    // Creator = unidade de billing ("canais" no chip de workspace). Sem ele,
+    // entitlements.usage.creators fica 0 mesmo com canal cadastrado.
+    creatorDocs.push({
+      _id: `cr-${a.local}`,
+      workspaceId: a.workspaceId,
+      name: a.display,
+      slug: a.channelName,
+      status: 'active',
+      createdAt: now,
+    });
     chanDocs.push({
       _id: a.channelId,
       channel: a.channelName,
@@ -451,7 +469,7 @@ async function main() {
       externalId: a.externalId,
       displayName: a.display,
       ownerId: a.userId,
-      creatorId: null,
+      creatorId: `cr-${a.local}`,
       workspaceId: a.workspaceId,
       flags: {},
       metadata: {},
@@ -461,6 +479,7 @@ async function main() {
   await db.collection('users').insertMany(userDocs);
   await db.collection('workspaces').insertMany(wsDocs);
   await db.collection('memberships').insertMany(memDocs);
+  await db.collection('creators').insertMany(creatorDocs);
   await db.collection('channels').insertMany(chanDocs);
   console.log(`[seed] contas/canais: ${ACCOUNTS.length} criados (limpeza de ${existingUserIds.length} conta(s) antiga(s))`);
 

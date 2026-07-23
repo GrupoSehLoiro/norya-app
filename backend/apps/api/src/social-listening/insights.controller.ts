@@ -1,17 +1,24 @@
-import { BadRequestException, Controller, Get, Query, Res } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Logger, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { AiContextResolverService, ReportLlmService } from '@sehloro/infra';
 import { InsightsService } from './insights.service';
 import { InsightsReportService } from './insights-report.service';
 import { ReportPdfService } from './report-pdf.service';
+import { HtmlPdfRendererService } from './html-pdf-renderer.service';
+import { buildReportHtml } from './report-html';
+import { EmotesService } from './emotes.service';
 import { MessageSearchService } from './message-search.service';
 
 @Controller('v2/social-listening/insights')
 export class InsightsController {
+  private readonly logger = new Logger(InsightsController.name);
+
   constructor(
     private readonly service: InsightsService,
     private readonly reports: InsightsReportService,
     private readonly pdf: ReportPdfService,
+    private readonly htmlPdf: HtmlPdfRendererService,
+    private readonly emotes: EmotesService,
     private readonly messages: MessageSearchService,
     private readonly reportLlm: ReportLlmService,
     private readonly aiContext: AiContextResolverService,
@@ -36,7 +43,7 @@ export class InsightsController {
       throw new BadRequestException('from/to inválido');
     }
     const data = await this.reports.build(channelId, from, to);
-    const buffer = await this.pdf.render(data);
+    const buffer = await this._renderPdf(channelId, data);
     const fname = `relatorio-${channelId}-${to.toISOString().slice(0, 10)}.pdf`;
     res.set({
       'Content-Type': 'application/pdf',
@@ -44,6 +51,29 @@ export class InsightsController {
       'Content-Length': String(buffer.length),
     });
     res.end(buffer);
+  }
+
+  /**
+   * Caminho preferido: HTML → Chromium (emotes como imagem). Sem Chromium na
+   * máquina, ou com erro no render, cai no pdfkit (texto puro) — o relatório
+   * nunca deixa de sair.
+   */
+  private async _renderPdf(
+    channelId: string,
+    data: Awaited<ReturnType<InsightsReportService['build']>>,
+  ): Promise<Buffer> {
+    if (this.htmlPdf.isAvailable()) {
+      try {
+        const dict = await this.emotes
+          .forChannel(channelId)
+          .then((r) => r.emotes)
+          .catch(() => []);
+        return await this.htmlPdf.render(buildReportHtml(data, dict));
+      } catch (err) {
+        this.logger.warn(`render HTML→PDF falhou, caindo p/ pdfkit: ${(err as Error).message}`);
+      }
+    }
+    return this.pdf.render(data);
   }
 
   /**

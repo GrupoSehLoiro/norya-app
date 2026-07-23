@@ -144,8 +144,13 @@ services:
     # Teto de recursos: no incidente de 2026-07-15 um vazamento de processos
     # filhos levou o nest-api a 7 GiB / 2400 PIDs, o OOM killer matou o mongod
     # e o host inteiro travou. Com limite, só o nest-api reinicia.
+    # pids_limit subiu de 256→512 quando o relatório passou a imprimir via
+    # Chromium (HtmlPdfRendererService): o browser forka vários processos e o
+    # cgroup conta cada thread — 256 era apertado e derrubava o render p/ o
+    # fallback pdfkit (sem emoji). O render é serial e fecha após 60s ociosos,
+    # então 512 dá folga mantendo o teto bem abaixo dos 2400 do incidente.
     mem_limit: 2g
-    pids_limit: 256
+    pids_limit: 512
     environment:
       NODE_ENV: production
       API_PORT: "3000"

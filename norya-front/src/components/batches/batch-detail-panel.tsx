@@ -3,6 +3,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
 import { Badge } from '@/components/ui/badge';
+import { EmoteText } from '@/components/ui/emote-text';
+import { useChannelEmotes, type ChannelEmote } from '@/hooks/use-channel-emotes';
 import type { BatchDetail, BatchMessage } from '@/lib/batches-types';
 
 interface Props {
@@ -38,6 +40,7 @@ export function BatchDetailPanel({ batchId }: Props) {
     queryFn: () => api.get<BatchDetail>(`/api/v2/social-listening/batches/${encodeURIComponent(batchId)}`),
     staleTime: 5 * 60_000,
   });
+  const emotes = useChannelEmotes(data?.channelId ?? null);
 
   if (isLoading) return <p className="text-sm text-ink-400">Carregando mensagens…</p>;
   if (error)    return <p className="text-sm text-err">{(error as Error).message}</p>;
@@ -59,14 +62,14 @@ export function BatchDetailPanel({ batchId }: Props) {
 
       <ul className="space-y-1.5">
         {data.messages.map((m) => (
-          <MessageRow key={m.id} message={m} />
+          <MessageRow key={m.id} message={m} emotes={emotes} />
         ))}
       </ul>
     </div>
   );
 }
 
-function MessageRow({ message }: { message: BatchMessage }) {
+function MessageRow({ message, emotes }: { message: BatchMessage; emotes: Map<string, ChannelEmote> }) {
   const sent = sentimentTone(message.sentimentHint);
   return (
     <li
@@ -87,7 +90,9 @@ function MessageRow({ message }: { message: BatchMessage }) {
             <Badge tone={sent.tone}>{message.sentimentHint}</Badge>
           )}
         </div>
-        <p className="mt-0.5 break-words text-sm text-ink-700">{message.text}</p>
+        <p className="mt-0.5 break-words text-sm text-ink-700">
+          <EmoteText text={message.text} emotes={emotes} />
+        </p>
         {message.emotes && message.emotes.length > 0 && (
           <p className="mt-1 font-mono text-[10px] text-ink-400">
             emotes: {message.emotes.join(', ')}

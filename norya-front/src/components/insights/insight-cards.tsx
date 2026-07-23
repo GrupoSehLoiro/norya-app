@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { InsightText } from '@/components/ui/insight-text';
 import { api, ApiError } from '@/lib/api-client';
-import { fetchWindowInsight } from '@/lib/analytics';
+import { fetchWindowInsight, fetchBrandCounts } from '@/lib/analytics';
 import { classifySentiment, formatPct } from '@/lib/utils';
 
 interface InsightCardsProps {
@@ -41,7 +41,13 @@ export function InsightCards({ analysis, brandsOverride, channelId, from, to }: 
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {/* #1 — Clima geral (pizza) */}
+      {/* #1 — Palavras-chave monitoradas (ex-"Marcas mencionadas"): vem
+          primeiro e sempre renderiza (tem empty state), ocupando o slot do
+          antigo card standalone de palavras-chave — que sumia em dia sem
+          atividade e fazia o layout pular. */}
+      <BrandsCard brands={brands} channelId={channelId} from={from} to={to} />
+
+      {/* #2 — Clima geral (pizza) */}
       <Card>
         <p className="eyebrow">Clima geral</p>
         <div className="mt-3 flex flex-wrap items-center gap-6">
@@ -66,7 +72,7 @@ export function InsightCards({ analysis, brandsOverride, channelId, from, to }: 
         </div>
       </Card>
 
-      {/* #2 — Pauta mais comentada (quadro maior, descrição em destaque) */}
+      {/* #3 — Pauta mais comentada (quadro maior, descrição em destaque) */}
       <Card>
         <div className="flex items-baseline justify-between gap-3">
           <p className="eyebrow">Pauta mais comentada</p>
@@ -89,10 +95,6 @@ export function InsightCards({ analysis, brandsOverride, channelId, from, to }: 
           <p className="mt-3 text-sm text-ink-400">—</p>
         )}
       </Card>
-
-      {/* #3 — Marcas mencionadas: clique numa marca gera o contexto via IA;
-          o "+" adiciona novas palavras/marcas ao monitoramento. */}
-      <BrandsCard brands={brands} channelId={channelId} from={from} to={to} />
     </div>
   );
 }
@@ -147,6 +149,18 @@ function BrandsCard({
   const [newBrand, setNewBrand] = useState('');
   const [addMsg, setAddMsg] = useState<string | null>(null);
 
+  // Palavras CADASTRADAS + contagem retroativa sobre o texto real. É a fonte
+  // primária do card: a palavra aparece assim que é cadastrada (mesmo com 0
+  // menções), e a contagem reflete o que já foi dito no período. Enquanto
+  // carrega, cai no que o batch detectou (`brands`) pra não piscar vazio.
+  const countsQuery = useQuery({
+    enabled: !!channelId,
+    queryKey: ['brands-counts', channelId, from, to],
+    queryFn: () => fetchBrandCounts(channelId, from, to),
+    staleTime: 30_000,
+  });
+  const displayBrands = countsQuery.data ?? brands;
+
   // Contexto da marca clicada — resumo das mensagens que a mencionam no
   // período. A busca é por substring: normaliza o nome ("Coca-Cola" → "coca")
   // pra casar com a grafia solta do chat.
@@ -168,6 +182,7 @@ function BrandsCard({
       setNewBrand('');
       setAdding(false);
       void qc.invalidateQueries({ queryKey: ['brands', channelId] });
+      void qc.invalidateQueries({ queryKey: ['brands-counts', channelId] });
     },
     onError: (err) => {
       setAddMsg(err instanceof ApiError ? err.message : 'Falha ao adicionar a marca.');
@@ -177,7 +192,7 @@ function BrandsCard({
   return (
     <Card className="sm:col-span-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="eyebrow">Marcas mencionadas</p>
+        <p className="eyebrow">Palavras-chave</p>
         <button
           type="button"
           onClick={() => { setAdding((v) => !v); setAddMsg(null); }}
@@ -214,11 +229,13 @@ function BrandsCard({
       )}
       {addMsg && <p className="mt-2 text-xs text-ink-400">{addMsg}</p>}
 
-      {brands.length === 0 ? (
-        <p className="mt-3 text-sm text-ink-400">Nenhuma marca monitorada apareceu no chat ainda.</p>
+      {displayBrands.length === 0 ? (
+        <p className="mt-3 text-sm text-ink-400">
+          Nenhuma palavra monitorada cadastrada. Use o + para adicionar uma e acompanhar as menções.
+        </p>
       ) : (
         <ul className="mt-3 flex flex-wrap gap-2">
-          {brands.map((b) => {
+          {displayBrands.map((b) => {
             const active = selected === b.brand;
             return (
               <li key={b.brand}>

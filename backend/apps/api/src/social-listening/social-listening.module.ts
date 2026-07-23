@@ -16,12 +16,14 @@ import {
   AnalyticsModule,
   LlmModule,
   ReportLlmService,
+  TwitchHelixService,
 } from '@sehloro/infra';
 import { SocialListeningController } from './social-listening.controller';
 import { SocialListeningService } from './social-listening.service';
 import { AdSegmentService } from './ad-segment.service';
 import { AdSegmentController } from './ad-segment.controller';
 import { BrandService } from './brand.service';
+import { BrandCountsService } from './brand-counts.service';
 import { BrandController } from './brand.controller';
 import { TwitchAdBreakHandler } from './twitch-ad-break.handler';
 import { JwtModule } from '@nestjs/jwt';
@@ -32,6 +34,7 @@ import { SocialListeningOrchestrator } from './orchestrator.service';
 import { InsightsService } from './insights.service';
 import { InsightsController } from './insights.controller';
 import { StreamController } from './stream.controller';
+import { LiveChatService } from './live-chat.service';
 import { MetricsService } from './metrics.service';
 import { MetricsController } from './metrics.controller';
 import { InsightsReportService } from './insights-report.service';
@@ -47,6 +50,9 @@ import { TopicsService } from './topics.service';
 import { TopicsController } from './topics.controller';
 import { BatchInsightService } from './batch-insight.service';
 import { BatchInsightController } from './batch-insight.controller';
+import { EmotesService } from './emotes.service';
+import { EmotesController } from './emotes.controller';
+import { HtmlPdfRendererService } from './html-pdf-renderer.service';
 
 @Module({
   imports: [
@@ -76,26 +82,42 @@ import { BatchInsightController } from './batch-insight.controller';
     BrandAnalyticsController,
     TopicsController,
     BatchInsightController,
+    EmotesController,
   ],
   providers: [
     SocialListeningService,
     AdSegmentService,
     BrandService,
+    BrandCountsService,
     TwitchAdBreakHandler,
     // ConfigsLoaderService vem exportado do SocialListeningPersistenceModule
     BatchAnalysisWriter,
     PublishInsightService,
     SocialListeningOrchestrator,
     InsightsService,
+    LiveChatService,
     MetricsService,
     ReportLlmService,
     InsightsReportService,
     ReportPdfService,
+    HtmlPdfRendererService,
     MessageSearchService,
     AdSummaryService,
     BrandAnalyticsService,
     TopicsService,
     BatchInsightService,
+    EmotesService,
+    // Instância própria (mesma decisão do MonitoringModule): token de app é
+    // barato e o serviço não guarda estado além do cache do token.
+    {
+      provide: TwitchHelixService,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const clientId = config.get<string>('TWITCH_CLIENT_ID') ?? '';
+        const clientSecret = config.get<string>('TWITCH_CLIENT_SECRET') ?? '';
+        return new TwitchHelixService(clientId, clientSecret);
+      },
+    },
   ],
   exports: [
     SocialListeningService,

@@ -66,6 +66,14 @@ export interface BatchAggregate {
   /** Estatística por usuário (baseada em sentimentHint do tier-1). */
   perUser: PerUserStats[];
 
+  /**
+   * Tally de sentimentHints ponderado por `msgWeights`: cada grupo de
+   * copypasta conta pelo nº real de ocorrências na janela. Sem pesos,
+   * iguala a soma dos counts de perUser. Opcional por compat com
+   * aggregates construídos à mão em testes.
+   */
+  sentimentWeighted?: { pos: number; neu: number; neg: number };
+
   /** Sinal de AD ativa na janela (preenchido pelo orchestrator). */
   adActive: boolean;
   adSource: 'twitch' | 'manual' | null;
@@ -83,6 +91,12 @@ export interface DedupResult {
   unique: RawMessage[];
   /** Hash → contagem real (inclui re-aparições dentro do TTL). */
   groups: Map<string, number>;
+  /**
+   * msg.id (das únicas) → nº de ocorrências DENTRO deste batch. Difere de
+   * `groups` (contagem Redis no TTL, cruza batches): este mapa é o peso
+   * por-janela que o WindowAggregator usa (`msgWeights`).
+   */
+  countsByMsgId: Map<string, number>;
   /** Quantas msgs foram suprimidas (input.length - unique.length). */
   dedupCount: number;
 }

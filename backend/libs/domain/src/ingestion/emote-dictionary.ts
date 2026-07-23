@@ -5,6 +5,7 @@
  * mensagens para enriquecer RawMessageEmote[] antes de entrar no pipeline de IA.
  */
 import seedData from './data/twitch-emotes-seed.json';
+import emojiSeedData from './data/unicode-emojis-seed.json';
 
 export type EmoteSemantic =
   | 'HYPE'
@@ -42,7 +43,12 @@ export class TwitchEmoteDictionary implements EmoteDictionary {
 
   constructor(extraEntries?: Record<string, EmoteEntry>) {
     const seed = seedData as SeedShape;
-    this.map = new Map<string, EmoteEntry>(Object.entries(seed));
+    // Emojis Unicode entram no mesmo dicionário: mensagens só-de-emoji
+    // ganham hint no tier-1 e viram tokens semânticos no replacer.
+    // A curadoria do seed segue o uso corrente em chat pt-BR (ex.: caveira
+    // como riso, palhaço como deboche; emojis ambíguos com polaridade suave).
+    const emojiSeed = emojiSeedData as SeedShape;
+    this.map = new Map<string, EmoteEntry>([...Object.entries(seed), ...Object.entries(emojiSeed)]);
     if (extraEntries) {
       for (const [code, entry] of Object.entries(extraEntries)) {
         this.map.set(code, entry);
@@ -72,6 +78,60 @@ export class TwitchEmoteDictionary implements EmoteDictionary {
   }
 }
 
+// ─── Emojis Unicode ──────────────────────────────────────────────────────────
+
+const EMOJI_CHAR_RE = /\p{Extended_Pictographic}/u;
+
+export interface EmojiMatchers {
+  /** Sem flag g — seguro para `.test()` (não guarda lastIndex). */
+  single: RegExp;
+  /** Flag g — uma ocorrência por match (para matchAll/replace). */
+  global: RegExp;
+  /** Flag g — run consecutivo do mesmo emoji num match só. */
+  run: RegExp;
+}
+
+const matchersCache = new WeakMap<EmoteDictionary, EmojiMatchers | null>();
+
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Regexes das chaves do dicionário que são emoji Unicode (não códigos de
+ * emote tipo "PogChamp"). Cacheado por instância de dicionário — o
+ * orchestrator usa uma instância só, então compila uma vez.
+ * Retorna null se o dicionário não tem nenhum emoji.
+ */
+export function getEmojiMatchers(dictionary: EmoteDictionary): EmojiMatchers | null {
+  const cached = matchersCache.get(dictionary);
+  if (cached !== undefined) return cached;
+  const keys = [...dictionary.entries()]
+    .map(([code]) => code)
+    .filter((code) => EMOJI_CHAR_RE.test(code))
+    // Mais longos primeiro: sequência com variation selector (VS16) deve
+    // ganhar de um prefixo dela.
+    .sort((a, b) => b.length - a.length);
+  let matchers: EmojiMatchers | null = null;
+  if (keys.length > 0) {
+    const src = keys.map(escapeRe).join('|');
+    matchers = {
+      single: new RegExp(src, 'u'),
+      global: new RegExp(src, 'gu'),
+      run: new RegExp(`(${src})(?:\\s*\\1)*`, 'gu'),
+    };
+  }
+  matchersCache.set(dictionary, matchers);
+  return matchers;
+}
+
+/** Todas as ocorrências de emojis conhecidos no texto (na ordem, com repetição). */
+export function findUnicodeEmoteCodes(text: string, dictionary: EmoteDictionary): string[] {
+  const matchers = getEmojiMatchers(dictionary);
+  if (!matchers || !matchers.single.test(text)) return [];
+  return [...text.matchAll(matchers.global)].map((m) => m[0]);
+}
+
 // ─── slangNormalize ──────────────────────────────────────────────────────────
 
 /**
@@ -84,11 +144,12 @@ export class TwitchEmoteDictionary implements EmoteDictionary {
 export function slangNormalize(text: string): string {
   return (
     text
-      // Risadas — kkk (3+), haha, rsrs
+      // Risadas — kkk (3+), hahaha, haaa, rsrs, huehue
       .replace(/k{3,}/gi, '[LAUGH]')
-      .replace(/ha{2,}h?a*/gi, '[LAUGH]')
-      .replace(/(rs){1,}/gi, '[LAUGH_MID]')
-      .replace(/hue{2,}/gi, '[LAUGH_MID]')
+      .replace(/(?:ha){2,}h?/gi, '[LAUGH]')
+      .replace(/ha{2,}/gi, '[LAUGH]')
+      .replace(/(?:rs){2,}/gi, '[LAUGH_MID]')
+      .replace(/(?:hue){2,}/gi, '[LAUGH_MID]')
       // Hype / surpresa
       .replace(/uepa+/gi, '[HYPE_LOW]')
       .replace(/uau+/gi, '[HYPE_LOW]')

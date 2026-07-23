@@ -31,8 +31,9 @@ export class RedisCopypastaDedupService implements CopypastaDedup {
   async process(msgs: ReadonlyArray<RawMessage>): Promise<DedupResult> {
     const unique: RawMessage[] = [];
     const groups = new Map<string, number>();
+    const countsByMsgId = new Map<string, number>();
     if (msgs.length === 0) {
-      return { unique, groups, dedupCount: 0 };
+      return { unique, groups, countsByMsgId, dedupCount: 0 };
     }
 
     // Hash determinístico em paralelo + Redis pipeline.
@@ -54,6 +55,10 @@ export class RedisCopypastaDedupService implements CopypastaDedup {
       throw new Error('RedisCopypastaDedup: pipeline retornou null');
     }
 
+    // Contagem LOCAL do batch (peso por-janela) + hash da msg única do grupo.
+    const batchCounts = new Map<string, number>();
+    const uniqueHashByMsgId = new Map<string, string>();
+
     for (let i = 0; i < msgs.length; i++) {
       const h = hashes[i]!;
       const setReply = replies[i * 3];
@@ -64,19 +69,27 @@ export class RedisCopypastaDedupService implements CopypastaDedup {
       const isFirstEver = setReply?.[1] === 'OK'; // SET NX retorna 'OK' se setou
       const count = (incrReply?.[1] as number) ?? 1;
       groups.set(h, count);
+      batchCounts.set(h, (batchCounts.get(h) ?? 0) + 1);
 
       // Primeira ocorrência: dentro do TTL OU dentro do batch (defesa)
       if (isFirstEver && !seenInBatch.has(h)) {
         unique.push(msgs[i]!);
         seenInBatch.add(h);
+        uniqueHashByMsgId.set(msgs[i]!.id, h);
       } else if (!seenInBatch.has(h)) {
         // segunda+ aparição: NÃO entra em unique
       }
     }
 
+    // Peso por-janela da msg única = quantas vezes o grupo apareceu NESTE batch.
+    for (const [msgId, h] of uniqueHashByMsgId) {
+      countsByMsgId.set(msgId, batchCounts.get(h) ?? 1);
+    }
+
     return {
       unique,
       groups,
+      countsByMsgId,
       dedupCount: msgs.length - unique.length,
     };
   }

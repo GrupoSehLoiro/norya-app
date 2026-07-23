@@ -30,6 +30,8 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { InsightText } from '@/components/ui/insight-text';
+import { EmoteText } from '@/components/ui/emote-text';
+import { useChannelEmotes } from '@/hooks/use-channel-emotes';
 import { api, getToken } from '@/lib/api-client';
 import { searchMessages, fetchWindowInsight } from '@/lib/analytics';
 import {
@@ -257,7 +259,11 @@ export function ActivityAreaChart({
     );
 
   return (
-    <Card>
+    // Com o popover do calendário aberto, o card precisa vencer os cards
+    // seguintes: o hover deles aplica transform (novo stacking context) e
+    // pintaria por cima do popover. z só enquanto aberto — permanente
+    // rebaixaria o overlay expandido (fixed) pra dentro deste contexto.
+    <Card className={pickerOpen ? 'z-20' : undefined}>
       <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-4">
           {channelId ? (
@@ -467,6 +473,7 @@ function RangeDrilldown({
 }) {
   const winFrom = committed ? new Date(committed.a).toISOString() : null;
   const winTo = committed ? new Date(committed.b).toISOString() : null;
+  const emotes = useChannelEmotes(channelId);
 
   const msgs = useQuery({
     enabled: !!committed && !dragging,
@@ -531,7 +538,7 @@ function RangeDrilldown({
               {msgs.data!.items.slice(0, 60).map((m) => (
                 <li key={m.messageId} className="text-sm text-ink-700">
                   <span className="font-medium text-ink-800">{m.username}</span>
-                  <span className="ml-2">{m.text}</span>
+                  <EmoteText text={m.text} emotes={emotes} className="ml-2" />
                 </li>
               ))}
             </ul>

@@ -5,7 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { SseIndicator } from '@/components/ui/sse-indicator';
 import { useChannelStatus } from '@/hooks/use-channel-status';
+import { useChannelEmotes } from '@/hooks/use-channel-emotes';
+import { EmoteText } from '@/components/ui/emote-text';
 import { useSseInsights } from '@/hooks/use-sse-insights';
+import { useLiveChat } from '@/hooks/use-live-chat';
 import { searchMessages, type MessageHit } from '@/lib/analytics';
 import { formatRelative } from '@/lib/utils';
 
@@ -55,21 +58,26 @@ function ts(m: MessageHit): number {
   return Number.isNaN(t) ? 0 : t;
 }
 
-const WINDOW_MS = 6 * 60 * 60 * 1000; // janela de busca (6h) — atual e por página de histórico
-const POLL_MS = 8_000; // poll curto: menos espera entre o flush do batch e o replay na tela
+const WINDOW_MS = 6 * 60 * 60 * 1000; // janela de busca (6h) — histórico inicial e por página
 
 /**
- * Feed ao vivo — chat real do canal, no comportamento de um chat de live:
+ * Feed ao vivo — chat CRU do canal, em tempo real, no comportamento da Twitch:
  *
- *  - Só mensagens que realmente chegaram; se a live parou, ficam as últimas.
+ *  - Cada mensagem chega msg-a-msg via SSE (`/stream/:channelId/chat`), sem
+ *    esperar o batch. O backend faz backfill das últimas ~60s ao conectar.
+ *  - O histórico inicial (antes do backfill) vem de uma busca única em
+ *    batch_messages; rolar até o topo puxa mais páginas antigas.
  *  - Mensagens novas entram AOS POUCOS por baixo, empurrando as antigas para
- *    cima (fila de exibição gradual — um lote de 100 não "estoura" de uma vez).
- *  - Barra de rolagem interna; rolar até o topo puxa o histórico anterior.
+ *    cima (fila de exibição gradual — uma rajada não "estoura" de uma vez).
  *  - Colado no fim = acompanha sozinho; rolou pra cima = posição preservada.
  */
 export function LiveFeed({ channelId }: { channelId: string | null }) {
-  const { status, lastPing, error } = useSseInsights(channelId);
+  // Mantém a invalidação dos gráficos (insights-history/latest) viva; o status
+  // e as mensagens do feed vêm do SSE de chat cru abaixo.
+  useSseInsights(channelId);
+  const { status, lastPing, error, messages: liveMessages } = useLiveChat(channelId);
   const channelStatus = useChannelStatus(channelId);
+  const emotes = useChannelEmotes(channelId);
   const channelOnline = channelStatus.data?.online === true;
 
   // Mensagens exibidas (ascendente: antiga → nova) + fila de entrada gradual.
@@ -94,7 +102,9 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
     bootedRef.current = false;
   }, [channelId]);
 
-  // Poll das mensagens recentes (últimas 6h) — só o que realmente chegou.
+  // Histórico inicial (últimas 6h): busca ÚNICA em batch_messages só pra
+  // preencher a tela quando o feed abre. O tempo real vem do SSE, não daqui —
+  // por isso sem refetchInterval.
   const latest = useQuery({
     enabled: !!channelId,
     queryKey: ['live-feed-latest', channelId],
@@ -103,32 +113,44 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
       const from = new Date(to.getTime() - WINDOW_MS);
       return searchMessages(channelId!, '', from.toISOString(), to.toISOString());
     },
-    refetchInterval: POLL_MS,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
-  // Novas mensagens: só a PRIMEIRA resposta com histórico entra direto (é
-  // backdrop, sem animação). Tudo que chega depois — inclusive o primeiro
-  // flush de uma live recém-começada — entra na fila e pinga aos poucos.
+  // Boot do histórico: a 1ª resposta é prependada (é mais antiga que qualquer
+  // mensagem ao vivo que já tenha entrado pelo SSE). Sem animação — é backdrop.
   useEffect(() => {
     const items = latest.data?.items;
-    if (!items) return;
-    const isBoot = !bootedRef.current;
-    bootedRef.current = true; // mesmo vazia, a 1ª resposta consome o boot
+    if (!items || bootedRef.current) return;
+    bootedRef.current = true;
     const fresh = items
       .filter((m) => !seenRef.current.has(m.messageId))
       .sort((a, b) => ts(a) - ts(b));
     if (fresh.length === 0) return;
     for (const m of fresh) seenRef.current.add(m.messageId);
-    if (isBoot) {
-      setDisplayed(fresh);
+    const el = scrollRef.current;
+    // Se o usuário já rolou pra ler, preserva a posição ao prepend; senão cola no fim.
+    prependDeltaRef.current = el && !atBottomRef.current ? el.scrollHeight - el.scrollTop : null;
+    setDisplayed((prev) => [...fresh, ...prev]);
+    if (prependDeltaRef.current === null) {
       requestAnimationFrame(() => {
-        const el = scrollRef.current;
-        if (el) el.scrollTop = el.scrollHeight;
+        const e = scrollRef.current;
+        if (e) e.scrollTop = e.scrollHeight;
       });
-      return;
     }
-    queueRef.current.push(...fresh);
   }, [latest.data]);
+
+  // Tempo real: cada mensagem do SSE (backfill + ao vivo) entra na fila de
+  // exibição gradual. Dedup por messageId cobre a sobreposição com o histórico.
+  useEffect(() => {
+    if (liveMessages.length === 0) return;
+    const fresh = liveMessages
+      .filter((m) => !seenRef.current.has(m.messageId))
+      .sort((a, b) => ts(a) - ts(b));
+    if (fresh.length === 0) return;
+    for (const m of fresh) seenRef.current.add(m.messageId);
+    queueRef.current.push(...fresh);
+  }, [liveMessages]);
 
   // Drenagem da fila: replay no ritmo REAL do chat — o intervalo entre uma
   // mensagem e a próxima na tela segue o intervalo dos timestamps em que elas
@@ -269,7 +291,7 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
                 <span className="chat-name flex-shrink-0 font-semibold" style={{ color: nameColor(m.username) }}>
                   {m.username}
                 </span>
-                <span className="min-w-0 break-words text-ink-500">{m.text}</span>
+                <EmoteText text={m.text} emotes={emotes} className="min-w-0 break-words text-ink-500" />
               </li>
             ))}
           </ul>

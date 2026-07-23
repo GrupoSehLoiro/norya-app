@@ -77,9 +77,13 @@ export function serializeAggregate(agg: BatchAggregate): string {
     const tag = m.user.isMod ? 'M' : m.user.isSubscriber ? 'S' : '_';
     return `[${tag}] ${m.user.username}: ${m.text.slice(0, 140)}`;
   });
+  const sw = agg.sentimentWeighted;
   return [
     `window=${agg.windowStart.toISOString()} → ${agg.windowEnd.toISOString()}`,
     `totalMsgs=${agg.totalMsgs} weighted=${agg.totalMsgsWeighted} users=${agg.uniqueUsers}`,
+    // Tally do tier-1 ponderado por repetição (copypasta pesa pelo nº real
+    // de ocorrências) — mesmo formato dos few-shots (sentiment_hints={...}).
+    ...(sw ? [`sentiment_hints={pos:${sw.pos},neg:${sw.neg},neu:${sw.neu}}`] : []),
     `isSubscriberRatio=${agg.isSubscriberRatio.toFixed(2)}`,
     `adActive=${agg.adActive} adSource=${agg.adSource ?? 'null'}`,
     `topTokens=${topTokens.join(',')}`,

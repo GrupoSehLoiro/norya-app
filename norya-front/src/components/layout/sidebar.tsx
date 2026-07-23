@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { SidebarChannelPicker } from './sidebar-channel-picker';
 import { useAuth } from '@/hooks/use-auth';
 
 interface NavItem {
@@ -12,8 +11,6 @@ interface NavItem {
   label: string;
   group?: string;
   icon: React.ReactNode;
-  /** Marca o grupo como collapsible (accordion). Default false. */
-  collapsibleGroup?: boolean;
   /** Só aparece para owner/admin do workspace. */
   adminOnly?: boolean;
 }
@@ -65,14 +62,14 @@ const items: NavItem[] = [
   { href: '/feature-flags', label: 'Feature flags', group: 'Admin', adminOnly: true, icon: <Icon d="M6 3v18M18 3v18M3 6h18M3 18h18" /> },
   { href: '/logs',          label: 'Access logs',   group: 'Admin', adminOnly: true, icon: <Icon d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" /> },
   { href: '/access',        label: 'Gerenciador de acesso', group: 'Admin', adminOnly: true, icon: <Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-1a6 6 0 0 1 6-6h1M16 16l2 2 4-4" /> },
-  // Legado — collapsible. Features que vieram da SLMOD-api Express; serão
-  // absorvidas por bounded contexts vivos no M5. Ver docs/technical/legacy-module.md.
-  { href: '/legacy/bans',        label: 'Bans',        group: 'Legado', collapsibleGroup: true, icon: <Icon d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14" /> },
-  { href: '/legacy/timeouts',    label: 'Timeouts',    group: 'Legado', collapsibleGroup: true, icon: <Icon d="M12 8v4l3 2M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" /> },
-  { href: '/legacy/removed',     label: 'Removidas',   group: 'Legado', collapsibleGroup: true, icon: <Icon d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /> },
-  { href: '/legacy/predictions', label: 'Predictions', group: 'Legado', collapsibleGroup: true, icon: <Icon d="M3 17l6-6 4 4 8-8M14 7h7v7" /> },
-  { href: '/legacy/polls',       label: 'Polls',       group: 'Legado', collapsibleGroup: true, icon: <Icon d="M3 12h4v9H3zM10 3h4v18h-4zM17 8h4v13h-4z" /> },
-  { href: '/legacy/emojis',      label: 'Emojis',      group: 'Legado', collapsibleGroup: true, icon: <Icon d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" /> },
+  // Legado — features que vieram da SLMOD-api Express; serão absorvidas por
+  // bounded contexts vivos no M5. Ver docs/technical/legacy-module.md.
+  { href: '/legacy/bans',        label: 'Bans',        group: 'Legado', icon: <Icon d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14" /> },
+  { href: '/legacy/timeouts',    label: 'Timeouts',    group: 'Legado', icon: <Icon d="M12 8v4l3 2M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" /> },
+  { href: '/legacy/removed',     label: 'Removidas',   group: 'Legado', icon: <Icon d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /> },
+  { href: '/legacy/predictions', label: 'Predictions', group: 'Legado', icon: <Icon d="M3 17l6-6 4 4 8-8M14 7h7v7" /> },
+  { href: '/legacy/polls',       label: 'Polls',       group: 'Legado', icon: <Icon d="M3 12h4v9H3zM10 3h4v18h-4zM17 8h4v13h-4z" /> },
+  { href: '/legacy/emojis',      label: 'Emojis',      group: 'Legado', icon: <Icon d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" /> },
 ];
 
 const STORAGE_KEY = 'sehloro:sidebar-collapsed-groups';
@@ -130,7 +127,9 @@ export function Sidebar() {
     });
   }
 
-  // Agrupa preservando ordem de inserção (primeiro item de cada grupo define posição).
+  // Agrupa preservando ordem de inserção (primeiro item de cada grupo define
+  // posição). Toda subcategoria nomeada é colapsável (accordion) — pedido do
+  // design pra reduzir a altura do menu.
   const visibleItems = items.filter((it) => !it.adminOnly || isAdmin);
   const groups: { name: string; items: NavItem[]; collapsible: boolean }[] = [];
   const groupIndex = new Map<string, number>();
@@ -140,11 +139,9 @@ export function Sidebar() {
     if (idx === undefined) {
       idx = groups.length;
       groupIndex.set(key, idx);
-      groups.push({ name: key, items: [], collapsible: false });
+      groups.push({ name: key, items: [], collapsible: key !== '' });
     }
-    const target = groups[idx]!;
-    target.items.push(it);
-    if (it.collapsibleGroup) target.collapsible = true;
+    groups[idx]!.items.push(it);
   }
 
   const path = pathname ?? '';
@@ -153,42 +150,54 @@ export function Sidebar() {
     <aside
       className={cn(
         'hidden md:flex md:flex-col',
-        'sticky top-[88px] z-10',
-        'h-[calc(100vh-104px)] flex-shrink-0',
+        'sticky top-6 z-10',
+        'h-[calc(100vh-48px)] flex-shrink-0',
         'glass-surface gap-5 overflow-y-auto',
         'transition-[width] duration-200',
         slim ? 'w-[64px] p-[18px_10px]' : 'w-[244px] p-[18px_14px]',
       )}
     >
-      <button
-        type="button"
-        onClick={toggleSlim}
-        aria-label={slim ? 'Expandir menu' : 'Recolher menu'}
-        title={slim ? 'Expandir menu' : 'Recolher menu'}
-        className={cn(
-          'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12px] font-medium text-ink-400',
-          'transition-colors hover:bg-white/[0.04] hover:text-ink-700',
-          slim && 'justify-center px-0',
-        )}
-      >
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={cn('flex-shrink-0 transition-transform duration-200', slim && 'rotate-180')}
-          aria-hidden
+      {/* Logo em cima do menu: wordmark expandida, símbolo quando recolhida. */}
+      <div className={cn('flex items-center', slim ? 'flex-col gap-2' : 'justify-between pl-2.5 pr-1')}>
+        <Link
+          href="/dashboard"
+          aria-label="Norya — início"
+          className="text-accent-400 transition-opacity hover:opacity-80"
         >
-          <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />
-        </svg>
-        {!slim && <span>Recolher menu</span>}
-      </button>
-
-      {!slim && <SidebarChannelPicker />}
+          {slim ? (
+            <span className="text-[22px] font-bold tracking-tight">N</span>
+          ) : (
+            <span className="text-[22px] font-bold tracking-tight">Norya</span>
+          )}
+        </Link>
+        <button
+          type="button"
+          onClick={toggleSlim}
+          aria-label={slim ? 'Expandir menu' : 'Recolher menu'}
+          title={slim ? 'Expandir menu' : 'Recolher menu'}
+          className={cn(
+            'flex h-8 w-8 items-center justify-center rounded-lg text-ink-400',
+            'transition-colors hover:bg-white/[0.04] hover:text-ink-700',
+          )}
+        >
+          {/* Símbolo padrão de recolher/expandir painel lateral */}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.7"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M9 3v18" />
+            {slim ? <path d="m14 9 3 3-3 3" /> : <path d="m17 15-3-3 3-3" />}
+          </svg>
+        </button>
+      </div>
 
       {groups.map(({ name, items: list, collapsible }) => {
         const isCollapsed = !slim && collapsible && collapsed.has(name);

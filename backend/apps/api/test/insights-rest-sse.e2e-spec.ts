@@ -21,6 +21,10 @@ import {
   SocialListeningPersistenceModule,
   LLM_CLASSIFIER_TOKEN,
   MockLlmClassifier,
+  FallbackLlmClassifier,
+  PersistenceModule,
+  ReportLlmService,
+  TwitchHelixService,
 } from '@sehloro/infra';
 import { COPYPASTA_DEDUP_TOKEN, EVENT_BUS_TOKEN, type RawMessage } from '@sehloro/domain';
 import { ConfigsLoaderService } from '@sehloro/infra';
@@ -30,6 +34,11 @@ import { AdSegmentService } from '../src/social-listening/ad-segment.service';
 import { SocialListeningOrchestrator } from '../src/social-listening/orchestrator.service';
 import { InsightsService } from '../src/social-listening/insights.service';
 import { InsightsController } from '../src/social-listening/insights.controller';
+import { InsightsReportService } from '../src/social-listening/insights-report.service';
+import { ReportPdfService } from '../src/social-listening/report-pdf.service';
+import { HtmlPdfRendererService } from '../src/social-listening/html-pdf-renderer.service';
+import { EmotesService } from '../src/social-listening/emotes.service';
+import { MessageSearchService } from '../src/social-listening/message-search.service';
 
 const CHANNEL = 'rest-sse-' + randomUUID().slice(0, 6);
 
@@ -65,6 +74,8 @@ describe('REST /insights — happy path', () => {
 
   beforeAll(async () => {
     process.env.SOCIAL_LISTENING_CHANNELS = CHANNEL;
+    // Gate de gap-of-silence desligado: o teste empurra msgs e drena na sequência.
+    process.env.SOCIAL_LISTENING_IDLE_GAP_MS = '0';
     if (!process.env.CLICKHOUSE_URL) process.env.CLICKHOUSE_URL = 'http://clickhouse:8123';
     if (!process.env.CLICKHOUSE_USER) process.env.CLICKHOUSE_USER = 'default';
     if (!process.env.CLICKHOUSE_PASSWORD) process.env.CLICKHOUSE_PASSWORD = 'devpass';
@@ -79,6 +90,7 @@ describe('REST /insights — happy path', () => {
       imports: [
         ConfigModule.forRoot({ isGlobal: true, cache: true, ignoreEnvFile: true }),
         MongooseModule.forRoot(process.env.MONGODB_URI!),
+        PersistenceModule,
         SocialListeningPersistenceModule,
         AnalyticsModule.forRootAsync(),
         JwtModule.registerAsync({
@@ -95,12 +107,28 @@ describe('REST /insights — happy path', () => {
         { provide: EVENT_BUS_TOKEN, useValue: bus },
         MockLlmClassifier,
         { provide: LLM_CLASSIFIER_TOKEN, useExisting: MockLlmClassifier },
+        FallbackLlmClassifier,
         ConfigsLoaderService,
         BatchAnalysisWriter,
         PublishInsightService,
         AdSegmentService,
         SocialListeningOrchestrator,
         InsightsService,
+        InsightsReportService,
+        ReportPdfService,
+        HtmlPdfRendererService,
+        MessageSearchService,
+        ReportLlmService,
+        EmotesService,
+        {
+          provide: TwitchHelixService,
+          inject: [ConfigService],
+          useFactory: (config: ConfigService) =>
+            new TwitchHelixService(
+              config.get<string>('TWITCH_CLIENT_ID') ?? '',
+              config.get<string>('TWITCH_CLIENT_SECRET') ?? '',
+            ),
+        },
       ],
     }).compile();
 
@@ -108,7 +136,7 @@ describe('REST /insights — happy path', () => {
     app.setGlobalPrefix('api');
     await app.init();
     orchestrator = moduleRef.get(SocialListeningOrchestrator);
-  });
+  }, 30_000);
 
   afterAll(async () => {
     if (app) await app.close();

@@ -264,6 +264,8 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
       unique: kept,
       groups: deduped.groups,
       sentimentHints: hints,
+      // Peso por-janela do grupo copypasta: pondera sentimento e topTokens.
+      msgWeights: deduped.countsByMsgId,
       adActive: adStatus.active,
       adSource: adStatus.source,
       emoteDictionary: this.emoteDictionary,

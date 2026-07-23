@@ -9,6 +9,7 @@
     "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": "<rootDir>/tsconfig.e2e.json" }]
   },
   "moduleNameMapper": {
+    "^puppeteer-core$": "<rootDir>/stubs/puppeteer-core.stub.ts",
     "^@sehloro/domain$": "<rootDir>/../../../libs/domain/src",
     "^@sehloro/domain/(.*)$": "<rootDir>/../../../libs/domain/src/$1",
     "^@sehloro/infra$": "<rootDir>/../../../libs/infra/src",

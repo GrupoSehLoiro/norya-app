@@ -1,4 +1,5 @@
 import type { RawMessage } from '../../../ingestion/raw-message';
+import { TwitchEmoteDictionary } from '../../../ingestion/emote-dictionary';
 import { classifyHeuristic } from '../heuristic-classifier';
 import type { ClassifierConfigs } from '../types';
 import { emptyConfigs } from '../types';
@@ -128,5 +129,45 @@ describe('classifyHeuristic — keep + hints', () => {
     });
     const r = classifyHeuristic({ msg: mkMsg('jogou valorant subiu rank'), configs: cfg });
     expect(r.categoryHint).toBe('game');
+  });
+});
+
+describe('classifyHeuristic — emojis Unicode', () => {
+  const dict = new TwitchEmoteDictionary();
+
+  it('mensagem só de emojis (run colado) → keep com hint positivo', () => {
+    const r = classifyHeuristic({
+      msg: mkMsg('😂😂😂'),
+      configs: emptyConfigs(),
+      emoteDictionary: dict,
+    });
+    expect(r.kind).toBe('keep');
+    expect(r.categoryHint).toBe('emote_only');
+    expect(r.sentimentHint).toBe('positive');
+  });
+
+  it('emoji único curto NÃO cai em drop_short', () => {
+    const r = classifyHeuristic({
+      msg: mkMsg('🔥'),
+      configs: emptyConfigs(),
+      emoteDictionary: dict,
+    });
+    expect(r.kind).toBe('keep');
+    expect(r.sentimentHint).toBe('positive');
+  });
+
+  it('emoji negativo → hint negativo', () => {
+    const r = classifyHeuristic({
+      msg: mkMsg('🤡🤡'),
+      configs: emptyConfigs(),
+      emoteDictionary: dict,
+    });
+    expect(r.kind).toBe('keep');
+    expect(r.sentimentHint).toBe('negative');
+  });
+
+  it('sem dicionário, emoji único continua caindo em drop_short (comportamento antigo)', () => {
+    const r = classifyHeuristic({ msg: mkMsg('🔥'), configs: emptyConfigs() });
+    expect(r.kind).toBe('drop_short');
   });
 });
