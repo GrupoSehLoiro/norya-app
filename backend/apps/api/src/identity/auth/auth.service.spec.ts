@@ -254,7 +254,7 @@ describe('AuthService.refresh', () => {
       expect(err).toBeInstanceOf(UnauthorizedException);
       expect((err as UnauthorizedException).getResponse()).toEqual(
         expect.objectContaining({
-          message: 'Refresh reutilizado — sessão revogada',
+          message: 'Refresh reutilizado. Sessão revogada',
         }),
       );
     }
