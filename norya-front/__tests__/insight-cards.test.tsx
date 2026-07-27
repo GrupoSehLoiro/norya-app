@@ -84,6 +84,10 @@ describe('<InsightCards />', () => {
     };
     renderCards({ analysis: empty, ...PERIOD });
     expect(screen.getByText('—')).toBeInTheDocument();
-    expect(screen.getByText('Nenhuma marca monitorada apareceu no chat ainda.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Nenhuma palavra monitorada cadastrada. Use o + para adicionar uma e acompanhar as menções.',
+      ),
+    ).toBeInTheDocument();
   });
 });
