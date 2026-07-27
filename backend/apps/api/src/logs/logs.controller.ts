@@ -1,9 +1,11 @@
 /**
  * GET /api/v2/logs — consulta de access logs (API + worker).
  *
- * Protegido por Basic Auth operacional (LOGS_USER/LOGS_PASSWORD do .env),
- * NÃO pelo JWT do produto — ver LogsBasicAuthGuard. Consumido pela página
- * /logs do console e por curl.
+ * Protegido pelo JWT do produto (JwtAuthGuard global) + role=admin inline —
+ * mesmo padrão do AdminUsersController/FeatureFlagsController. A antiga
+ * credencial Basic operacional (LOGS_USER/LOGS_PASSWORD) foi removida: quem
+ * já é admin no console vê os logs sem um segundo login. Consumido pela
+ * página /logs do console.
  *
  * Filtros (todos opcionais, combináveis):
  *   ?service=api|worker    origem
@@ -14,21 +16,17 @@
  *   ?from=ISO&to=ISO       janela temporal
  *   ?limit=100             máx. 500
  */
-import { BadRequestException, Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, ForbiddenException, Get, Query } from '@nestjs/common';
 import { AccessLogService, type AccessLogSource } from '@sehloro/infra';
-import { Public } from '../identity/auth/decorators/public.decorator';
-import { LogsBasicAuthGuard } from './logs-basic-auth.guard';
+import { CurrentUser, type AuthUser } from '../identity/auth/decorators/current-user.decorator';
 
-// @Public() só bypassa o JwtAuthGuard global — a rota continua fechada,
-// mas pela credencial Basic operacional (LogsBasicAuthGuard), não por JWT.
-@Public()
 @Controller('v2/logs')
-@UseGuards(LogsBasicAuthGuard)
 export class LogsController {
   constructor(private readonly accessLog: AccessLogService) {}
 
   @Get()
   async list(
+    @CurrentUser() user: AuthUser,
     @Query('service') service?: string,
     @Query('method') method?: string,
     @Query('status') status?: string,
@@ -38,6 +36,7 @@ export class LogsController {
     @Query('to') to?: string,
     @Query('limit') limit?: string,
   ) {
+    if (user?.role !== 'admin') throw new ForbiddenException();
     if (service && service !== 'api' && service !== 'worker') {
       throw new BadRequestException('service deve ser "api" ou "worker"');
     }

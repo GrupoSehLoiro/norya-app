@@ -76,19 +76,81 @@ describe('emotesToHtml', () => {
 });
 
 describe('buildReportHtml', () => {
-  it('gera documento completo com capa, métricas e emotes nas seções', () => {
+  it('gera documento completo com herói, métricas e emotes', () => {
     const html = buildReportHtml(baseData(), DICT);
     expect(html).toContain('gabs_tv');
-    expect(html).toContain('RELATÓRIO DE COMUNIDADE DA LIVE');
-    // resumo executivo e narrativa com emote como imagem
+    expect(html).toContain('Relatório de comunidade da live');
+    // resumo executivo, chips e narrativa com emote como imagem
     expect(html.match(/class="emote"/g)!.length).toBeGreaterThanOrEqual(3);
-    // chips de palavras-chave: KEKW vira imagem, clutch fica texto
-    expect(html).toContain('<span class="chip">clutch</span>');
+    // chips de palavras-chave com contagem: KEKW vira imagem, clutch fica texto
+    expect(html).toContain('<span class="chip">clutch<i>7</i></span>');
     // barras de sentimento com os percentuais
     expect(html).toContain('Positivo 60%');
     expect(html).toContain('Negativo 10%');
-    // toxicidade em vermelho
-    expect(html).toContain('bar-row negative');
+    // marcas presentes viram barra
+    expect(html).toContain('Coca-Cola');
+  });
+
+  it('não renderiza nada de toxicidade/moderação, mesmo com dados presentes', () => {
+    const data = baseData();
+    data.narrative.topicos = [
+      {
+        titulo: 'Clima e sentimento',
+        tag: 'sentimento',
+        bullets: ['Chat positivo em 60% das mensagens.'],
+      },
+      {
+        titulo: 'Toxicidade e moderação',
+        tag: 'moderação',
+        bullets: ['Usuário troll com 42% de toxicidade.'],
+      },
+    ];
+    const html = buildReportHtml(data, DICT);
+    // métrica toxicUsers presente no input, mas card não existe
+    expect(html.toLowerCase()).not.toContain('toxicidade');
+    expect(html.toLowerCase()).not.toContain('moderação');
+    expect(html).not.toContain('troll');
+    // o tópico legítimo continua
+    expect(html).toContain('Clima e sentimento');
+  });
+
+  it('nº ímpar de tópicos: a última caixa vira full-width (não deixa buraco no grid)', () => {
+    const data = baseData();
+    data.narrative.topicos = [
+      { titulo: 'A', tag: 'sentimento', bullets: ['x.'] },
+      { titulo: 'B', tag: 'conversas', bullets: ['y.'] },
+      { titulo: 'C', tag: 'audiência', bullets: ['z.'] },
+    ];
+    const html = buildReportHtml(data, DICT);
+    expect(html.match(/class="topic wide"/g)!.length).toBe(1);
+    // com nº par, ninguém é wide
+    data.narrative.topicos.push({ titulo: 'D', tag: 'marcas', bullets: ['w.'] });
+    expect(buildReportHtml(data, DICT)).not.toContain('topic wide');
+  });
+
+  it('renderiza tópicos estruturados (bento) quando a narrativa traz `topicos`', () => {
+    const data = baseData();
+    data.narrative.topicos = [
+      {
+        titulo: 'Clima e sentimento',
+        tag: 'sentimento',
+        bullets: ['Chat positivo em 60% das mensagens.', 'KEKW dominou os momentos de clutch.'],
+      },
+    ];
+    data.narrative.quotes = [{ user: 'viewer1', text: 'que clutch KEKW' }];
+    const html = buildReportHtml(data, DICT);
+    expect(html).toContain('<span class="topic-tag">sentimento</span>');
+    expect(html).toContain('Clima e sentimento');
+    expect(html).toContain('Chat positivo em 60% das mensagens.');
+    // citação com autor
+    expect(html).toContain('@viewer1');
+  });
+
+  it('deriva caixas de tópicos a partir de `secoes` (narrativa antiga/template)', () => {
+    const html = buildReportHtml(baseData(), DICT);
+    // seção "Clima" vira caixa com tag adivinhada e corpo quebrado em bullets
+    expect(html).toContain('<span class="topic-tag">sentimento</span>');
+    expect(html).toContain('Tom positivo com');
   });
 
   it('escapa nome de canal hostil', () => {
@@ -106,6 +168,8 @@ describe('buildReportHtml', () => {
     data.metrics.topCategories = [];
     const html = buildReportHtml(data, []);
     expect(html).toContain('Sem pico de engajamento destacado');
-    expect(html).not.toContain('Marcas mencionadas');
+    // sem marcas o card continua, com estado vazio (informação para patrocinador)
+    expect(html).toContain('Sem menções comerciais diretas no período.');
+    expect(html).not.toContain('Pautas mais comentadas');
   });
 });

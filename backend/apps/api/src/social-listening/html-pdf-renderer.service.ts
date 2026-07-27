@@ -68,10 +68,19 @@ export class HtmlPdfRendererService implements OnModuleDestroy {
 
   private _withTimeout(p: Promise<Buffer>): Promise<Buffer> {
     return new Promise<Buffer>((resolve, reject) => {
-      const t = setTimeout(() => reject(new Error(`render excedeu ${RENDER_TIMEOUT_MS}ms`)), RENDER_TIMEOUT_MS);
+      const t = setTimeout(
+        () => reject(new Error(`render excedeu ${RENDER_TIMEOUT_MS}ms`)),
+        RENDER_TIMEOUT_MS,
+      );
       p.then(
-        (v) => { clearTimeout(t); resolve(v); },
-        (e) => { clearTimeout(t); reject(e); },
+        (v) => {
+          clearTimeout(t);
+          resolve(v);
+        },
+        (e) => {
+          clearTimeout(t);
+          reject(e);
+        },
       );
     });
   }
@@ -84,18 +93,17 @@ export class HtmlPdfRendererService implements OnModuleDestroy {
       await page.setContent(html, { waitUntil: 'load', timeout: NETWORK_IDLE_TIMEOUT_MS });
       await page
         .waitForNetworkIdle({ idleTime: 300, timeout: NETWORK_IDLE_TIMEOUT_MS })
-        .catch(() => this.logger.warn('timeout aguardando imagens de emote — imprimindo mesmo assim'));
+        .catch(() =>
+          this.logger.warn('timeout aguardando imagens de emote — imprimindo mesmo assim'),
+        );
+      // Layout bento full-bleed: as páginas do buildReportHtml têm fundo,
+      // margens e rodapé próprios — o Chromium imprime sem moldura nenhuma.
       const pdf = await page.pdf({
         format: 'A4',
         printBackground: true,
-        margin: { top: '44px', bottom: '56px', left: '54px', right: '54px' },
-        displayHeaderFooter: true,
-        headerTemplate: '<span></span>',
-        footerTemplate:
-          '<div style="width:100%;font-size:8px;font-family:Helvetica,Arial,sans-serif;color:#767c83;' +
-          'padding:0 54px;display:flex;justify-content:space-between;align-items:center;">' +
-          '<span>norya</span>' +
-          '<span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>',
+        preferCSSPageSize: true,
+        margin: { top: 0, bottom: 0, left: 0, right: 0 },
+        displayHeaderFooter: false,
       });
       return Buffer.from(pdf);
     } finally {

@@ -22,7 +22,9 @@ import { Model } from 'mongoose';
 import { BatchMessagesSchemaName } from '@sehloro/infra';
 import {
   CHANNEL_BRAND_REPOSITORY,
+  CHANNEL_REPOSITORY,
   type ChannelBrandRepository,
+  type ChannelRepository,
 } from '@sehloro/domain';
 
 export interface BrandCount {
@@ -55,12 +57,19 @@ export class BrandCountsService {
   constructor(
     @Inject(CHANNEL_BRAND_REPOSITORY)
     private readonly brands: ChannelBrandRepository,
+    @Inject(CHANNEL_REPOSITORY)
+    private readonly channels: ChannelRepository,
     @InjectModel(BatchMessagesSchemaName)
     private readonly model: Model<BatchDoc>,
   ) {}
 
   async counts(channelId: string, from?: string, to?: string): Promise<BrandCount[]> {
-    const brands = await this.brands.listByChannel(channelId);
+    // A allowlist é do CRIADOR (resolvido pelo canal); a contagem varre as
+    // mensagens do canal selecionado (`batch_messages` continua por canal).
+    const channel = await this.channels.findById(channelId).catch(() => null);
+    const creatorId = channel?.getCreatorId();
+    if (!creatorId) return [];
+    const brands = await this.brands.listByCreator(creatorId);
     if (brands.length === 0) return [];
 
     const filter: Record<string, unknown> = { channelId };

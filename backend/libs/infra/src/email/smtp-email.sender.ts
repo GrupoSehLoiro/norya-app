@@ -43,7 +43,7 @@ export class SmtpEmailSender implements EmailSender {
   }
 
   async send(message: EmailMessage): Promise<void> {
-    const from = this.config.get<string>('MAIL_FROM') ?? 'SEHLORO <no-reply@sehloro.dev>';
+    const from = this.config.get<string>('MAIL_FROM') ?? 'Norya <no-reply@norya.dev>';
     await this.getTransporter().sendMail({
       from,
       to: message.to,

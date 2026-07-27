@@ -27,7 +27,7 @@ export function ChannelPicker({ value, onChange }: Props) {
           onChange={(e) => onChange(e.target.value || null)}
           className="h-10 w-full appearance-none rounded-lg border border-white/[0.08] bg-white/[0.04] pl-9 pr-9 text-sm font-medium text-ink-800 focus:border-accent-400/60 focus:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-accent-400/20"
         >
-          <option value="" className="bg-bg-1 text-ink-600">— selecione —</option>
+          <option value="" className="bg-bg-1 text-ink-600">selecione…</option>
           {data?.map((c) => (
             <option key={c.id} value={c.id} className="bg-bg-1 text-ink-800">
               {c.name} ({c.platform})

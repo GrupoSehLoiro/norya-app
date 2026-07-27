@@ -41,7 +41,7 @@ function FeatureFlagsInner() {
       <PageHeader
         eyebrow="Admin"
         title="Feature flags"
-        description="Toggle de funcionalidades por canal/user/percent — endpoint /api/v2/feature-flags."
+        description="Liga e desliga funcionalidades por canal, usuário ou porcentagem."
       />
 
       {error && (

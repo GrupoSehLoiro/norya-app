@@ -4,9 +4,9 @@ import { ChatRail, Ticker } from './landing-demo';
 import { HeroIntro, MotionStyles, Parallax, ProductFrame, Reveal } from './motion';
 
 export const metadata: Metadata = {
-  title: 'Norya — o chat não para. Você não precisa ler.',
+  title: 'Norya: o chat não para. Você não precisa ler.',
   description:
-    'Análise de sentimento em tempo real para lives na Twitch e na Kick. O chat inteiro, lido e traduzido enquanto a live acontece.',
+    'Social listening em tempo real para lives na Twitch e na Kick. O chat inteiro, lido e traduzido enquanto a live acontece.',
 };
 
 /**
@@ -46,6 +46,11 @@ function Header() {
         <Link href="/landing" className="text-lg font-bold tracking-tight text-ink-800">
           Norya<span className="text-accent-400">.</span>
         </Link>
+        <nav className="hidden items-center gap-8 md:flex" aria-label="Navegação">
+          <a href="#recursos" className="text-[13.5px] text-ink-400 transition-colors hover:text-ink-800">Recursos</a>
+          <a href="#casos-de-uso" className="text-[13.5px] text-ink-400 transition-colors hover:text-ink-800">Casos de uso</a>
+          <a href="#faq" className="text-[13.5px] text-ink-400 transition-colors hover:text-ink-800">Perguntas</a>
+        </nav>
         <div className="flex items-center gap-5">
           <Link href="/login" className="text-[13.5px] text-ink-400 transition-colors hover:text-ink-800">
             Entrar
@@ -81,7 +86,7 @@ function Hero() {
           <span className="text-accent-400">precisa ler.</span>
         </h1>
         <p className="mt-7 max-w-md text-[15px] leading-relaxed text-ink-400">
-          A Norya lê o chat da sua live inteiro — milhares de mensagens — e
+          A Norya lê o chat da sua live inteiro e
           te devolve o que importa: o clima, os picos e o que fazer com eles.
           Em português, enquanto a live acontece.
         </p>
@@ -124,7 +129,7 @@ function Manifesto() {
         <p className="mx-auto mt-8 max-w-xl font-mono text-[11px] uppercase leading-relaxed tracking-[0.22em] text-ink-400">
           a sua live gera milhares de sinais por hora
           <br className="hidden md:block" />
-          — a norya transforma sinal em prova
+          a norya transforma sinal em prova
         </p>
       </Reveal>
       </Parallax>
@@ -132,18 +137,51 @@ function Manifesto() {
   );
 }
 
-// ─── Produto anotado (recursos como callouts em volta do painel) ───────────
+// ─── Recursos (produto em destaque + bento de features) ────────────────────
 
-const CALLOUTS_LEFT = [
-  { title: 'O clima, ao vivo', desc: 'Sentimento da audiência a cada 15 segundos.' },
-  { title: 'Picos explicados', desc: 'Selecione o trecho; a Norya resume o momento.' },
-  { title: 'Marcas medidas', desc: 'Menções contadas e contextualizadas.' },
-] as const;
-
-const CALLOUTS_RIGHT = [
-  { title: 'Fluente no nicho', desc: '“Ace” e “clutch” contam como hype, não ruído.' },
-  { title: 'Relatório de um clique', desc: 'O pós-live em PDF, pronto para a marca.' },
-  { title: 'Memória pesquisável', desc: 'Todo o histórico, com busca e resumo.' },
+const FEATURES = [
+  {
+    span: 'lg:col-span-2',
+    tag: 'Clima ao vivo',
+    title: 'O sentimento do chat, a cada 15 segundos',
+    desc: 'A Norya lê cada mensagem e te devolve o clima em tempo real: positivo, neutro ou negativo. Você sente a virada antes que ela vire problema.',
+    visual: 'clima',
+  },
+  {
+    span: 'lg:col-span-2',
+    tag: 'Picos explicados',
+    title: 'Todo pico do gráfico, explicado',
+    desc: 'Recorte um momento da live e a IA resume o que fez a galera reagir: a jogada, o corte, o anúncio.',
+    visual: 'pico',
+  },
+  {
+    span: 'lg:col-span-1',
+    tag: 'Marcas',
+    title: 'Menções que viram prova',
+    desc: 'Cada citação de marca contada e contextualizada. O número que o patrocinador quer ver.',
+    visual: null,
+  },
+  {
+    span: 'lg:col-span-1',
+    tag: 'Nicho',
+    title: 'Fluente no seu nicho',
+    desc: '“Ace”, “clutch”, emote e meme entram como hype, não como ruído.',
+    visual: 'nicho',
+  },
+  {
+    span: 'lg:col-span-1',
+    tag: 'Relatório',
+    title: 'O pós-live em PDF',
+    desc: 'Clima, picos e marcas do dia num relatório pronto pra mandar pra marca.',
+    visual: null,
+  },
+  {
+    span: 'lg:col-span-1',
+    tag: 'Histórico',
+    title: 'Memória pesquisável',
+    desc: 'Toda live passada fica buscável, com resumo de qualquer trecho.',
+    visual: null,
+  },
 ] as const;
 
 function AnnotatedProduct() {
@@ -154,41 +192,121 @@ function AnnotatedProduct() {
           Recursos
         </p>
         <h2 className="mx-auto mt-4 max-w-2xl text-center text-3xl font-bold leading-tight tracking-[-0.02em] text-ink-800 md:text-5xl">
-          Tudo aponta para a mesma tela<span className="text-accent-400">.</span>
+          Tudo que a Norya lê na sua live<span className="text-accent-400">.</span>
         </h2>
+        <p className="mx-auto mt-5 max-w-xl text-center text-[15px] leading-relaxed text-ink-400">
+          Uma tela só pra tudo que acontece no chat enquanto você joga: o clima, os
+          picos, as marcas e o que fazer com cada um.
+        </p>
       </Reveal>
 
-      <div className="mt-14 grid items-center gap-10 lg:grid-cols-[1fr_minmax(380px,460px)_1fr]">
-        {/* callouts à esquerda */}
-        <div className="order-2 flex flex-col gap-8 lg:order-1 lg:text-right">
-          {CALLOUTS_LEFT.map((c, i) => (
-            <Reveal key={c.title} variant="left" delay={i * 140}>
-              <div className="border-l-2 border-accent-400/40 pl-4 lg:border-l-0 lg:border-r-2 lg:pl-0 lg:pr-4">
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent-300">{c.title}</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-ink-400">{c.desc}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        {/* o painel no centro — camada com leve profundidade vs os callouts */}
-        <Parallax speed={0.22} className="order-1 lg:order-2">
+      {/* Produto em destaque */}
+      <Parallax speed={0.16} className="mt-14">
+        <div className="mx-auto max-w-[460px]">
           <ProductFrame />
-        </Parallax>
-
-        {/* callouts à direita */}
-        <div className="order-3 flex flex-col gap-8">
-          {CALLOUTS_RIGHT.map((c, i) => (
-            <Reveal key={c.title} variant="right" delay={i * 140}>
-              <div className="border-l-2 border-accent-400/40 pl-4">
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent-300">{c.title}</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-ink-400">{c.desc}</p>
-              </div>
-            </Reveal>
-          ))}
         </div>
+      </Parallax>
+
+      {/* Bento de features */}
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {FEATURES.map((f, i) => (
+          <Reveal key={f.title} delay={(i % 2) * 90} className={f.span}>
+            <FeatureCard tag={f.tag} title={f.title} desc={f.desc} visual={f.visual} />
+          </Reveal>
+        ))}
+
+        {/* Banner "sem bot" — largura total, com CTA */}
+        <Reveal delay={90} className="lg:col-span-4">
+          <div className="flex flex-col items-start justify-between gap-5 rounded-2xl border border-accent-400/25 bg-accent-400/[0.05] p-7 sm:flex-row sm:items-center">
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent-300">Twitch + Kick</p>
+              <p className="mt-2 text-xl font-semibold tracking-tight text-ink-800">
+                Sem bot no canal, sem overlay, sem instalação.
+              </p>
+              <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-ink-400">
+                Você conecta pela conta oficial da plataforma. Na sua próxima live, o
+                painel já está acompanhando o chat.
+              </p>
+            </div>
+            <Link
+              href="/signup"
+              className="shrink-0 rounded-full bg-accent-400 px-6 py-3 text-sm font-semibold text-bg-0 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(215,254,1,0.22)]"
+            >
+              Conectar meu canal
+            </Link>
+          </div>
+        </Reveal>
       </div>
     </section>
+  );
+}
+
+function FeatureCard({
+  tag, title, desc, visual,
+}: {
+  tag: string;
+  title: string;
+  desc: string;
+  visual: string | null;
+}) {
+  return (
+    <div className="flex h-full flex-col rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-colors hover:border-white/[0.14]">
+      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent-300">{tag}</p>
+      <p className="mt-2.5 text-lg font-semibold leading-snug tracking-[-0.01em] text-ink-800">{title}</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-400">{desc}</p>
+      {visual === 'clima' && <ClimaBar />}
+      {visual === 'pico' && <PicoSpark />}
+      {visual === 'nicho' && <NichoChips />}
+    </div>
+  );
+}
+
+function ClimaBar() {
+  return (
+    <div className="mt-auto pt-6">
+      <div className="flex h-2 overflow-hidden rounded-full bg-white/[0.06]">
+        <span className="bg-ok" style={{ width: '74%' }} />
+        <span className="bg-white/25" style={{ width: '18%' }} />
+        <span className="bg-err" style={{ width: '8%' }} />
+      </div>
+      <div className="mt-2 flex justify-between font-mono text-[10px] text-ink-400">
+        <span className="text-ok">74% positivo</span>
+        <span>8% negativo</span>
+      </div>
+    </div>
+  );
+}
+
+function PicoSpark() {
+  return (
+    <div className="mt-auto pt-6">
+      <svg viewBox="0 0 220 44" className="w-full" aria-hidden>
+        <polyline
+          points="0,36 26,30 48,33 72,15 96,22 116,6 140,24 168,19 220,26"
+          fill="none"
+          stroke="#d7fe01"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="116" cy="6" r="3.5" fill="#d7fe01" />
+      </svg>
+    </div>
+  );
+}
+
+function NichoChips() {
+  return (
+    <div className="mt-auto flex flex-wrap gap-1.5 pt-6">
+      {['ace', 'clutch', 'GG', 'Pog', 'clipa'].map((t) => (
+        <span
+          key={t}
+          className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 font-mono text-[11px] text-ink-600"
+        >
+          {t}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -248,7 +366,7 @@ const FAQS = [
   },
   {
     q: 'Funciona em português?',
-    a: 'A Norya nasceu para o chat brasileiro. Gíria, meme e emote fazem parte da análise — e os resumos saem em português.',
+    a: 'A Norya nasceu para o chat brasileiro. Gíria, meme e emote fazem parte da análise, e os resumos saem em português.',
   },
   {
     q: 'O que exatamente é analisado?',
@@ -306,7 +424,7 @@ function FinalCta() {
           Sua audiência está falando neste exato momento.
         </p>
         <p className="mt-2 text-sm leading-relaxed text-ink-400">
-          Conecte o canal e comece a ouvir — a primeira análise sai na sua próxima live.
+          Conecte o canal e comece a ouvir. A primeira análise sai na sua próxima live.
         </p>
         <div className="mt-7 flex items-center gap-5">
           <Link
@@ -325,20 +443,72 @@ function FinalCta() {
   );
 }
 
-// ─── Footer (uma linha, quieto) ────────────────────────────────────────────
+// ─── Footer (colunas) ──────────────────────────────────────────────────────
+
+const FOOTER_COLS = [
+  {
+    title: 'Produto',
+    links: [
+      { label: 'Recursos', href: '#recursos' },
+      { label: 'Casos de uso', href: '#casos-de-uso' },
+      { label: 'Perguntas', href: '#faq' },
+    ],
+  },
+  {
+    title: 'Conta',
+    links: [
+      { label: 'Entrar', href: '/login' },
+      { label: 'Criar conta', href: '/signup' },
+    ],
+  },
+  {
+    title: 'Plataformas',
+    links: [
+      { label: 'Twitch', href: '/signup' },
+      { label: 'Kick', href: '/signup' },
+    ],
+  },
+] as const;
 
 function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] py-8">
-      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-4 px-5 text-[13px] text-ink-400">
-        <span className="font-bold tracking-tight text-ink-800">Norya<span className="text-accent-400">.</span></span>
-        <nav className="flex flex-wrap items-center gap-6" aria-label="Rodapé">
-          <a href="#recursos" className="transition-colors hover:text-ink-700">Recursos</a>
-          <a href="#casos-de-uso" className="transition-colors hover:text-ink-700">Casos de uso</a>
-          <a href="#faq" className="transition-colors hover:text-ink-700">Perguntas</a>
-          <Link href="/login" className="transition-colors hover:text-ink-700">Entrar</Link>
-        </nav>
-        <span className="font-mono text-xs text-ink-400/60">© {new Date().getFullYear()} norya.io</span>
+    <footer className="border-t border-white/[0.06] py-16">
+      <div className="mx-auto grid max-w-[1200px] gap-10 px-5 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+        <div>
+          <span className="text-lg font-bold tracking-tight text-ink-800">
+            Norya<span className="text-accent-400">.</span>
+          </span>
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink-400">
+            Social listening em tempo real pra lives na Twitch e na Kick. O chat
+            inteiro, lido e traduzido enquanto a live acontece.
+          </p>
+        </div>
+        {FOOTER_COLS.map((col) => (
+          <div key={col.title}>
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-500">{col.title}</p>
+            <ul className="mt-4 flex flex-col gap-2.5">
+              {col.links.map((l) => (
+                <li key={l.label}>
+                  {l.href.startsWith('#') ? (
+                    <a href={l.href} className="text-sm text-ink-400 transition-colors hover:text-ink-800">
+                      {l.label}
+                    </a>
+                  ) : (
+                    <Link href={l.href} className="text-sm text-ink-400 transition-colors hover:text-ink-800">
+                      {l.label}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div className="mx-auto mt-12 flex max-w-[1200px] flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] px-5 pt-6">
+        <span className="font-mono text-xs text-ink-400/60">
+          © {new Date().getFullYear()} norya.io · feito pra quem vive de live.
+        </span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-400/60">pt-BR</span>
       </div>
     </footer>
   );

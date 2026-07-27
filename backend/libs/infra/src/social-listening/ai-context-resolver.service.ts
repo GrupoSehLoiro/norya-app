@@ -107,7 +107,9 @@ export class AiContextResolverService {
 
     const channel = await this.channels.findById(channelId).catch(() => null);
     const creatorId = channel?.getCreatorId();
+    let brandDocs: Awaited<ReturnType<typeof this.brands.listByCreator>> = [];
     if (creatorId) {
+      brandDocs = await this.brands.listByCreator(creatorId).catch(() => []);
       const profile = await this.profiles.findByCreatorId(creatorId).catch(() => null);
       if (profile) {
         const p = profile.toPersistence();
@@ -126,7 +128,6 @@ export class AiContextResolverService {
       }
     }
 
-    const brandDocs = await this.brands.listByChannel(channelId).catch(() => []);
     const brandKeys = [...new Set(brandDocs.map((b) => b.name.toLowerCase()))];
 
     const or: Record<string, unknown>[] = [{ scope: 'global' }];

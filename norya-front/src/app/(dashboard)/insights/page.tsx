@@ -89,10 +89,10 @@ export default function InsightsPage() {
   return (
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
-        eyebrow="Ao vivo"
-        title={<>Análise de <span className="text-accent-400">sentimentos</span></>}
-        description="Clima do chat, pautas e marcas ao longo da live."
-        info="Acompanhe como o chat reagiu ao longo da live: clima geral, assuntos, palavras-chave, marcas e picos de atividade. Use o seletor de dia no gráfico para revisitar lives passadas. (Texto provisório.)"
+        eyebrow="Social listening"
+        title={<>O pulso da <span className="text-accent-400">sua live</span></>}
+        description="Como a audiência reage em tempo real: o clima, os assuntos e os picos do chat, minuto a minuto."
+        info="Tudo que rola no chat durante a live, lido pela IA em tempo real: o clima geral (positivo, neutro, negativo), os assuntos que dominam a conversa, as marcas citadas e os momentos de pico. Use o seletor de dia no gráfico pra revisitar lives passadas e baixar um relatório em PDF."
       />
 
       <ChannelStatusBanner channelId={channelId} />
@@ -118,15 +118,15 @@ export default function InsightsPage() {
             value={monthSummary.data ? String(monthSummary.data.activeDays) : '—'}
             foot="últimos 30 dias"
           />
-          <StatBox label="Pico de usuários" value={summary.data.peakUsers.toLocaleString('pt-BR')} foot="numa janela do dia" />
-          <StatBox label="Janelas" value={summary.data.windows.toLocaleString('pt-BR')} foot="blocos analisados" />
+          <StatBox label="Pico de usuários" value={summary.data.peakUsers.toLocaleString('pt-BR')} foot="no melhor momento" />
+          <StatBox label="Janelas" value={summary.data.windows.toLocaleString('pt-BR')} foot="trechos lidos pela IA" />
         </section>
       ) : null}
 
       {!channelId ? (
         <EmptyState
           title="Selecione um canal"
-          description="Escolha um canal conectado no menu lateral para ver as análises."
+          description="Escolha um canal conectado no menu lateral pra ver o que a audiência anda comentando."
         />
       ) : latest.isLoading ? (
         <Card>Carregando…</Card>
@@ -140,8 +140,8 @@ export default function InsightsPage() {
         />
       ) : (
         <EmptyState
-          title="Nenhuma análise ainda"
-          description="Assim que o canal abrir uma live monitorada, as análises aparecem aqui."
+          title="Ainda sem análises"
+          description="Assim que você abrir uma live, a IA começa a ler o chat e as análises aparecem aqui."
         />
       )}
 
@@ -188,7 +188,7 @@ function ClimateAlert({ items }: { items: BatchAnalysis[] }) {
       </svg>
       <p className="text-sm text-ink-700">
         <b className="text-warn">Clima do chat caindo:</b> {alert.from}% → {alert.to}% positivo
-        nas últimas janelas. A causa provável está nos assuntos e no recorte do gráfico abaixo.
+        nos últimos minutos. Dá uma olhada nos assuntos e no recorte do gráfico abaixo pra entender o que mudou.
       </p>
     </div>
   );

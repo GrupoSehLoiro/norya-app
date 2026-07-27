@@ -7,11 +7,9 @@ import {
   login as doLogin,
   logout as doLogout,
   register as doRegister,
-  resendCode as doResendCode,
-  verifyEmail as doVerifyEmail,
 } from '@/lib/auth';
 import type { AccountType } from '@/lib/auth';
-import type { JwtUser, RegisterResponse } from '@/lib/types';
+import type { JwtUser } from '@/lib/types';
 
 interface AuthContextValue {
   user: JwtUser | null;
@@ -23,9 +21,7 @@ interface AuthContextValue {
     displayName?: string,
     accountType?: AccountType,
     document?: string,
-  ) => Promise<RegisterResponse>;
-  verifyEmail: (email: string, code: string) => Promise<JwtUser>;
-  resendCode: (email: string) => Promise<void>;
+  ) => Promise<JwtUser>;
   logout: () => void;
 }
 
@@ -51,15 +47,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return u;
       },
       async register(email, password, displayName, accountType, document) {
-        return doRegister(email, password, displayName, accountType, document);
-      },
-      async verifyEmail(email, code) {
-        const u = await doVerifyEmail(email, code);
+        const u = await doRegister(email, password, displayName, accountType, document);
         setUser(u);
         return u;
-      },
-      async resendCode(email) {
-        await doResendCode(email);
       },
       logout() {
         doLogout();

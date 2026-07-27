@@ -27,7 +27,7 @@ export default function DashboardHomePage() {
         eyebrow={`Olá, ${user?.username ?? ''}`}
         title={<>Início<span className="text-accent-700">.</span></>}
         description="Seus canais, marcas e análises num só lugar."
-        info="Esta é a página inicial da plataforma: mostra seus canais conectados, as lives em andamento e os atalhos para as principais áreas. (Texto provisório.)"
+        info="Seu ponto de partida: os canais conectados, as lives que estão no ar agora e atalhos pras principais áreas. Comece conectando um canal: na sua próxima live, a Norya já começa a ler o chat."
       />
 
       {/* Stat cards */}
@@ -37,6 +37,7 @@ export default function DashboardHomePage() {
           value={channels.isLoading ? '—' : String(channels.data?.length ?? 0)}
           href="/channels"
           cta="Gerenciar →"
+          className="outline outline-1 -outline-offset-1 outline-pal-cyan-line"
         />
         <StatCard
           label="Sessões ao vivo"
@@ -77,9 +78,9 @@ export default function DashboardHomePage() {
             <OpenLink />
           </Link>
 
-          <ShortcutCard href="/brands" title="Marcas" desc="Menções às marcas que você acompanha" />
-          <ShortcutCard href="/batches" title="Mensagens do chat" desc="Busque o que o chat falou, por período" />
-          <ShortcutCard href="/insights" title="Análise de sentimento" desc="Clima do chat, assuntos e picos da live" />
+          <ShortcutCard href="/brands" title="Marcas" desc="Quanto a audiência cita cada marca que você acompanha" />
+          <ShortcutCard href="/batches" title="Mensagens do chat" desc="Busque o que a galera falou, por termo e período" />
+          <ShortcutCard href="/insights" title="Pulso da live" desc="O clima do chat, os assuntos e os picos, em tempo real" />
         </div>
       </section>
     </div>
@@ -106,11 +107,12 @@ interface StatCardProps {
   cta?: string;
   accent?: boolean;
   live?: boolean;
+  className?: string;
 }
 
-function StatCard({ label, value, foot, href, cta, accent, live }: StatCardProps) {
+function StatCard({ label, value, foot, href, cta, accent, live, className }: StatCardProps) {
   return (
-    <article className={`glass-card ${accent ? 'glass-card--accent' : ''}`}>
+    <article className={`glass-card ${accent ? 'glass-card--accent' : ''} ${className ?? ''}`}>
       <div className="flex items-start justify-between gap-3">
         <p className="eyebrow">{label}</p>
         {live ? (

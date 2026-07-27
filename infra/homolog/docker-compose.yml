@@ -180,6 +180,9 @@ services:
       TWITCH_WEBHOOK_SECRET: ${TWITCH_WEBHOOK_SECRET:-}
       KICK_CLIENT_ID: ${KICK_CLIENT_ID:-}
       KICK_CLIENT_SECRET: ${KICK_CLIENT_SECRET:-}
+      # kick.com/api responde 403 Cloudflare por IP; o chatroomId só resolve
+      # via proxy (template {url}) — sem esta var a ingestão Kick não sobe.
+      KICK_CHATROOM_PROXY: ${KICK_CHATROOM_PROXY:-}
       # Base pública — usada nos redirect_uri de OAuth (Twitch/Kick) e links.
       PUBLIC_API_URL: https://${DOMAIN}
       CONSOLE_URL: https://${DOMAIN}
@@ -246,6 +249,9 @@ services:
       TWITCH_WEBHOOK_SECRET: ${TWITCH_WEBHOOK_SECRET:-}
       KICK_CLIENT_ID: ${KICK_CLIENT_ID:-}
       KICK_CLIENT_SECRET: ${KICK_CLIENT_SECRET:-}
+      # Mesma razão do nest-api: sem o proxy o chatroomId não resolve e a
+      # ingestão Kick fica "chatroomId não resolvido — pulando" em loop.
+      KICK_CHATROOM_PROXY: ${KICK_CHATROOM_PROXY:-}
     networks: [sehloro-net]
     depends_on:
       nest-api:

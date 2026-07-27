@@ -234,10 +234,14 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
     const deduped = await this.dedup.process(msgs);
 
     // 3. configs + AD status + brands (paralelo)
+    // A allowlist é do CRIADOR: resolvemos o creator do canal e carregamos as
+    // marcas dele (marca por canal vazava entre donos que reaproveitam a conta).
+    const channelForBrands = await this.channelsRepo.findById(channelId).catch(() => null);
+    const creatorId = channelForBrands?.getCreatorId();
     const [configs, adStatus, brands] = await Promise.all([
       this.configs.load(),
       this.ad.getAdActiveInWindow(channelId, windowStart, windowEnd),
-      this.brandsRepo.listByChannel(channelId),
+      creatorId ? this.brandsRepo.listByCreator(creatorId) : Promise.resolve([]),
     ]);
 
     // 4. heuristic per msg → hints

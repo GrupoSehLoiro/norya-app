@@ -45,7 +45,7 @@ function makeProfiles(p: { category?: string; subcategory?: string; tags?: strin
 }
 
 function makeBrands(names: string[]) {
-  return { listByChannel: jest.fn(async () => names.map((name) => ({ name }))) };
+  return { listByCreator: jest.fn(async () => names.map((name) => ({ name }))) };
 }
 
 function build(opts: {
@@ -89,11 +89,13 @@ describe('AiContextResolverService', () => {
     expect(r.parts.every((p) => p.included)).toBe(true);
   });
 
-  it('canal sem creator: só global + marcas', async () => {
+  it('canal sem creator: só global (allowlist é por creator)', async () => {
+    // Marcas passaram a ser escopadas por creatorId: sem creator vinculado não
+    // há allowlist a resolver (evita vazamento entre donos do mesmo canal).
     const svc = build({ docs: DOCS, creatorId: undefined, brands: ['coca-cola'] });
     const r = await svc.resolveDetailed('chan-1');
     expect(r.text).toContain('prompt-global');
-    expect(r.text).toContain('prompt-coca');
+    expect(r.text).not.toContain('prompt-coca');
     expect(r.text).not.toContain('prompt-games');
   });
 

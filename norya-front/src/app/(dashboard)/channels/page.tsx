@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/layout/page-header';
@@ -13,6 +13,7 @@ import { ChannelAvatar } from '@/components/ui/channel-avatar';
 import { ChannelLiveBadge } from '@/components/monitoring/channel-live-badge';
 import { getToken } from '@/lib/api-client';
 import { fetchChannels } from '@/lib/queries';
+import { useSelectedChannel } from '@/hooks/use-selected-channel';
 import { cn, formatDate } from '@/lib/utils';
 
 const PAGE_SIZE = 10;
@@ -25,11 +26,20 @@ const SORTS: { key: SortKey; label: string }[] = [
 ];
 
 export default function ChannelsPage() {
+  const router = useRouter();
+  const { setChannelId } = useSelectedChannel();
   const [connectOpen, setConnectOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortKey>('name');
   const [view, setView] = useState<'list' | 'grid'>('list');
   const [page, setPage] = useState(1);
+
+  // Ver insights = trocar o canal ativo (o mesmo estado do seletor ao vivo)
+  // e ir para /insights, que já monta o layout completo pro canal escolhido.
+  function openInsights(id: string) {
+    setChannelId(id);
+    router.push('/insights');
+  }
 
   const channels = useQuery({
     queryKey: ['channels-v2'],
@@ -63,11 +73,17 @@ export default function ChannelsPage() {
   return (
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
-        eyebrow="Canais"
-        title="Canais"
-        info="Aqui ficam todos os canais conectados à plataforma (Twitch e Kick): conecte novas contas, busque, ordene e acompanhe o status de cada canal. (Texto provisório.)"
+        eyebrow="Social listening"
+        title="Seus canais"
+        description="Todos os canais Twitch e Kick que você conectou. Conecte novos, encontre um pelo nome e veja quais estão ao vivo agora."
+        info="Cada canal conectado aqui vira uma live que a Norya acompanha: conecte sua conta Twitch ou Kick pelo login oficial (sem bot, sem overlay), e a plataforma passa a ler o chat e gerar as análises. Busque, ordene e veja o status de cada um num piscar."
         actions={
-          <Button onClick={() => setConnectOpen(true)}>+ Novo canal</Button>
+          <Button
+            onClick={() => setConnectOpen(true)}
+            className="bg-none !bg-pal-sky !text-pal-sky-ink !shadow-[0_8px_20px_var(--pal-sky-soft)] hover:brightness-105"
+          >
+            + Novo canal
+          </Button>
         }
       />
 
@@ -149,12 +165,13 @@ export default function ChannelsPage() {
                       </td>
                       <td className="py-2.5 pr-4 text-ink-400">{formatDate(c.createdAt)}</td>
                       <td className="py-2.5 pr-4">
-                        <Link
+                        <button
+                          type="button"
                           className="text-accent-300 hover:text-accent-400 hover:underline"
-                          href={`/insights/${encodeURIComponent(c.id)}`}
+                          onClick={() => openInsights(c.id)}
                         >
                           ver
-                        </Link>
+                        </button>
                       </td>
                       <td className="py-2.5 pr-4 text-right">
                         <ChannelLiveBadge channelId={c.id} />
@@ -179,12 +196,13 @@ export default function ChannelsPage() {
                     </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between text-xs text-ink-400">
-                    <Link
+                    <button
+                      type="button"
                       className="text-accent-300 hover:text-accent-400 hover:underline"
-                      href={`/insights/${encodeURIComponent(c.id)}`}
+                      onClick={() => openInsights(c.id)}
                     >
                       Ver insights
-                    </Link>
+                    </button>
                     <ChannelLiveBadge channelId={c.id} />
                   </div>
                 </li>

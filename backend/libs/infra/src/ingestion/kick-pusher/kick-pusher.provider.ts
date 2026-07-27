@@ -14,8 +14,17 @@
  * Error recovery: auth 401 → chama tokenService.getValidToken + reconecta,
  * até MAX_RECONNECTS vezes com backoff exponencial.
  */
-import Pusher from 'pusher-js';
+import type PusherType from 'pusher-js';
 import type { Channel as PusherChannel } from 'pusher-js';
+import * as PusherNS from 'pusher-js';
+
+// O build Node do pusher-js (dist/node/pusher.js) exporta `{ Pusher }` SEM
+// `default` — o `import Pusher from 'pusher-js'` compilado p/ CJS vira
+// `pusher_js_1.default` (undefined) e explode em runtime. Interop manual:
+const Pusher: typeof PusherType =
+  (PusherNS as { Pusher?: typeof PusherType }).Pusher ??
+  (PusherNS as { default?: typeof PusherType }).default ??
+  (PusherNS as unknown as typeof PusherType);
 import type {
   Channel,
   ChatProvider,

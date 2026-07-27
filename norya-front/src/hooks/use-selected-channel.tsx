@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 
-const STORAGE_KEY = 'sehloro.selectedChannelId';
+const STORAGE_KEY = 'norya.selectedChannelId';
 
 interface Ctx {
   channelId: string | null;

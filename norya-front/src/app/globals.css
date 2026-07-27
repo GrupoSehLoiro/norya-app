@@ -298,3 +298,52 @@ html.light .text-warn\/80 { color: #b45309; }
 html.light .text-warn\/60 { color: #c2710c; }
 html.light .bg-warn { background-color: #f59e0b; }
 html.light .border-warn { border-color: #f59e0b; }
+
+/* ============================================================================
+ * Paleta de acentos por página (tailwind: colors.pal.*) — um destaque único
+ * por página do console. Dark usa os pastéis originais da paleta; o light
+ * remapeia para versões saturadas/escuras que contrastam no fundo branco.
+ * Derivadas -line (bordas/outline) e -soft (fundos) via color-mix — resolvem
+ * no uso, então herdam automaticamente a troca de tema.
+ * ========================================================================== */
+:root {
+  --pal-cyan:   #cdeefc;
+  --pal-sky:    #5fcffc;
+  --pal-sky-ink:#082c3f; /* texto sobre --pal-sky */
+  --pal-peri:   #c5bff7;
+  --pal-orchid: #f7b3f3;
+  --pal-pink:   #fcafc8;
+  --pal-amber:  #f7ac18;
+  --pal-green:  #57dd17;
+  --pal-mint:   #c2f0b0;
+
+  --pal-cyan-line:   color-mix(in srgb, var(--pal-cyan) 45%, transparent);
+  --pal-sky-line:    color-mix(in srgb, var(--pal-sky) 45%, transparent);
+  --pal-peri-line:   color-mix(in srgb, var(--pal-peri) 45%, transparent);
+  --pal-orchid-line: color-mix(in srgb, var(--pal-orchid) 45%, transparent);
+  --pal-pink-line:   color-mix(in srgb, var(--pal-pink) 45%, transparent);
+  --pal-amber-line:  color-mix(in srgb, var(--pal-amber) 45%, transparent);
+  --pal-green-line:  color-mix(in srgb, var(--pal-green) 45%, transparent);
+  --pal-mint-line:   color-mix(in srgb, var(--pal-mint) 45%, transparent);
+
+  --pal-cyan-soft:   color-mix(in srgb, var(--pal-cyan) 12%, transparent);
+  --pal-sky-soft:    color-mix(in srgb, var(--pal-sky) 12%, transparent);
+  --pal-peri-soft:   color-mix(in srgb, var(--pal-peri) 12%, transparent);
+  --pal-orchid-soft: color-mix(in srgb, var(--pal-orchid) 12%, transparent);
+  --pal-pink-soft:   color-mix(in srgb, var(--pal-pink) 12%, transparent);
+  --pal-amber-soft:  color-mix(in srgb, var(--pal-amber) 12%, transparent);
+  --pal-green-soft:  color-mix(in srgb, var(--pal-green) 12%, transparent);
+  --pal-mint-soft:   color-mix(in srgb, var(--pal-mint) 12%, transparent);
+}
+
+html.light {
+  --pal-cyan:   #0e7fb0;
+  --pal-sky:    #0673b8;
+  --pal-sky-ink:#ffffff;
+  --pal-peri:   #5f4fd0;
+  --pal-orchid: #b437a6;
+  --pal-pink:   #d14574;
+  --pal-amber:  #b06f00;
+  --pal-green:  #2f9e0e;
+  --pal-mint:   #3e9427;
+}

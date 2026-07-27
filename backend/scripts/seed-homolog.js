@@ -23,8 +23,13 @@
 
 // Resolve bcrypt/mongoose exatamente como o app resolve (independe de onde
 // este arquivo esteja montado — evita dor de cabeça com o layout do pnpm).
+// Âncora: dentro da imagem é /app; no host (dev-host.sh) é o repo local.
 const { createRequire } = require('module');
-const appRequire = createRequire('/app/apps/api/dist/main.js');
+const path = require('path');
+const anchor = require('fs').existsSync('/app/apps/api/dist/main.js')
+  ? '/app/apps/api/dist/main.js'
+  : path.join(__dirname, '..', 'apps', 'api', 'dist', 'main.js');
+const appRequire = createRequire(anchor);
 const bcrypt = appRequire('bcrypt');
 const mongoose = appRequire('mongoose');
 
@@ -320,9 +325,11 @@ function buildLiveSessions(account) {
 }
 
 function buildChannelBrands(account) {
+  // Allowlist é do CRIADOR (eixo principal). `channelId` fica só como
+  // proveniência; a listagem/detecção filtram por creatorId.
   return BRANDS.slice(0, 5).map((b) => ({
+    creatorId: `cr-${account.local}`,
     channelId: account.channelId,
-    creatorId: null,
     name: b,
     aliases: [b.toLowerCase()],
     regex: null,

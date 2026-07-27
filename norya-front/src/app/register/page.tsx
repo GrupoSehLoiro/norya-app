@@ -64,7 +64,7 @@ export default function RegisterPage() {
           <div className="mb-2 text-center">
             <h1 className="text-2xl font-bold tracking-tight text-ink-800">Criar conta</h1>
             <p className="mt-1 text-sm text-ink-400">
-              Apenas admins podem criar contas — o servidor valida o JWT.
+              Apenas admins podem criar contas.
             </p>
           </div>
 

@@ -30,10 +30,11 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { InsightText } from '@/components/ui/insight-text';
-import { EmoteText } from '@/components/ui/emote-text';
+import { ChatLine, ChatSkinStyles, type ChatPlatform } from '@/components/ui/chat-skin';
 import { useChannelEmotes } from '@/hooks/use-channel-emotes';
 import { api, getToken } from '@/lib/api-client';
 import { searchMessages, fetchWindowInsight } from '@/lib/analytics';
+import { fetchChannels } from '@/lib/queries';
 import {
   dayBoundsIso,
   formatYmdLabel,
@@ -96,14 +97,9 @@ function selStats(points: Point[], sel: Sel) {
       windows += 1;
     }
   }
-  // Sentimento do recorte (ponderado por volume) e variação de volume vs a
-  // média do dia inteiro — os números que contam a história do pico.
+  // Sentimento do recorte, ponderado por volume.
   const posPct = msgs > 0 ? Math.round((posWeighted / msgs) * 100) : null;
-  const dayTotal = points.reduce((acc, p) => acc + p.msgs, 0);
-  const dayAvg = points.length > 0 ? dayTotal / points.length : 0;
-  const deltaPct =
-    windows > 0 && dayAvg > 0 ? Math.round((msgs / windows / dayAvg - 1) * 100) : null;
-  return { msgs, peakUsers, windows, posPct, deltaPct };
+  return { msgs, peakUsers, windows, posPct };
 }
 
 interface Props {
@@ -236,7 +232,7 @@ export function ActivityAreaChart({
     ) : points.length === 0 ? (
       <p className="text-sm text-ink-400">
         {isToday
-          ? 'Sem atividade hoje — abra uma live e o gráfico se preenche.'
+          ? 'Sem atividade hoje. Abra uma live e o gráfico se preenche.'
           : 'Sem atividade nesta data.'}
       </p>
     ) : (
@@ -466,7 +462,6 @@ function RangeDrilldown({
     peakUsers: number;
     windows: number;
     posPct: number | null;
-    deltaPct: number | null;
   };
   dragging: boolean;
   onClose: () => void;
@@ -474,6 +469,15 @@ function RangeDrilldown({
   const winFrom = committed ? new Date(committed.a).toISOString() : null;
   const winTo = committed ? new Date(committed.b).toISOString() : null;
   const emotes = useChannelEmotes(channelId);
+
+  // Plataforma do canal → skin das mensagens (mesma estética do Feed ao vivo).
+  const channelsQ = useQuery({
+    queryKey: ['channels-v2'],
+    queryFn: fetchChannels,
+    staleTime: 60_000,
+  });
+  const platform: ChatPlatform =
+    channelsQ.data?.find((c) => c.id === channelId)?.platform === 'kick' ? 'kick' : 'twitch';
 
   const msgs = useQuery({
     enabled: !!committed && !dragging,
@@ -495,14 +499,6 @@ function RangeDrilldown({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-semibold tabular-nums text-ink-800">
           Pico das {formatHour(new Date(visual.a))} às {formatHour(new Date(visual.b))}
-          <span className="ml-2 text-xs font-normal text-ink-400">
-            {fmtDuration(visual.b - visual.a)} · {stats.msgs.toLocaleString('pt-BR')} msgs ·
-            pico {stats.peakUsers} usuários · {stats.windows} janelas
-            {stats.posPct !== null ? ` · ${stats.posPct}% positivo` : ''}
-            {stats.deltaPct !== null
-              ? ` · ${stats.deltaPct >= 0 ? '+' : ''}${stats.deltaPct}% vs média do dia`
-              : ''}
-          </span>
         </p>
         <div className="flex items-center gap-3">
           {dragging && <span className="text-[11px] text-accent-300">solte pra analisar…</span>}
@@ -511,6 +507,12 @@ function RangeDrilldown({
           </button>
         </div>
       </div>
+      <p className="mt-1 text-xs tabular-nums text-ink-400">
+        {fmtDuration(visual.b - visual.a)} · {stats.msgs.toLocaleString('pt-BR')} mensagens ·
+        pico de {stats.peakUsers} {stats.peakUsers === 1 ? 'usuário' : 'usuários'} · {stats.windows}{' '}
+        {stats.windows === 1 ? 'janela' : 'janelas'}
+        {stats.posPct !== null ? ` · ${stats.posPct}% positivo` : ''}
+      </p>
 
       <div className={'mt-3 grid grid-cols-1 gap-4 transition-opacity lg:grid-cols-2 ' + (stale ? 'opacity-45' : '')}>
         <div>
@@ -534,15 +536,13 @@ function RangeDrilldown({
           ) : (msgs.data?.items.length ?? 0) === 0 ? (
             <p className="text-sm text-ink-400">Sem mensagens registradas nesse recorte.</p>
           ) : (
-            <ul className="max-h-48 space-y-1.5 overflow-y-auto pr-1">
+            <ul className={`chat-skin skin-${platform} max-h-48 overflow-y-auto rounded-lg px-1.5 py-1.5`}>
               {msgs.data!.items.slice(0, 60).map((m) => (
-                <li key={m.messageId} className="text-sm text-ink-700">
-                  <span className="font-medium text-ink-800">{m.username}</span>
-                  <EmoteText text={m.text} emotes={emotes} className="ml-2" />
-                </li>
+                <ChatLine key={m.messageId} m={m} platform={platform} emotes={emotes} />
               ))}
             </ul>
           )}
+          <ChatSkinStyles />
         </div>
       </div>
     </div>

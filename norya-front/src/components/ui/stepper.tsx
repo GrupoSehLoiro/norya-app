@@ -1,3 +1,4 @@
+import { IconCheck } from '@/components/ui/icons';
 import { cn } from '@/lib/utils';
 
 export interface StepperStep {
@@ -32,7 +33,7 @@ export function Stepper({
                   !active && !done && 'bg-white/[0.05] text-ink-400',
                 )}
               >
-                {done ? '✓' : i + 1}
+                {done ? <IconCheck size={12} /> : i + 1}
               </span>
               <span
                 className={cn(

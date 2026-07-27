@@ -9,9 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { InsightText } from '@/components/ui/insight-text';
 import { api, ApiError } from '@/lib/api-client';
-import { fetchWindowInsight, fetchBrandCounts } from '@/lib/analytics';
+import { fetchBrandCounts } from '@/lib/analytics';
 import { classifySentiment, formatPct } from '@/lib/utils';
 
 interface InsightCardsProps {
@@ -144,7 +143,6 @@ function BrandsCard({
   to: string;
 }) {
   const qc = useQueryClient();
-  const [selected, setSelected] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [newBrand, setNewBrand] = useState('');
   const [addMsg, setAddMsg] = useState<string | null>(null);
@@ -161,24 +159,11 @@ function BrandsCard({
   });
   const displayBrands = countsQuery.data ?? brands;
 
-  // Contexto da marca clicada — resumo das mensagens que a mencionam no
-  // período. A busca é por substring: normaliza o nome ("Coca-Cola" → "coca")
-  // pra casar com a grafia solta do chat.
-  const searchTerm = selected
-    ? (selected.replace(/[^\p{L}\p{N} ]/gu, ' ').trim().split(/\s+/)[0] ?? selected)
-    : null;
-  const context = useQuery({
-    enabled: !!selected,
-    queryKey: ['brand-context', channelId, searchTerm, from, to],
-    queryFn: () => fetchWindowInsight(channelId, { from, to, q: searchTerm! }),
-    staleTime: 60_000,
-  });
-
   const addMut = useMutation({
     mutationFn: (name: string) =>
       api.post('/api/v2/social-listening/brands', { channelId, name }),
     onSuccess: (_data, name) => {
-      setAddMsg(`“${name}” adicionada — novas menções passam a ser monitoradas.`);
+      setAddMsg(`“${name}” adicionada. Novas menções passam a ser monitoradas.`);
       setNewBrand('');
       setAdding(false);
       void qc.invalidateQueries({ queryKey: ['brands', channelId] });
@@ -235,66 +220,16 @@ function BrandsCard({
         </p>
       ) : (
         <ul className="mt-3 flex flex-wrap gap-2">
-          {displayBrands.map((b) => {
-            const active = selected === b.brand;
-            return (
-              <li key={b.brand}>
-                <button
-                  type="button"
-                  onClick={() => setSelected(active ? null : b.brand)}
-                  aria-pressed={active}
-                  title={`Ver contexto de ${b.brand}`}
-                  className={
-                    'flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors ' +
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60 ' +
-                    (active
-                      ? 'border-accent-400/40 bg-accent-400/10'
-                      : 'border-white/[0.08] bg-white/[0.04] hover:border-white/[0.16]')
-                  }
-                >
-                  <span className="text-sm font-semibold text-ink-800">{b.brand}</span>
-                  <Badge tone="accent">{b.count}</Badge>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      {selected && (
-        <div className="mt-4 rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-ink-800">
-              Contexto: {selected}
-              {context.data ? (
-                <span className="ml-2 text-xs font-normal text-ink-400">
-                  {context.data.total} mensagens no período
-                </span>
-              ) : null}
-            </p>
-            <button
-              type="button"
-              onClick={() => setSelected(null)}
-              className="text-xs text-ink-400 hover:text-ink-700"
+          {displayBrands.map((b) => (
+            <li
+              key={b.brand}
+              className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5"
             >
-              fechar ✕
-            </button>
-          </div>
-          {context.isLoading ? (
-            <p className="mt-2 text-sm text-ink-400">gerando contexto…</p>
-          ) : context.isError ? (
-            <p className="mt-2 text-sm text-err">Não foi possível gerar o contexto agora.</p>
-          ) : context.data ? (
-            <>
-              <InsightText className="mt-2 space-y-2 text-sm leading-relaxed text-ink-700" text={context.data.insight} />
-              <div className="mt-2">
-                <Badge tone={context.data.aiEnabled ? 'positive' : 'neutral'}>
-                  {context.data.aiEnabled ? 'resumo via IA' : 'resumo básico'}
-                </Badge>
-              </div>
-            </>
-          ) : null}
-        </div>
+              <span className="text-sm font-semibold text-ink-800">{b.brand}</span>
+              <Badge tone="accent">{b.count}</Badge>
+            </li>
+          ))}
+        </ul>
       )}
     </Card>
   );

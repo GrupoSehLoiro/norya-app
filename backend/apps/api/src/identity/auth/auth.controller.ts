@@ -9,17 +9,19 @@
  *   POST /api/v2/auth/refresh       (public)  — rotação de refresh
  *   POST /api/v2/auth/logout        (auth)    — revoga refresh
  *   GET  /api/v2/auth/me            (auth)    — contexto user + workspaces
+ *   PATCH /api/v2/auth/me           (auth)    — auto-edição (displayName, locale)
  *   POST /api/v2/auth/workspace/:id/activate (auth) — troca workspace ativo
  */
-import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RegisterDto } from './dto/register.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ResendCodeDto } from './dto/resend-code.dto';
+import { UpdateMeDto } from './dto/update-me.dto';
 import { Public } from './decorators/public.decorator';
 import { CurrentUser, type AuthUser } from './decorators/current-user.decorator';
-import { AuthService, AuthTokens, LoginResult, MeResult, RegisterResult } from './auth.service';
+import { AuthService, AuthTokens, LoginResult, MeResult } from './auth.service';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 
 @Controller('v2/auth')
@@ -28,8 +30,8 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  @HttpCode(202)
-  register(@Body(new ZodValidationPipe(RegisterDto)) dto: RegisterDto): Promise<RegisterResult> {
+  @HttpCode(201)
+  register(@Body(new ZodValidationPipe(RegisterDto)) dto: RegisterDto): Promise<LoginResult> {
     return this.auth.register(dto);
   }
 
@@ -74,6 +76,15 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: AuthUser): Promise<MeResult> {
     return this.auth.getMe(user.sub);
+  }
+
+  @Patch('me')
+  @HttpCode(200)
+  updateMe(
+    @CurrentUser() user: AuthUser,
+    @Body(new ZodValidationPipe(UpdateMeDto)) dto: UpdateMeDto,
+  ): Promise<MeResult> {
+    return this.auth.updateMe(user.sub, dto);
   }
 
   @Post('workspace/:id/activate')

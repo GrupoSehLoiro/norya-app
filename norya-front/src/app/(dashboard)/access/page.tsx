@@ -177,7 +177,7 @@ function CreateUserCard({
     <Card className="max-w-2xl">
       <CardHeader
         title="Criar usuário"
-        description="Nasce ativo e com email verificado — sem fluxo de código. Papel admin dá acesso a todo o grupo Admin."
+        description="Nasce ativo e com email verificado, sem fluxo de código. Papel admin dá acesso a todo o grupo Admin."
       />
       <form
         className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2"

@@ -35,7 +35,8 @@ marcas mencionadas (apenas as do allowlist informado).
 Se a janela cair durante AD ATIVO, marque ad_sentiment com os mesmos pos/neg/neu da janela
 (toda a janela está sob o ad).
 Sempre preencha dominant_category_context: uma frase curta (pt-BR, ~140 chars) explicando o
-contexto da categoria mais comentada NESTA janela — o que estão falando e por quê. Concreto, não genérico.`;
+contexto da categoria mais comentada NESTA janela — o que estão falando e por quê. Concreto, não genérico.
+Estilo: nunca use travessão (—) nos textos; prefira vírgula, dois-pontos ou ponto final.`;
 
 const FEW_SHOT_V1 = `Exemplo 1 — hype genuíno:
 Input parcial: topTokens=[pog,letsgo,fire], sentiment_hints={pos:18,neg:1,neu:2}

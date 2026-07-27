@@ -62,12 +62,12 @@ function AiTrainingInner() {
       <PageHeader
         eyebrow="Admin"
         title="Treinamento IA"
-        description="Ensine o contexto de cada categoria, game e marca — a IA usa isso em todas as análises."
-        info="Cada nó da taxonomia (categoria → subcategoria → game) e cada marca pode ter um prompt de contexto. Quando um canal tem aquele perfil, o prompt entra automaticamente nas análises de IA daquele canal. (Texto provisório.)"
+        description="Ensine o contexto de cada categoria, game e marca. A IA usa isso em todas as análises."
+        info="Cada nó da taxonomia (categoria → subcategoria → game) e cada marca pode ter um prompt de contexto. Quando um canal tem aquele perfil, o prompt entra automaticamente nas análises de IA daquele canal."
       />
 
       {/* Prompt global */}
-      <Card>
+      <Card className="outline outline-1 -outline-offset-1 outline-pal-mint-line">
         <CardHeader
           eyebrow="Base"
           title="Prompt global"
@@ -352,7 +352,7 @@ function EditContextModal({
     <Modal onClose={onClose} title={target.label} maxWidth="max-w-2xl">
       <p className="mb-3 text-sm text-ink-400">
         Estes textos entram como contexto nas análises de IA dos canais com esse perfil.
-        Escreva instruções diretas (jargões do nicho, o que é positivo/negativo, o que observar) —
+        Escreva instruções diretas (jargões do nicho, o que é positivo/negativo, o que observar),
         um assunto por texto.
       </p>
 
@@ -501,7 +501,7 @@ function PreviewCard() {
             </pre>
           ) : (
             <p className="text-sm text-ink-400">
-              Nenhum contexto aplicável — o canal não tem perfil/marcas que casem com os prompts, ou não há prompts ativos.
+              Nenhum contexto aplicável: o canal não tem perfil/marcas que casem com os prompts, ou não há prompts ativos.
             </p>
           )}
         </>

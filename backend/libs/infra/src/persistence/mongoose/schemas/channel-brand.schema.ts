@@ -11,16 +11,22 @@ export const ChannelBrandSchemaName = 'ChannelBrand';
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
 })
 export class ChannelBrandPersistence {
+  /**
+   * Creator dono da marca — allowlist no nível do criador e EIXO PRINCIPAL de
+   * escopo. A marca é individual do criador, não do canal: a mesma conta de
+   * plataforma pode ser reaproveitada por donos diferentes, então escopar por
+   * canal vazava marcas entre usuários. Preenchido no onboarding/CRUD e pela
+   * migração 003 (`migrate-channel-brands-creator.js`).
+   */
   @Prop({ type: String, required: true, index: true })
-  channelId!: string;
+  creatorId!: string;
 
   /**
-   * Creator dono da marca (allowlist no nível do criador). NOVO — opcional na
-   * transição; a detecção carimba a plataforma de origem da menção. Preenchido
-   * pela migração 003 e pelo onboarding. Em Fase 2 vira o eixo principal.
+   * Canal de origem no momento da criação (proveniência/legado). Opcional —
+   * listagem e detecção passaram a operar por `creatorId`.
    */
   @Prop({ type: String, index: true })
-  creatorId?: string;
+  channelId?: string | null;
 
   @Prop({ type: String, required: true })
   name!: string;
@@ -34,4 +40,6 @@ export class ChannelBrandPersistence {
 
 export type ChannelBrandDocument = HydratedDocument<ChannelBrandPersistence>;
 export const ChannelBrandSchema = SchemaFactory.createForClass(ChannelBrandPersistence);
-ChannelBrandSchema.index({ channelId: 1, name: 1 }, { unique: true });
+// Unicidade por criador (não por canal): cada creator tem sua própria marca.
+// O índice legado `{ channelId, name }` é derrubado pela migração 003.
+ChannelBrandSchema.index({ creatorId: 1, name: 1 }, { unique: true });

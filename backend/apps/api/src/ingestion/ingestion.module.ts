@@ -43,7 +43,18 @@ import { ChannelsService } from './channels/channels.service';
         ),
       inject: [ConfigService],
     },
-    KickRestClient,
+    {
+      // Mesmo padrão do Helix acima: credenciais via ConfigService habilitam o
+      // fallback pela API oficial quando o endpoint não-oficial está bloqueado.
+      provide: KickRestClient,
+      useFactory: (config: ConfigService) =>
+        new KickRestClient({
+          clientId: config.get<string>('KICK_CLIENT_ID'),
+          clientSecret: config.get<string>('KICK_CLIENT_SECRET'),
+          chatroomProxy: config.get<string>('KICK_CHATROOM_PROXY'),
+        }),
+      inject: [ConfigService],
+    },
     OrchestratorService,
     ReconcilerService,
     ChannelsService,

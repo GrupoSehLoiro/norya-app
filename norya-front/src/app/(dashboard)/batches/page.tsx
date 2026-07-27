@@ -21,61 +21,73 @@ export default function BatchesPage() {
   const emotes = useChannelEmotes(channelId);
   const [term, setTerm] = useState('');
   const [range, setRange] = useState<DateRangeValue>({ from: '', to: '' });
-  const [applied, setApplied] = useState(0); // bump p/ disparar a busca
+  // Recorte APLICADO (snapshot no clique/Enter) — digitar no input não
+  // re-dispara a busca; apagar o termo fecha os resultados.
+  const [appliedFilter, setAppliedFilter] = useState<{ term: string; from: string; to: string } | null>(null);
   const [aiRequested, setAiRequested] = useState(0); // bump p/ pedir o resumo IA
 
   const search = useQuery({
-    enabled: !!channelId && applied > 0,
-    queryKey: ['msg-search', channelId, term, range.from, range.to, applied],
+    enabled: !!channelId && appliedFilter !== null,
+    queryKey: ['msg-search', channelId, appliedFilter],
     queryFn: () =>
       searchMessages(
         channelId!,
-        term,
-        range.from || undefined,
-        range.to || undefined,
+        appliedFilter!.term,
+        appliedFilter!.from || undefined,
+        appliedFilter!.to || undefined,
       ),
   });
 
   // Resumo IA sobre o mesmo recorte da busca (termo + período).
   const aiSummary = useQuery({
-    enabled: !!channelId && aiRequested > 0,
-    queryKey: ['msg-search-ai', channelId, term, range.from, range.to, aiRequested],
+    enabled: !!channelId && appliedFilter !== null && aiRequested > 0,
+    queryKey: ['msg-search-ai', channelId, appliedFilter, aiRequested],
     queryFn: () =>
       fetchWindowInsight(channelId!, {
-        q: term || undefined,
-        from: range.from || undefined,
-        to: range.to || undefined,
+        q: appliedFilter!.term || undefined,
+        from: appliedFilter!.from || undefined,
+        to: appliedFilter!.to || undefined,
       }),
     staleTime: 60_000,
   });
 
   function runSearch() {
-    setApplied((n) => n + 1);
+    setAppliedFilter({ term, from: range.from, to: range.to });
     setAiRequested(0); // novo recorte → o resumo anterior não vale mais
+  }
+
+  function onTermChange(value: string) {
+    setTerm(value);
+    // Campo esvaziado → volta ao estado inicial, sem painel de resultados.
+    if (value === '') {
+      setAppliedFilter(null);
+      setAiRequested(0);
+    }
   }
 
   return (
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
-        eyebrow="Chat"
+        eyebrow="Social listening"
         title="Mensagens do chat"
-        description="Busque por termo (ex.: redbull) e período. Recorte a live por data."
-        info="Todas as mensagens registradas do chat ficam aqui. Busque por palavra-chave e período, e peça um resumo da IA sobre o resultado. (Texto provisório.)"
+        description="Todo o chat das suas lives, buscável por termo e período, com um resumo da IA sobre o que você encontrar."
+        info="Cada mensagem das suas lives fica guardada aqui, buscável. Procure por uma palavra (o nome de um patrocinador, um meme, uma reclamação) num período qualquer, veja as mensagens originais e peça pra IA resumir o que a galera estava falando."
       />
 
       {!channelId ? (
-        <EmptyState title="Selecione um canal" description="As mensagens são acumuladas conforme as lives são monitoradas." />
+        <EmptyState title="Selecione um canal" description="As mensagens vão se acumulando aqui a cada live que você faz." />
       ) : (
         <>
           <Card>
-            <CardHeader title="Buscar mensagens" description="Termo + período. Deixe o termo vazio para listar tudo do período." />
+            <CardHeader title="Buscar mensagens" description="Um termo e um período. Deixe o termo vazio pra ver tudo do período." />
             <div className="flex flex-col gap-3">
               <div className="flex gap-2">
                 <Input
                   value={term}
-                  onChange={(e) => setTerm(e.target.value)}
+                  onChange={(e) => onTermChange(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && runSearch()}
                   placeholder='ex: "redbull"'
+                  className="focus:border-pal-peri focus:ring-pal-peri-soft"
                 />
                 <Button onClick={runSearch}>Buscar</Button>
               </div>
@@ -83,7 +95,7 @@ export default function BatchesPage() {
             </div>
           </Card>
 
-          {applied > 0 && (
+          {appliedFilter !== null && (
             <Card>
               <CardHeader
                 title="Resultados"
@@ -99,7 +111,7 @@ export default function BatchesPage() {
                         loading={aiSummary.isLoading && aiRequested > 0}
                         disabled={(search.data.total ?? 0) === 0}
                         onClick={() => setAiRequested((n) => n + 1)}
-                        title="A IA resume o contexto das mensagens encontradas"
+                        title="A IA resume o que a galera estava falando nessas mensagens"
                       >
                         ✦ Resumo IA
                       </Button>
@@ -111,7 +123,7 @@ export default function BatchesPage() {
               {aiRequested > 0 && (
                 <div className="mb-4 rounded-xl border border-accent-400/20 bg-accent-400/[0.04] p-4">
                   <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.14em] text-ink-400">
-                    Resumo da IA {term ? `— “${term}”` : '— período selecionado'}
+                    Resumo da IA {appliedFilter?.term ? `(“${appliedFilter.term}”)` : '(período selecionado)'}
                   </p>
                   {aiSummary.isLoading ? (
                     <p className="text-sm text-ink-400">analisando as mensagens…</p>
@@ -154,7 +166,7 @@ export default function BatchesPage() {
           )}
 
           <Card>
-            <CardHeader title="Janelas" description="Blocos de análise acumulados ao longo das lives." />
+            <CardHeader title="Janelas de análise" description="Cada trecho da live que a IA leu e resumiu, do mais recente ao mais antigo. Abra uma pra ver o resumo daquele momento." />
             <BatchList channelId={channelId} />
           </Card>
         </>

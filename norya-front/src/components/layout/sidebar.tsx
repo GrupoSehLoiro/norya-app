@@ -50,40 +50,50 @@ const items: NavItem[] = [
     ),
   },
   { href: '/channels',     label: 'Canais',             icon: <Icon d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /> },
-  { href: '/insights',     label: 'Análise de sentimentos', group: 'IA Core', icon: <Icon d="M22 12h-4l-3 9L9 3l-3 9H2" /> },
-  { href: '/batches',      label: 'Mensagens do chat',  group: 'IA Core',     icon: <Icon d="M3 3h18v18H3zM3 9h18M9 21V9" /> },
-  { href: '/brands',       label: 'Marcas',             group: 'IA Core',     icon: <Icon d="M20.91 8.84 8.56 21.18a4.5 4.5 0 0 1-6.36-6.36L14.55 2.47M13 7l4 4" /> },
-  { href: '/ad-control',   label: 'Anúncios',           group: 'IA Core',     icon: <Icon d="M5 3l14 9-14 9z" /> },
-  { href: '/sessions',     label: 'Sessões ao vivo',    group: 'Ingestão',    icon: <Icon d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /> },
-  { href: '/integrations/twitch', label: 'Twitch', group: 'Integrações', icon: <Icon d="M4 3l16 0 0 14-4 4-3 0-3 3-3 0 0-3-3 0z" /> },
-  { href: '/integrations/kick',   label: 'Kick',   group: 'Integrações', icon: <Icon d="M5 3v18l5-5h9V3z" /> },
+  { href: '/insights',     label: 'Pulso da live',      group: 'Social listening', icon: <Icon d="M22 12h-4l-3 9L9 3l-3 9H2" /> },
+  { href: '/batches',      label: 'Mensagens do chat',  group: 'Social listening', icon: <Icon d="M3 3h18v18H3zM3 9h18M9 21V9" /> },
+  { href: '/brands',       label: 'Marcas',             group: 'Social listening', icon: <Icon d="M20.91 8.84 8.56 21.18a4.5 4.5 0 0 1-6.36-6.36L14.55 2.47M13 7l4 4" /> },
+  // Moderação — herança dos bots, reempacotada num lugar que faz sentido pro
+  // streamer (antes viviam soltas no grupo "Legado").
+  { href: '/legacy/bans',     label: 'Bans',                group: 'Moderação', icon: <Icon d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14" /> },
+  { href: '/legacy/timeouts', label: 'Timeouts',            group: 'Moderação', icon: <Icon d="M12 8v4l3 2M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" /> },
+  { href: '/legacy/removed',  label: 'Mensagens removidas', group: 'Moderação', icon: <Icon d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /> },
+
+  // Engajamento — o que a audiência votou/palpitou e como se expressou.
+  { href: '/legacy/polls',       label: 'Enquetes',    group: 'Engajamento', icon: <Icon d="M3 12h4v9H3zM10 3h4v18h-4zM17 8h4v13h-4z" /> },
+  { href: '/legacy/predictions', label: 'Predictions', group: 'Engajamento', icon: <Icon d="M3 17l6-6 4 4 8-8M14 7h7v7" /> },
+  { href: '/legacy/emojis',      label: 'Emojis',      group: 'Engajamento', icon: <Icon d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" /> },
+
+  // Conectar Twitch/Kick saiu do menu: a conexão acontece pela página Canais
+  // (modal "Conectar"), e o OAuth volta pra lá. As rotas /integrations/* foram
+  // desativadas (redirecionam pra /channels). "Histórico de lives" também saiu.
+
+  // Admin — operação/observabilidade. Só admin; nasce recolhido.
   { href: '/ai-training',  label: 'Treinamento IA', group: 'Admin', adminOnly: true, icon: <Icon d="M12 2a7 7 0 0 1 7 7c0 2.4-1.2 4.5-3 5.7V17a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2.3C6.2 13.5 5 11.4 5 9a7 7 0 0 1 7-7zM9 21h6" /> },
-  { href: '/metrics',      label: 'Métricas IA',   group: 'Admin', adminOnly: true, icon: <Icon d="M3 3v18h18M7 14l4-4 4 4 5-5" /> },
+  { href: '/metrics',      label: 'Métricas da IA', group: 'Admin', adminOnly: true, icon: <Icon d="M3 3v18h18M7 14l4-4 4 4 5-5" /> },
   { href: '/feature-flags', label: 'Feature flags', group: 'Admin', adminOnly: true, icon: <Icon d="M6 3v18M18 3v18M3 6h18M3 18h18" /> },
   { href: '/logs',          label: 'Access logs',   group: 'Admin', adminOnly: true, icon: <Icon d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" /> },
   { href: '/access',        label: 'Gerenciador de acesso', group: 'Admin', adminOnly: true, icon: <Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-1a6 6 0 0 1 6-6h1M16 16l2 2 4-4" /> },
-  // Legado — features que vieram da SLMOD-api Express; serão absorvidas por
-  // bounded contexts vivos no M5. Ver docs/technical/legacy-module.md.
-  { href: '/legacy/bans',        label: 'Bans',        group: 'Legado', icon: <Icon d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14" /> },
-  { href: '/legacy/timeouts',    label: 'Timeouts',    group: 'Legado', icon: <Icon d="M12 8v4l3 2M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" /> },
-  { href: '/legacy/removed',     label: 'Removidas',   group: 'Legado', icon: <Icon d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /> },
-  { href: '/legacy/predictions', label: 'Predictions', group: 'Legado', icon: <Icon d="M3 17l6-6 4 4 8-8M14 7h7v7" /> },
-  { href: '/legacy/polls',       label: 'Polls',       group: 'Legado', icon: <Icon d="M3 12h4v9H3zM10 3h4v18h-4zM17 8h4v13h-4z" /> },
-  { href: '/legacy/emojis',      label: 'Emojis',      group: 'Legado', icon: <Icon d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" /> },
 ];
 
-const STORAGE_KEY = 'sehloro:sidebar-collapsed-groups';
-const SLIM_KEY = 'sehloro:sidebar-slim';
+// Grupos secundários nascem recolhidos para o menu respirar — o streamer foca
+// no topo (Início/Canais/Social listening). Vale só no 1º acesso; depois o
+// estado escolhido pelo usuário é respeitado.
+const DEFAULT_COLLAPSED = ['Moderação', 'Engajamento', 'Admin'];
+
+const STORAGE_KEY = 'norya:sidebar-collapsed-groups';
+const SLIM_KEY = 'norya:sidebar-slim';
 
 function loadCollapsed(): Set<string> {
   if (typeof window === 'undefined') return new Set();
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
+    // 1º acesso (sem estado salvo) → aplica os grupos secundários recolhidos.
+    if (raw === null) return new Set(DEFAULT_COLLAPSED);
     const parsed: unknown = JSON.parse(raw);
     return Array.isArray(parsed) ? new Set(parsed.filter((s): s is string => typeof s === 'string')) : new Set();
   } catch {
-    return new Set();
+    return new Set(DEFAULT_COLLAPSED);
   }
 }
 
@@ -161,7 +171,7 @@ export function Sidebar() {
       <div className={cn('flex items-center', slim ? 'flex-col gap-2' : 'justify-between pl-2.5 pr-1')}>
         <Link
           href="/dashboard"
-          aria-label="Norya — início"
+          aria-label="Norya (início)"
           className="text-accent-400 transition-opacity hover:opacity-80"
         >
           {slim ? (

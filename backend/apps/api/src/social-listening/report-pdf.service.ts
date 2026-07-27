@@ -26,7 +26,6 @@ const OLIVE = '#5f6b00'; // "lime" legível como texto no claro (eyebrows)
 const POS = '#1f9d6b';
 const NEU = '#cfd5db';
 const NEG = '#dd5a4f';
-const NEG_TRACK = '#f6e3e1';
 const HILITE_BG = '#fbfde8';
 const HILITE_LINE = '#e4f19a';
 
@@ -112,17 +111,6 @@ export class ReportPdfService {
         width,
       );
     }
-    if (m.toxicUsers.length) {
-      label(doc, 'Moderação · maior toxicidade', left);
-      rankedBars(
-        doc,
-        m.toxicUsers.map((u) => ({ label: u.username, value: Math.round(u.ratio * 100) })),
-        left,
-        width,
-        { suffix: '%', color: NEG, track: NEG_TRACK },
-      );
-    }
-
     // ── Análise (IA) ──
     eyebrow(doc, 'Análise', left);
     for (const s of data.narrative.secoes) {
@@ -210,7 +198,7 @@ export class ReportPdfService {
       .fillColor(COVER_SUB)
       .font('Helvetica')
       .fontSize(13)
-      .text(`${fmtLong(data.from)} — ${fmtLong(data.to)}`, left, doc.y + 22, { width });
+      .text(`${fmtLong(data.from)} a ${fmtLong(data.to)}`, left, doc.y + 22, { width });
 
     // Rodapé da capa — duas colunas limpas
     const fy = H - 92;

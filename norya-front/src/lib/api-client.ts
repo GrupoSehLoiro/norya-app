@@ -12,7 +12,8 @@
  *  - SSR-safe: checks `typeof window` antes de tocar `localStorage`.
  */
 
-const TOKEN_STORAGE_KEY = 'sehloro:jwt';
+const TOKEN_STORAGE_KEY = 'norya:jwt';
+const REFRESH_STORAGE_KEY = 'norya:refresh';
 
 export class ApiError extends Error {
   constructor(
@@ -30,14 +31,88 @@ export function getToken(): string | null {
   return window.localStorage.getItem(TOKEN_STORAGE_KEY);
 }
 
+export function getRefreshToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.localStorage.getItem(REFRESH_STORAGE_KEY);
+}
+
 export function setToken(token: string): void {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
 }
 
+/** Persiste o par emitido pelo login/refresh (o refresh é rotacionado a cada uso). */
+export function setTokens(accessToken: string, refreshToken: string): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
+  window.localStorage.setItem(REFRESH_STORAGE_KEY, refreshToken);
+}
+
 export function clearToken(): void {
   if (typeof window === 'undefined') return;
   window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+  window.localStorage.removeItem(REFRESH_STORAGE_KEY);
+}
+
+// ─── Refresh: proativo (antes do exp) + reativo (401 → refresh → retry) ─────
+
+/** exp (segundos unix) do JWT, sem depender de lib — null se ilegível. */
+function tokenExp(token: string): number | null {
+  try {
+    const payload = token.split('.')[1]!;
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const exp = (JSON.parse(json) as { exp?: number }).exp;
+    return typeof exp === 'number' ? exp : null;
+  } catch {
+    return null;
+  }
+}
+
+const REFRESH_SKEW_MS = 60_000; // renova quando falta <1min pro access expirar
+
+// Single-flight: N requests simultâneas com token vencido disparam UM refresh.
+// Rotação server-side exige isso — o segundo uso do mesmo refresh é rejeitado.
+let refreshInFlight: Promise<boolean> | null = null;
+
+/** Troca o refresh token por um novo par. true = tokens renovados. */
+function tryRefresh(): Promise<boolean> {
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = (async () => {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) return false;
+    try {
+      const res = await fetch('/api/v2/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+        credentials: 'same-origin',
+      });
+      if (!res.ok) {
+        // Refresh inválido/revogado — sessão realmente acabou.
+        if (res.status === 401 || res.status === 403) clearToken();
+        return false;
+      }
+      const data = (await res.json()) as { accessToken: string; refreshToken: string };
+      setTokens(data.accessToken, data.refreshToken);
+      return true;
+    } catch {
+      return false; // rede fora — mantém tokens; a request original reporta o erro
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+  return refreshInFlight;
+}
+
+/** Garante um access token fresco antes de usar (REST e SSE). */
+export async function ensureFreshToken(): Promise<string | null> {
+  const token = getToken();
+  if (!token) return null;
+  const exp = tokenExp(token);
+  if (exp !== null && exp * 1000 - Date.now() < REFRESH_SKEW_MS && getRefreshToken()) {
+    await tryRefresh();
+  }
+  return getToken();
 }
 
 export interface RequestOpts extends Omit<RequestInit, 'body'> {
@@ -46,6 +121,8 @@ export interface RequestOpts extends Omit<RequestInit, 'body'> {
   anonymous?: boolean;
   /** Quando true, deixa o caller tratar o 401 sem auto-redirect. */
   noAuthRedirect?: boolean;
+  /** Interno: já tentamos refresh+retry para esta chamada. */
+  _retried?: boolean;
 }
 
 async function request<T>(path: string, opts: RequestOpts = {}): Promise<T> {
@@ -55,7 +132,8 @@ async function request<T>(path: string, opts: RequestOpts = {}): Promise<T> {
     headers.set('Content-Type', 'application/json');
   }
   if (!opts.anonymous) {
-    const token = getToken();
+    // Proativo: se o access está a <1min do exp, rotaciona antes de usar.
+    const token = await ensureFreshToken();
     if (token) headers.set('Authorization', `Bearer ${token}`);
   }
 
@@ -73,10 +151,16 @@ async function request<T>(path: string, opts: RequestOpts = {}): Promise<T> {
     credentials: 'same-origin',
   });
 
-  if (res.status === 401 && !opts.noAuthRedirect && typeof window !== 'undefined') {
-    clearToken();
-    if (window.location.pathname !== '/login') {
-      window.location.href = '/login';
+  if (res.status === 401 && !opts.anonymous && typeof window !== 'undefined') {
+    // Reativo: access rejeitado no meio do caminho → rotaciona e repete UMA vez.
+    if (!opts._retried && (await tryRefresh())) {
+      return request<T>(path, { ...opts, _retried: true });
+    }
+    if (!opts.noAuthRedirect) {
+      clearToken();
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
   }
 

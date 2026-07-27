@@ -67,6 +67,12 @@ export const configSchema = z.object({
   TWITCH_BOT_USER_ID: z.string().optional(),
   KICK_CLIENT_ID: z.string().optional(),
   KICK_CLIENT_SECRET: z.string().optional(),
+  /**
+   * Fetcher externo p/ resolver o chatroomId quando o WAF da Kick bloqueia o
+   * IP do servidor (403 "security policy"). Template com `{url}`.
+   * Ex.: https://r.jina.ai/{url}
+   */
+  KICK_CHATROOM_PROXY: z.string().optional(),
 
   CORS_ORIGIN: z.string().optional(),
 
@@ -100,15 +106,6 @@ export const configSchema = z.object({
   LLM_DRIVER: z.enum(['mock', 'real', 'fallback']).optional(),
   /** Driver do EventBus: memory | redis. Default redis se REDIS_URL setado. */
   EVENT_BUS_DRIVER: z.enum(['memory', 'redis']).optional(),
-
-  // ── Página/endpoint de logs (GET /api/v2/logs) ─────────────────────────
-  /**
-   * Credencial de Basic Auth do endpoint de access logs. Os DOIS precisam
-   * estar setados para o endpoint existir; sem eles responde 404. Credencial
-   * operacional, separada do JWT do produto de propósito.
-   */
-  LOGS_USER: z.string().optional(),
-  LOGS_PASSWORD: z.string().min(12, 'LOGS_PASSWORD precisa de no mínimo 12 caracteres').optional(),
 
   // ── Bootstrap do primeiro admin (gestão de acesso) ─────────────────────
   /**

@@ -6,10 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { SseIndicator } from '@/components/ui/sse-indicator';
 import { useChannelStatus } from '@/hooks/use-channel-status';
 import { useChannelEmotes } from '@/hooks/use-channel-emotes';
-import { EmoteText } from '@/components/ui/emote-text';
 import { useSseInsights } from '@/hooks/use-sse-insights';
 import { useLiveChat } from '@/hooks/use-live-chat';
+import { ChatLine, ChatSkinStyles } from '@/components/ui/chat-skin';
 import { searchMessages, type MessageHit } from '@/lib/analytics';
+import { fetchChannels } from '@/lib/queries';
 import { formatRelative } from '@/lib/utils';
 
 const STATUS_TONE = {
@@ -19,39 +20,6 @@ const STATUS_TONE = {
   closed: 'neutral',
   error: 'negative',
 } as const;
-
-const DOT: Record<'pos' | 'neu' | 'neg', string> = {
-  pos: 'bg-ok',
-  neu: 'bg-white/30',
-  neg: 'bg-err',
-};
-
-function sentimentOf(s: string): 'pos' | 'neu' | 'neg' {
-  if (s === 'positive') return 'pos';
-  if (s === 'negative') return 'neg';
-  return 'neu';
-}
-
-// Cor por usuário, como no chat da Twitch: determinística pelo username,
-// paleta calibrada pra legibilidade no fundo escuro.
-const NAME_COLORS = [
-  '#ff8a8a', // coral
-  '#7cc4ff', // azul céu
-  '#8ee08e', // verde
-  '#ffb46b', // laranja
-  '#c9a2ff', // lilás
-  '#6fe0cb', // turquesa
-  '#ff9ed2', // rosa
-  '#ffd76e', // âmbar
-  '#9db8ff', // azul lavanda
-  '#b8e986', // lima
-];
-
-function nameColor(username: string): string {
-  let h = 0;
-  for (let i = 0; i < username.length; i++) h = (h * 31 + username.charCodeAt(i)) | 0;
-  return NAME_COLORS[Math.abs(h) % NAME_COLORS.length] ?? '#8ee08e';
-}
 
 function ts(m: MessageHit): number {
   const t = new Date(m.receivedAt).getTime();
@@ -79,6 +47,16 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
   const channelStatus = useChannelStatus(channelId);
   const emotes = useChannelEmotes(channelId);
   const channelOnline = channelStatus.data?.online === true;
+
+  // Plataforma do canal selecionado → skin do chat (Twitch ou Kick). Reusa o
+  // cache da lista do ChannelPicker (mesma queryKey).
+  const channelsQ = useQuery({
+    queryKey: ['channels-v2'],
+    queryFn: fetchChannels,
+    staleTime: 60_000,
+  });
+  const platform: 'twitch' | 'kick' =
+    channelsQ.data?.find((c) => c.id === channelId)?.platform === 'kick' ? 'kick' : 'twitch';
 
   // Mensagens exibidas (ascendente: antiga → nova) + fila de entrada gradual.
   const [displayed, setDisplayed] = useState<MessageHit[]>([]);
@@ -235,7 +213,7 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
   const list = useMemo(() => displayed, [displayed]);
 
   return (
-    <div className="glass-card flex h-[34rem] flex-col">
+    <div className="glass-card flex h-[34rem] flex-col outline outline-1 -outline-offset-1 outline-pal-orchid-line">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="eyebrow mb-1">Ao vivo</p>
@@ -267,55 +245,33 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
           {latest.isLoading
             ? 'carregando o chat…'
             : channelOnline
-            ? 'Ao vivo — aguardando as primeiras mensagens…'
-            : 'Sem mensagens recentes — o feed retoma quando o chat voltar a falar.'}
+            ? 'Ao vivo, aguardando as primeiras mensagens…'
+            : 'Sem mensagens recentes. O feed retoma quando o chat voltar a falar.'}
         </p>
       ) : (
         <div
           ref={scrollRef}
           onScroll={onScroll}
-          className="min-h-0 flex-1 overflow-y-auto pr-2"
+          className={`chat-skin skin-${platform} min-h-0 flex-1 overflow-y-auto rounded-xl px-2 py-2`}
         >
           {noMore && (
-            <p className="pb-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-ink-400/50">
+            <p className="pb-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] opacity-40">
               início do histórico
             </p>
           )}
-          <ul className="flex min-h-full flex-col justify-end gap-2.5">
+          <ul className="flex min-h-full flex-col justify-end">
             {list.map((m) => (
-              <li
+              <ChatLine
                 key={m.messageId}
-                className={`${liveIdsRef.current.has(m.messageId) ? 'msg-in ' : ''}flex w-fit max-w-full items-center gap-2.5 rounded-2xl rounded-bl-sm border border-white/[0.05] bg-white/[0.02] px-4 py-2.5 text-[13.5px]`}
-              >
-                <span className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${DOT[sentimentOf(m.sentiment)]}`} />
-                <span className="chat-name flex-shrink-0 font-semibold" style={{ color: nameColor(m.username) }}>
-                  {m.username}
-                </span>
-                <EmoteText text={m.text} emotes={emotes} className="min-w-0 break-words text-ink-500" />
-              </li>
+                m={m}
+                platform={platform}
+                emotes={emotes}
+                className={liveIdsRef.current.has(m.messageId) ? 'msg-in' : undefined}
+              />
             ))}
           </ul>
 
-          <style jsx>{`
-            /* paleta dos usernames é calibrada pro escuro; no claro, escurece */
-            :global(html.light) .chat-name {
-              filter: brightness(0.55) saturate(1.4);
-            }
-            /* mesmo easing do pin-in do /landing — chegada suave, sem estouro */
-            .msg-in {
-              animation: msg-in 480ms cubic-bezier(0.22, 1, 0.36, 1);
-            }
-            @keyframes msg-in {
-              from {
-                opacity: 0;
-                transform: translateY(14px) scale(0.97);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-              }
-            }
-          `}</style>
+          <ChatSkinStyles />
         </div>
       )}
     </div>

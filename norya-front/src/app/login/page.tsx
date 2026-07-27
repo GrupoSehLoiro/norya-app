@@ -5,9 +5,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Ambient } from '@/components/layout/ambient';
+import {
+  MenuRow,
+  Scenic,
+  ScenicPanel,
+  SButton,
+  SDivider,
+  SError,
+  SInput,
+  SLabel,
+} from '@/components/auth/scenic';
+import { IconChevronRight } from '@/components/ui/icons';
 import { useAuth } from '@/hooks/use-auth';
 import { ApiError } from '@/lib/api-client';
 
@@ -41,15 +49,9 @@ export default function LoginPage() {
       router.push('/dashboard');
     } catch (err) {
       if (err instanceof ApiError) {
-        // Conta ainda não verificada → manda para a confirmação de email.
-        const code = (err.payload as { code?: string } | undefined)?.code;
-        if (code === 'EMAIL_NOT_VERIFIED') {
-          router.push(`/verify-email?email=${encodeURIComponent(parsed.data.email)}`);
-          return;
-        }
         setServerError(err.message);
       } else {
-        setServerError('Falha ao entrar — verifique suas credenciais.');
+        setServerError('Falha ao entrar. Verifique suas credenciais.');
       }
     } finally {
       setSubmitting(false);
@@ -58,58 +60,60 @@ export default function LoginPage() {
 
   return (
     <>
-      <Ambient />
+      <Scenic />
       <main className="relative z-10 grid min-h-screen place-items-center p-6">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="glass-card w-full max-w-sm space-y-4"
-        >
-          <div className="mb-2 text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-ink-800">SLMod Console</h1>
-            <p className="mt-1 text-sm text-ink-400">Entre com seu email.</p>
+        <ScenicPanel className="w-full max-w-sm">
+          <div className="px-4 pb-3 pt-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d7fe01]">
+              Norya
+            </p>
+            <h1 className="mt-1.5 text-xl font-bold tracking-tight text-[#eef1f5]">Entrar</h1>
+            <p className="mt-0.5 text-sm text-[rgba(255,255,255,0.45)]">Entre com seu email.</p>
           </div>
 
-          <div>
-            <label className="mb-1 block text-[11px] font-medium uppercase tracking-[0.14em] text-ink-400">
-              Email
-            </label>
-            <Input
-              type="email"
-              autoComplete="email"
-              placeholder="voce@exemplo.com"
-              {...register('email')}
-            />
-            {errors.email && <p className="mt-1 text-xs text-err">{errors.email.message}</p>}
-          </div>
-          <div>
-            <label className="mb-1 block text-[11px] font-medium uppercase tracking-[0.14em] text-ink-400">
-              Senha
-            </label>
-            <Input
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              {...register('password')}
-            />
-            {errors.password && <p className="mt-1 text-xs text-err">{errors.password.message}</p>}
-          </div>
-
-          {serverError && (
-            <div className="rounded-lg border border-err/30 bg-err/[0.08] px-3 py-2 text-sm text-err">
-              {serverError}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 px-4 pb-3">
+            <div>
+              <SLabel>Email</SLabel>
+              <SInput
+                type="email"
+                autoComplete="email"
+                placeholder="voce@exemplo.com"
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="mt-1 text-xs text-[#fca5a5]">{errors.email.message}</p>
+              )}
             </div>
-          )}
+            <div>
+              <SLabel>Senha</SLabel>
+              <SInput
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="mt-1 text-xs text-[#fca5a5]">{errors.password.message}</p>
+              )}
+            </div>
 
-          <Button type="submit" className="w-full" loading={submitting} size="lg">
-            Entrar
-          </Button>
-          <p className="text-center text-xs text-ink-400">
-            Não tem conta?{' '}
-            <Link href="/signup" className="text-accent-400 hover:underline">
-              Criar conta
-            </Link>
-          </p>
-        </form>
+            {serverError && <SError>{serverError}</SError>}
+
+            <SButton type="submit" className="w-full" loading={submitting}>
+              Entrar
+            </SButton>
+          </form>
+
+          <SDivider className="my-2" />
+          <Link href="/signup" className="block focus:outline-none">
+            <MenuRow
+              label="Criar conta"
+              sub="Não tem conta?"
+              trailing={<IconChevronRight />}
+              className="hover:bg-[rgba(255,255,255,0.05)]"
+            />
+          </Link>
+        </ScenicPanel>
       </main>
     </>
   );

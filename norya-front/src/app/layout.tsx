@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Dark é o padrão (sem classe); só adiciona .light se foi escolhido. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.getItem('sehloro:theme')==='light'){document.documentElement.classList.add('light');}}catch(e){}`,
+            __html: `try{if(localStorage.getItem('norya:theme')==='light'){document.documentElement.classList.add('light');}}catch(e){}`,
           }}
         />
       </head>

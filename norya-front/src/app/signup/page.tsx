@@ -5,20 +5,32 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Ambient } from '@/components/layout/ambient';
+import {
+  MenuRow,
+  Scenic,
+  ScenicPanel,
+  SButton,
+  SDivider,
+  SError,
+  SInput,
+  SLabel,
+} from '@/components/auth/scenic';
+import {
+  IconBuilding,
+  IconChevronDown,
+  IconChevronRight,
+  IconChevronUp,
+  IconUser,
+} from '@/components/ui/icons';
 import { useAuth } from '@/hooks/use-auth';
 import { ApiError } from '@/lib/api-client';
 import type { AccountType } from '@/lib/auth';
-import { cn } from '@/lib/utils';
 
 interface TypeConfig {
   type: AccountType;
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   tagline: string;
-  formTitle: string;
   nameLabel: string;
   namePlaceholder: string;
   docType: 'cpf' | 'cnpj';
@@ -29,10 +41,9 @@ interface TypeConfig {
 const TYPES: TypeConfig[] = [
   {
     type: 'streamer',
-    icon: '👤',
+    icon: <IconUser size={18} />,
     label: 'Pessoa física',
     tagline: 'Cadastro com CPF',
-    formTitle: 'Criar conta (CPF)',
     nameLabel: 'Seu nome',
     namePlaceholder: 'ex: YoDa',
     docType: 'cpf',
@@ -41,10 +52,9 @@ const TYPES: TypeConfig[] = [
   },
   {
     type: 'brand',
-    icon: '🏢',
+    icon: <IconBuilding size={18} />,
     label: 'Pessoa jurídica',
     tagline: 'Cadastro com CNPJ',
-    formTitle: 'Criar conta (CNPJ)',
     nameLabel: 'Razão social / nome da empresa',
     namePlaceholder: 'ex: YoDaSnacks',
     docType: 'cnpj',
@@ -125,68 +135,56 @@ export default function SignupPage() {
 
   return (
     <>
-      <Ambient />
+      <Scenic />
       <main className="relative z-10 grid min-h-screen place-items-center p-6">
-        {selected ? (
-          <SignupForm config={selected} onBack={() => setSelected(null)} />
-        ) : (
-          <TypePicker onPick={setSelected} />
-        )}
+        <ScenicPanel className="w-full max-w-md">
+          <div className="px-4 pb-3 pt-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d7fe01]">
+              Norya
+            </p>
+            <h1 className="mt-1.5 text-xl font-bold tracking-tight text-[#eef1f5]">Criar conta</h1>
+            <p className="mt-0.5 text-sm text-[rgba(255,255,255,0.45)]">
+              Como você vai usar a plataforma?
+            </p>
+          </div>
+
+          {/* Accordion no padrão da referência: row ativa vira pill escuro com
+              chevron pra cima e o formulário expande logo abaixo. */}
+          <div className="space-y-1">
+            {TYPES.map((t) => {
+              const open = selected?.type === t.type;
+              return (
+                <div key={t.type}>
+                  <MenuRow
+                    icon={t.icon}
+                    label={t.label}
+                    sub={t.tagline}
+                    active={open}
+                    onClick={() => setSelected(open ? null : t)}
+                    trailing={open ? <IconChevronUp /> : <IconChevronDown />}
+                  />
+                  {open && <SignupForm config={t} />}
+                </div>
+              );
+            })}
+          </div>
+
+          <SDivider className="my-2" />
+          <Link href="/login" className="block focus:outline-none">
+            <MenuRow
+              label="Entrar"
+              sub="Já tem conta?"
+              trailing={<IconChevronRight />}
+              className="hover:bg-[rgba(255,255,255,0.05)]"
+            />
+          </Link>
+        </ScenicPanel>
       </main>
     </>
   );
 }
 
-function TypePicker({ onPick }: { onPick: (t: TypeConfig) => void }) {
-  return (
-    <div className="w-full max-w-md space-y-5">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-ink-800">Criar conta</h1>
-        <p className="mt-1 text-sm text-ink-400">Como você vai usar a plataforma?</p>
-      </div>
-
-      <div className="space-y-3">
-        {TYPES.map((t) => (
-          <button
-            key={t.type}
-            type="button"
-            onClick={() => onPick(t)}
-            className={cn(
-              'glass-card flex w-full items-center gap-4 text-left',
-              'transition-all duration-200 ease-glass',
-              'hover:-translate-y-px hover:border-accent-400/40',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60',
-            )}
-          >
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/[0.06] text-xl">
-              {t.icon}
-            </span>
-            <span className="min-w-0">
-              <span className="block font-semibold text-ink-800">{t.label}</span>
-              <span className="block text-xs text-ink-400">{t.tagline}</span>
-            </span>
-            <span className="ml-auto text-ink-400">→</span>
-          </button>
-        ))}
-      </div>
-
-      <p className="text-center text-xs text-ink-400">
-        Já tem conta?{' '}
-        <Link href="/login" className="text-accent-400 hover:underline">
-          Entrar
-        </Link>
-      </p>
-    </div>
-  );
-}
-
-function SignupForm({
-  config,
-  onBack,
-}: {
-  config: TypeConfig;
-  onBack: () => void;
-}) {
+function SignupForm({ config }: { config: TypeConfig }) {
   const router = useRouter();
   const { register: registerAccount } = useAuth();
   const [submitting, setSubmitting] = useState(false);
@@ -220,7 +218,8 @@ function SignupForm({
         config.type,
         onlyDigits(parsed.data.document),
       );
-      router.push(`/verify-email?email=${encodeURIComponent(parsed.data.email)}`);
+      // Conta criada e logada — segue direto pro onboarding.
+      router.push('/onboarding');
     } catch (err) {
       if (err instanceof ApiError) {
         setServerError(
@@ -235,24 +234,12 @@ function SignupForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="glass-card w-full max-w-sm space-y-4">
-      <div className="mb-1">
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-xs text-ink-400 hover:text-ink-700"
-        >
-          ← {config.icon} {config.label}
-        </button>
-      </div>
-      <div className="mb-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-ink-800">
-          {config.formTitle}
-        </h1>
-      </div>
-
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-4 px-4 pb-3 pt-4"
+    >
       <Field label={config.nameLabel} error={errors.displayName?.message}>
-        <Input
+        <SInput
           type="text"
           autoComplete="organization"
           placeholder={config.namePlaceholder}
@@ -261,7 +248,7 @@ function SignupForm({
       </Field>
 
       <Field label={config.docLabel} error={docError ?? errors.document?.message}>
-        <Input
+        <SInput
           type="text"
           inputMode="numeric"
           autoComplete="off"
@@ -277,11 +264,11 @@ function SignupForm({
       </Field>
 
       <Field label="Email" error={errors.email?.message}>
-        <Input type="email" autoComplete="email" placeholder="voce@exemplo.com" {...register('email')} />
+        <SInput type="email" autoComplete="email" placeholder="voce@exemplo.com" {...register('email')} />
       </Field>
 
       <Field label="Senha" error={errors.password?.message}>
-        <Input
+        <SInput
           type="password"
           autoComplete="new-password"
           placeholder="mínimo 8 caracteres"
@@ -290,7 +277,7 @@ function SignupForm({
       </Field>
 
       <Field label="Confirmar senha" error={errors.confirmPassword?.message}>
-        <Input
+        <SInput
           type="password"
           autoComplete="new-password"
           placeholder="repita a senha"
@@ -298,22 +285,11 @@ function SignupForm({
         />
       </Field>
 
-      {serverError && (
-        <div className="rounded-lg border border-err/30 bg-err/[0.08] px-3 py-2 text-sm text-err">
-          {serverError}
-        </div>
-      )}
+      {serverError && <SError>{serverError}</SError>}
 
-      <Button type="submit" className="w-full" loading={submitting} size="lg">
+      <SButton type="submit" className="w-full" loading={submitting}>
         Criar conta
-      </Button>
-
-      <p className="text-center text-xs text-ink-400">
-        Já tem conta?{' '}
-        <Link href="/login" className="text-accent-400 hover:underline">
-          Entrar
-        </Link>
-      </p>
+      </SButton>
     </form>
   );
 }
@@ -329,11 +305,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-[11px] font-medium uppercase tracking-[0.14em] text-ink-400">
-        {label}
-      </label>
+      <SLabel>{label}</SLabel>
       {children}
-      {error && <p className="mt-1 text-xs text-err">{error}</p>}
+      {error && <p className="mt-1 text-xs text-[#fca5a5]">{error}</p>}
     </div>
   );
 }

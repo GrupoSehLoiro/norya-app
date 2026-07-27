@@ -8,6 +8,7 @@
  * KICK_PROVIDER_CREATOR por um mock.
  */
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   CacheModule as InfraCacheModule,
   KickPusherProvider,
@@ -22,7 +23,13 @@ import { KICK_PROVIDER_CREATOR, type KickProviderCreator } from './kick-ingestio
   providers: [
     {
       provide: KickRestClient,
-      useFactory: () => new KickRestClient(),
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new KickRestClient({
+          clientId: config.get<string>('KICK_CLIENT_ID'),
+          clientSecret: config.get<string>('KICK_CLIENT_SECRET'),
+          chatroomProxy: config.get<string>('KICK_CHATROOM_PROXY'),
+        }),
     },
     {
       provide: KICK_PROVIDER_CREATOR,

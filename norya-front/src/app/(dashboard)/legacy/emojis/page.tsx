@@ -5,9 +5,8 @@ import { LegacyTable, fmtDate, type LegacyColumn } from '@/components/legacy/leg
 import type { EmojiRow } from '@/lib/legacy-types';
 
 const columns: LegacyColumn<EmojiRow>[] = [
-  { key: 'timestamp', header: 'Quando', width: '170px', render: (r) => fmtDate(r.timestamp) },
-  { key: 'channel',   header: 'Canal',   width: '140px', render: (r) => r.channel ?? '—' },
-  { key: 'username',  header: 'Usuário', width: '160px', mono: true, render: (r) => r.username ?? '—' },
+  { key: 'timestamp', header: 'Quando', width: '180px', render: (r) => fmtDate(r.timestamp) },
+  { key: 'username',  header: 'Usuário', width: '180px', mono: true, render: (r) => r.username ?? '—' },
   {
     key: 'emoji',
     header: 'Emoji',
@@ -26,15 +25,18 @@ export default function EmojisPage() {
   return (
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
-        eyebrow="Legado · Social Listening"
+        eyebrow="Social listening"
         title="Emojis"
-        description="Amostragem de emojis usados no chat — útil pra heurísticas de sentimento legadas."
+        description="Os emojis que a audiência mais solta no chat."
+        info="Amostra dos emojis usados no chat deste canal ao longo do tempo. Um jeito leve de sentir o clima sem ler mensagem por mensagem. O canal acompanha o que estiver ativo no menu da conta."
       />
       <LegacyTable<EmojiRow>
         resource="emojis"
         queryKey="legacy:emojis"
         columns={columns}
+        noun="registros"
         emptyTitle="Nenhum emoji no período"
+        emptyDescription="A galera ainda não soltou emojis registrados neste canal no período selecionado."
       />
     </div>
   );

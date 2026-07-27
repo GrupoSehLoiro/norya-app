@@ -65,7 +65,7 @@ function MetricsInner() {
       <PageHeader
         eyebrow="Observabilidade"
         title="Métricas da IA"
-        description="Agregação live sobre batch_analysis (ClickHouse). Atualiza a cada 30s."
+        description="Uso, custo e latência da IA em tempo real. Atualiza a cada 30s."
         actions={
           <div className="inline-flex items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.04] p-1">
             {RANGES.map((r, i) => (
@@ -105,6 +105,7 @@ function MetricsInner() {
               <SparkBars
                 values={data.timeseries.map((p) => p.batches)}
                 labels={data.timeseries.map((p) => p.bucket)}
+                color="var(--pal-amber)"
                 height={120}
               />
             </Card>
@@ -260,7 +261,7 @@ function KpiCards({ data }: { data: MetricsSummary }) {
       <Kpi label="Batches" value={data.totals.batches.toLocaleString('pt-BR')} />
       <Kpi label="Mensagens" value={data.totals.messages.toLocaleString('pt-BR')} hint={`${data.totals.messagesWeighted.toLocaleString('pt-BR')} c/ peso`} />
       <Kpi label="Canais ativos" value={String(data.totals.activeChannels)} />
-      <Kpi label="Custo (USD)" value={`$${data.totals.costUsd.toFixed(4)}`} hint={data.totals.costUsd === 0 ? 'mock — zero' : 'real'} />
+      <Kpi label="Custo (USD)" value={`$${data.totals.costUsd.toFixed(4)}`} hint={data.totals.costUsd === 0 ? 'mock (zero)' : 'real'} />
       <Kpi label="Latência p95" value={`${data.latency.p95Ms.toFixed(0)} ms`} hint={`p50 ${data.latency.p50Ms.toFixed(0)} · p99 ${data.latency.p99Ms.toFixed(0)}`} />
       <div className="glass-card">
         <p className="eyebrow">Cache hit (tier-2)</p>

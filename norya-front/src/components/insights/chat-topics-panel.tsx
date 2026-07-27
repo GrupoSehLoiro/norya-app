@@ -55,7 +55,7 @@ export function ChatTopicsPanel({
       <CardHeader
         eyebrow="IA"
         title="Assuntos do chat"
-        description="O que mais foi pautado no chat, descrito pela IA."
+        description="Os temas que dominaram a conversa, resumidos pela IA."
         actions={
           hidden.size > 0 ? (
             <button

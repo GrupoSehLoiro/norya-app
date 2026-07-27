@@ -1,0 +1,33 @@
+# =============================================================================
+# Overlay DEV-HOST — usado APENAS pelo ./dev-host.sh.
+#
+# Cenário: infra em containers (mongo, redis, clickhouse, mailpit) e os apps
+# (nest-api + console) rodando NO HOST em modo dev — sem build de imagem.
+#
+# Ajustes vs. docker-compose.local.yml (que já é aplicado antes deste):
+#   - redis publica porta no host (o API do host precisa alcançá-lo).
+#     6381 por padrão: 6379/6380 costumam estar ocupados por outras stacks.
+#   - clickhouse volta a publicar (o local overlay remove) numa porta alternativa
+#     (8124) para não colidir com stacks antigas que seguram a 8123.
+#   - mailpit: SMTP catcher local para EMAIL_DRIVER=smtp — os emails de
+#     verificação do signup ficam visíveis em http://localhost:8025.
+#
+# Portas sobrescritíveis via env na hora do `docker compose` (o dev-host.sh faz
+# isso): DEV_REDIS_PORT, DEV_CH_PORT, DEV_SMTP_PORT, DEV_MAILPIT_PORT.
+# =============================================================================
+services:
+  redis:
+    ports:
+      - "127.0.0.1:${DEV_REDIS_PORT:-6381}:6379"
+
+  clickhouse:
+    ports: !override
+      - "127.0.0.1:${DEV_CH_PORT:-8124}:8123"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${DEV_SMTP_PORT:-1025}:1025"
+      - "127.0.0.1:${DEV_MAILPIT_PORT:-8025}:8025"
+    networks: [sehloro-net]
