@@ -10,6 +10,7 @@ import { IngestionModule } from './ingestion/ingestion.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { SocialListeningModule } from './social-listening/social-listening.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
+import { AiTrainingModule } from './ai-training/ai-training.module';
 import { TwitchWebhookModule } from './ingestion/twitch-webhook/twitch-webhook.module';
 import { TwitchConduitApiModule } from './ingestion/twitch-conduit/twitch-conduit-api.module';
 import { TwitchOAuthModule } from './identity/twitch-oauth/twitch-oauth.module';
@@ -42,6 +43,7 @@ import { LogsModule } from './logs/logs.module';
     MonitoringModule,
     SocialListeningModule,
     FeatureFlagsModule,
+    AiTrainingModule,
     TwitchWebhookModule,
     TwitchConduitApiModule,
     TwitchOAuthModule,

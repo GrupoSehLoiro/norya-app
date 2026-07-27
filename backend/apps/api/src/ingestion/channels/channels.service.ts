@@ -59,6 +59,7 @@ export class ChannelsService {
 
     let externalId: string | undefined;
     let displayName: string | undefined;
+    let avatarUrl: string | undefined;
 
     if (dto.platform === 'twitch') {
       const user = await this.helixService.getUserByLogin(dto.name).catch(() => null);
@@ -67,6 +68,7 @@ export class ChannelsService {
       }
       externalId = user.id;
       displayName = user.displayName;
+      avatarUrl = user.profileImageUrl;
     } else if (dto.platform === 'kick') {
       const kickChannel = await this.kickClient.getChannel(dto.name).catch(() => null);
       if (!kickChannel) {
@@ -83,6 +85,7 @@ export class ChannelsService {
         platform: dto.platform,
         externalId,
         displayName,
+        avatarUrl,
         ownerId: dto.ownerId,
         flags: dto.flags,
         active: true,
@@ -109,6 +112,7 @@ export class ChannelsService {
       createdAt: current.created_at,
       externalId: current.externalId,
       displayName: current.displayName,
+      avatarUrl: current.profileImageUrl,
       ownerId: current.ownerId,
       flags: dto.flags !== undefined ? { ...current.flags, ...dto.flags } : current.flags,
     });

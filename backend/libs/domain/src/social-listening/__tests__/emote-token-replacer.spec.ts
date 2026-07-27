@@ -1,5 +1,6 @@
 import type { RawMessageEmote } from '../../ingestion/raw-message';
 import type { EmoteDictionary } from '../../ingestion/emote-dictionary';
+import { TwitchEmoteDictionary } from '../../ingestion/emote-dictionary';
 import { replaceEmotes } from '../emote-token-replacer';
 
 describe('replaceEmotes — caminho por ranges', () => {
@@ -43,5 +44,28 @@ describe('replaceEmotes — caminho por dicionário', () => {
 
   it('emote desconhecido fica literal', () => {
     expect(replaceEmotes('xxxUnknownEmote yy', [], dict)).toBe('xxxUnknownEmote yy');
+  });
+});
+
+describe('replaceEmotes — emojis Unicode', () => {
+  const dict = new TwitchEmoteDictionary();
+
+  it('run do mesmo emoji vira UM token (espelha kkkk → [LAUGH])', () => {
+    expect(replaceEmotes('😂😂😂 top', [], dict)).toBe('[POSITIVE_HIGH] top');
+  });
+
+  it('emojis diferentes viram tokens distintos', () => {
+    expect(replaceEmotes('🔥 🤡', [], dict)).toBe('[HYPE_HIGH] [NEGATIVE_HIGH]');
+  });
+
+  it('emoji também é substituído no caminho por ranges', () => {
+    const emotes: RawMessageEmote[] = [
+      { code: 'Kappa', start: 0, end: 4, semantic: 'SARCASM', intensity: 'mid' },
+    ];
+    expect(replaceEmotes('Kappa 😂😂', emotes, dict)).toBe('[SARCASM_MID] [POSITIVE_HIGH]');
+  });
+
+  it('emoji desconhecido fica literal', () => {
+    expect(replaceEmotes('🦖 oi mano', [], dict)).toBe('🦖 oi mano');
   });
 });

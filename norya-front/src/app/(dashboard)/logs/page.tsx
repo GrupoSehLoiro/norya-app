@@ -3,21 +3,19 @@
 /**
  * /logs — access logs da API + worker, via GET /api/v2/logs.
  *
- * O endpoint usa Basic Auth OPERACIONAL (LOGS_USER/LOGS_PASSWORD do .env do
- * backend), separada do JWT do console — por isso a página pede credencial
- * própria antes de consultar. A credencial vive só em sessionStorage (morre
- * com a aba) e um 401 derruba de volta pro formulário.
+ * O endpoint é protegido pelo próprio JWT de admin do console (mesmo padrão
+ * das demais telas admin) — não há mais credencial operacional separada. A
+ * página fica atrás do AdminGate e usa o cliente `api` autenticado.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardHeader } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/layout/page-header';
 import { AdminGate } from '@/components/auth/admin-gate';
-
-const CRED_STORAGE_KEY = 'sehloro:logs-basic';
+import { api, ApiError } from '@/lib/api-client';
 
 interface AccessLogItem {
   service: 'api' | 'worker';
@@ -51,11 +49,6 @@ interface Filters {
 }
 
 const DEFAULT_FILTERS: Filters = { service: '', method: '', onlyErrors: false, path: '', limit: 100 };
-
-function loadCred(): string | null {
-  if (typeof window === 'undefined') return null;
-  return window.sessionStorage.getItem(CRED_STORAGE_KEY);
-}
 
 function statusTone(status: number): 'positive' | 'warn' | 'negative' | 'neutral' {
   if (status >= 500) return 'negative';
@@ -108,7 +101,6 @@ export default function LogsPage() {
 }
 
 function LogsInner() {
-  const [cred, setCred] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [downloading, setDownloading] = useState<'json' | 'csv' | null>(null);
@@ -117,13 +109,6 @@ function LogsInner() {
   // reordenar/trocar os itens, e a navegação ←/→ do modal deve seguir a
   // ordem que o usuário estava vendo quando abriu.
   const [detail, setDetail] = useState<{ items: AccessLogItem[]; index: number } | null>(null);
-
-  useEffect(() => setCred(loadCred()), []);
-
-  const handleUnauthorized = useCallback(() => {
-    window.sessionStorage.removeItem(CRED_STORAGE_KEY);
-    setCred(null);
-  }, []);
 
   const query = useMemo(() => {
     const p = new URLSearchParams();
@@ -136,42 +121,19 @@ function LogsInner() {
   }, [filters]);
 
   const logs = useQuery<LogsResponse>({
-    enabled: Boolean(cred),
     queryKey: ['access-logs', query],
     refetchInterval: autoRefresh ? 5000 : false,
-    queryFn: async () => {
-      const res = await fetch(`/api/v2/logs?${query}`, {
-        headers: { Authorization: `Basic ${cred}`, Accept: 'application/json' },
-      });
-      if (res.status === 401) {
-        handleUnauthorized();
-        throw new Error('Credencial de logs inválida');
-      }
-      if (res.status === 404) {
-        throw new Error('Endpoint de logs desligado — configure LOGS_USER/LOGS_PASSWORD no backend');
-      }
-      if (!res.ok) throw new Error(`Falha ao consultar logs (HTTP ${res.status})`);
-      return res.json() as Promise<LogsResponse>;
-    },
+    queryFn: () => api.get<LogsResponse>(`/api/v2/logs?${query}`),
   });
 
   // Refaz a mesma consulta filtrada (mesmo query string da listagem) e baixa
   // o resultado como arquivo — o que se vê no filtro é o que sai no download.
   const downloadLogs = useCallback(
     async (format: 'json' | 'csv') => {
-      if (!cred) return;
       setDownloading(format);
       setDownloadError(null);
       try {
-        const res = await fetch(`/api/v2/logs?${query}`, {
-          headers: { Authorization: `Basic ${cred}`, Accept: 'application/json' },
-        });
-        if (res.status === 401) {
-          handleUnauthorized();
-          return;
-        }
-        if (!res.ok) throw new Error(`Falha ao baixar logs (HTTP ${res.status})`);
-        const data = (await res.json()) as LogsResponse;
+        const data = await api.get<LogsResponse>(`/api/v2/logs?${query}`);
         const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
         const blob =
           format === 'json'
@@ -180,24 +142,22 @@ function LogsInner() {
               new Blob(['\ufeff' + toCsv(data.items)], { type: 'text/csv;charset=utf-8' });
         saveBlob(blob, `access-logs-${stamp}.${format}`);
       } catch (err) {
-        setDownloadError(err instanceof Error ? err.message : 'Falha ao baixar logs');
+        setDownloadError(
+          err instanceof ApiError || err instanceof Error ? err.message : 'Falha ao baixar logs',
+        );
       } finally {
         setDownloading(null);
       }
     },
-    [cred, query, handleUnauthorized],
+    [query],
   );
-
-  if (!cred) {
-    return <CredentialGate onSubmit={(value) => setCred(value)} />;
-  }
 
   return (
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
         eyebrow="Admin"
         title="Access logs"
-        description="Quem acessou o quê — requests da API e eventos EventSub do worker (endpoint /api/v2/logs, retenção 14 dias)."
+        description="Quem acessou o quê: requests da API e eventos EventSub do worker (endpoint /api/v2/logs, retenção 14 dias)."
       />
 
       <Card padding="sm">
@@ -295,7 +255,7 @@ function LogsInner() {
         <Card padding="sm">
           <div className="flex items-center justify-between px-2 pb-2">
             <p className="text-xs uppercase tracking-[0.14em] text-ink-400">
-              {logs.data?.total ?? 0} registro(s) no filtro — exibindo {logs.data?.items.length ?? 0}
+              {logs.data?.total ?? 0} registro(s) no filtro, exibindo {logs.data?.items.length ?? 0}
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -374,51 +334,6 @@ function LogsInner() {
   );
 }
 
-function CredentialGate({ onSubmit }: { onSubmit: (encoded: string) => void }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  return (
-    <div className="flex flex-col gap-10 pb-20">
-      <PageHeader
-        eyebrow="Admin"
-        title="Access logs"
-        description="Área protegida por credencial operacional (LOGS_USER/LOGS_PASSWORD do .env do backend)."
-      />
-      <Card className="max-w-md">
-        <CardHeader title="Autenticação de logs" description="Credencial separada do login do console." />
-        <form
-          className="mt-4 flex flex-col gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!username || !password) return;
-            const encoded = btoa(`${username}:${password}`);
-            window.sessionStorage.setItem(CRED_STORAGE_KEY, encoded);
-            onSubmit(encoded);
-          }}
-        >
-          <div>
-            <FieldLabel>Usuário</FieldLabel>
-            <Input value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="off" />
-          </div>
-          <div>
-            <FieldLabel>Senha</FieldLabel>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
-          <Button type="submit" disabled={!username || !password}>
-            Entrar
-          </Button>
-        </form>
-      </Card>
-    </div>
-  );
-}
-
 /**
  * Modal de detalhe de um log: JSON completo formatado + navegação ←/→ na
  * ordem da lista de onde o usuário clicou (snapshot — imune ao auto-refresh).
@@ -477,7 +392,7 @@ function LogDetailModal({
         <div className="flex items-start justify-between gap-4 border-b border-white/[0.08] px-5 py-4">
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.14em] text-ink-400">
-              log {index + 1} de {items.length} —{' '}
+              log {index + 1} de {items.length} ·{' '}
               {new Date(item.at).toLocaleString('pt-BR', { hour12: false })}
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2">

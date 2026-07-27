@@ -6,7 +6,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { BatchMessagesSchemaName, ReportLlmService } from '@sehloro/infra';
+import { AiContextResolverService, BatchMessagesSchemaName, ReportLlmService } from '@sehloro/infra';
 
 export interface BatchInsight {
   batchId: string;
@@ -34,6 +34,7 @@ export class BatchInsightService {
     @InjectModel(BatchMessagesSchemaName)
     private readonly model: Model<BatchDoc>,
     private readonly reportLlm: ReportLlmService,
+    private readonly aiContext: AiContextResolverService,
   ) {}
 
   async forBatch(batchId: string): Promise<BatchInsight> {
@@ -53,9 +54,11 @@ export class BatchInsightService {
     let aiEnabled = false;
 
     if (msgs.length > 0) {
+      const extraContext = (await this.aiContext.resolveForChannel(doc.channelId)) ?? undefined;
       const ai = await this.reportLlm.quickInsight({
         channelName: doc.channelId,
         context: `Mensagens do bloco:\n${sample}`,
+        extraContext,
       });
       if (ai) {
         insight = ai;

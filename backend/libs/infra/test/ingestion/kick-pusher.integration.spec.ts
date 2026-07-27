@@ -68,7 +68,7 @@ describeIfToken('KickPusherProvider — integração real', () => {
 
       provider = new KickPusherProvider(
         channelStub as never,
-        { chatroomId: channel!.chatroomId },
+        { chatroomId: channel!.chatroomId! },
         tokenService,
         dictionary,
         restClient,
@@ -126,7 +126,7 @@ describeIfToken('KickPusherProvider — integração real', () => {
 
     provider = new KickPusherProvider(
       channelStub as never,
-      { chatroomId: channel!.chatroomId },
+      { chatroomId: channel!.chatroomId! },
       tokenService,
       dictionary,
     );
@@ -144,7 +144,7 @@ describeIfToken('KickPusherProvider — integração real', () => {
 
       provider = new KickPusherProvider(
         channelStub as never,
-        { chatroomId: channel!.chatroomId },
+        { chatroomId: channel!.chatroomId! },
         tokenService,
         dictionary,
       );
@@ -168,7 +168,7 @@ describeIfToken('KickPusherProvider — integração real', () => {
 
       provider = new KickPusherProvider(
         channelStub as never,
-        { chatroomId: channel!.chatroomId },
+        { chatroomId: channel!.chatroomId! },
         tokenService,
         dictionary,
       );

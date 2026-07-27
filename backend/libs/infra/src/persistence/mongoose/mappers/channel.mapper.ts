@@ -29,6 +29,7 @@ export function toDomain(doc: ChannelDocument): Channel {
     flags,
     creatorId: doc.creatorId,
     workspaceId: doc.workspaceId,
+    avatarUrl: doc.profileImageUrl,
   });
 }
 

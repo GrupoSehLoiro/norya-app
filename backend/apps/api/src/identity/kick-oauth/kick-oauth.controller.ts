@@ -109,7 +109,7 @@ export class KickOAuthController {
 
     if (error) {
       this.logger.warn(`Kick OAuth negado: ${error}`);
-      return { url: `${consoleUrl}/integrations/kick?kick=denied`, statusCode: 302 };
+      return { url: `${consoleUrl}/channels?kick=denied`, statusCode: 302 };
     }
 
     if (!code || !state) {
@@ -140,6 +140,7 @@ export class KickOAuthController {
               createdAt: existing.getCreatedAt(),
               externalId: identity.broadcasterUserId || existing.getExternalId(),
               displayName: identity.displayName,
+              avatarUrl: existing.getAvatarUrl(),
               ownerId: userId,
               creatorId: existing.getCreatorId(),
               workspaceId: existing.getWorkspaceId(),
@@ -189,14 +190,16 @@ export class KickOAuthController {
 
       const okQs = new URLSearchParams({ kick: 'ok', channelId: channel.getId() });
       if (warning) okQs.set('warning', warning);
-      const target = redirect ?? `${consoleUrl}/integrations/kick?${okQs.toString()}`;
+      // Pós-conexão volta pra Canais (páginas /integrations desativadas); o
+      // `redirect` explícito (ex.: onboarding) mantém prioridade.
+      const target = redirect ?? `${consoleUrl}/channels?${okQs.toString()}`;
       return {
         url: target.startsWith('http') ? target : `${consoleUrl}${target}`,
         statusCode: 302,
       };
     } catch (err) {
       this.logger.error(`Falha no callback Kick OAuth: ${(err as Error).message}`);
-      return { url: `${consoleUrl}/integrations/kick?kick=error`, statusCode: 302 };
+      return { url: `${consoleUrl}/channels?kick=error`, statusCode: 302 };
     }
   }
 

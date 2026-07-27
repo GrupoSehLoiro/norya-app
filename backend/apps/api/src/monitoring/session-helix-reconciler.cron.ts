@@ -1,16 +1,17 @@
 /**
  * SessionHelixReconcilerCron — reconcilia as LiveSessions com a verdade da
- * Twitch (Helix /streams) a cada minuto.
+ * Twitch (Helix /streams) a cada 10s.
  *
  * Complementa o EventSub, que é o caminho rápido mas pode falhar em silêncio:
  * canal sem subscriptions (desconectado/reconectado no meio da live), worker
  * fora do ar na hora do evento, sessão aberta manualmente. Com o reconciler,
- * o status "AO VIVO" do console converge em ≤60s nas duas direções:
+ * o status "AO VIVO" do console converge em ≤10s nas duas direções:
  *  - sessão ACTIVE cujo canal NÃO está mais live no Helix → fecha;
  *  - canal twitch ativo que ESTÁ live no Helix sem sessão → abre (mesmo gate
  *    de flag `monitoring.autoStart` do handler EventSub).
  *
- * Custo: 1 request Helix por canal twitch ativo por minuto (app token; retry
+ * Custo: 6 requests Helix por canal twitch ativo por minuto (app token tem
+ * 800 pontos/min; /streams custa 1 — folga enorme pro nosso N de canais; retry
  * de 429 já tratado no TwitchHelixService). Erro em um canal não interrompe
  * os demais; erro geral nunca propaga para fora do cron.
  */
@@ -45,7 +46,7 @@ export class SessionHelixReconcilerCron {
     private readonly helix: TwitchHelixService,
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async sweep(): Promise<void> {
     // Guard de reentrância: Helix lento não pode empilhar varreduras.
     if (this.running) return;

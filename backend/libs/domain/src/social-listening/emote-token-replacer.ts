@@ -21,6 +21,7 @@ import type {
   EmoteSemantic,
   EmoteIntensity,
 } from '../ingestion/emote-dictionary';
+import { getEmojiMatchers } from '../ingestion/emote-dictionary';
 
 function tokenFor(
   semantic: EmoteSemantic | undefined,
@@ -43,33 +44,51 @@ export function replaceEmotes(
   emotes: ReadonlyArray<RawMessageEmote>,
   dictionary?: EmoteDictionary,
 ): string {
+  let out = text;
+
   // Caminho 1: ranges presentes → substituição por índice.
   if (emotes.length > 0) {
     const sorted = [...emotes].sort((a, b) => a.start - b.start);
-    let out = '';
+    let acc = '';
     let cursor = 0;
     for (const e of sorted) {
       if (e.start < cursor) continue; // overlap defensivo
-      out += text.slice(cursor, e.start);
-      out += tokenFor(e.semantic, e.intensity);
+      acc += text.slice(cursor, e.start);
+      acc += tokenFor(e.semantic, e.intensity);
       cursor = e.end + 1;
     }
-    out += text.slice(cursor);
-    return out;
+    acc += text.slice(cursor);
+    out = acc;
+  } else if (dictionary && dictionary.size > 0) {
+    // Caminho 2: word-replace via dicionário.
+    const tokens = out.split(/(\s+)/);
+    for (let i = 0; i < tokens.length; i++) {
+      const tok = tokens[i];
+      if (!tok) continue;
+      const entry: EmoteEntry | undefined = dictionary.get(tok);
+      if (entry) {
+        tokens[i] = tokenFor(entry.semantic, entry.intensity);
+      }
+    }
+    out = tokens.join('');
   }
 
-  // Caminho 2: word-replace via dicionário.
+  // Passo final (ambos os caminhos): emojis Unicode → token semântico.
+  // Ranges de plataforma nunca cobrem emoji Unicode, então este passo é
+  // complementar. Runs do mesmo emoji viram um único token, como o
+  // colapso de "kkkk" no slangNormalize.
+  return replaceUnicodeEmojis(out, dictionary);
+}
+
+/** Substitui emojis Unicode conhecidos por tokens `[SEMANTIC_INTENSITY]`. */
+export function replaceUnicodeEmojis(text: string, dictionary?: EmoteDictionary): string {
   if (!dictionary || dictionary.size === 0) return text;
-  const tokens = text.split(/(\s+)/);
-  for (let i = 0; i < tokens.length; i++) {
-    const tok = tokens[i];
-    if (!tok) continue;
-    const entry: EmoteEntry | undefined = dictionary.get(tok);
-    if (entry) {
-      tokens[i] = tokenFor(entry.semantic, entry.intensity);
-    }
-  }
-  return tokens.join('');
+  const matchers = getEmojiMatchers(dictionary);
+  if (!matchers || !matchers.single.test(text)) return text;
+  return text.replace(matchers.run, (_full, code: string) => {
+    const entry = dictionary.get(code);
+    return entry ? tokenFor(entry.semantic, entry.intensity) : code;
+  });
 }
 
 /** Conveniência: opera sobre uma RawMessage. */

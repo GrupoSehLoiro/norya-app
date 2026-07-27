@@ -20,11 +20,33 @@ export interface ReportLlmInput {
   context: string;
   /** Nome do canal/streamer para personalizar o tom. */
   channelName: string;
+  /**
+   * Bloco "Treinamento IA" do canal (AiContextResolver) — curadoria por
+   * categoria/subcategoria/game/marca. Anexado ao system quando presente.
+   */
+  extraContext?: string;
+}
+
+/** Anexa o contexto de treinamento (quando houver) ao system base. */
+function withExtraContext(system: string, input: ReportLlmInput): string {
+  return input.extraContext ? `${system}\n\n${input.extraContext}` : system;
 }
 
 export interface ReportNarrative {
   resumoExecutivo: string;
+  /**
+   * Seções em prosa — DERIVADAS dos tópicos quando a IA responde no formato
+   * novo. Mantidas na interface para o fallback pdfkit (ReportPdfService).
+   */
   secoes: Array<{ titulo: string; corpo: string }>;
+  /**
+   * Tópicos em caixas (layout bento do relatório HTML): título + tag curta +
+   * bullets de 1 frase. Ausente em narrativas antigas/template — o HTML então
+   * deriva as caixas a partir de `secoes`.
+   */
+  topicos?: Array<{ titulo: string; tag: string; bullets: string[] }>;
+  /** Falas reais e marcantes do chat, para o card "Vozes do chat". */
+  quotes?: Array<{ user: string; text: string }>;
 }
 
 const REPORT_TOOL = {
@@ -45,29 +67,52 @@ const REPORT_TOOL = {
           'mensagens, clima dominante (com o % real), e o momento ou pauta que mais marcou. ' +
           'Nada de generalidades — cite os valores fornecidos.',
       },
-      secoes: {
+      topicos: {
         type: 'array',
         description:
-          'De 4 a 6 seções densas. Sugeridas: "Clima e sentimento", "Pautas do chat", ' +
-          '"Destaques e momentos", "Menções a marcas", "Público e engajamento", ' +
-          '"Moderação e atritos". REGRAS para o corpo de cada seção (2 a 4 parágrafos): ' +
+          'De 4 a 6 tópicos, cada um vira uma CAIXA no relatório (layout bento). ' +
+          'Sugeridos: "Clima e sentimento", "Pautas do chat", "Destaques e momentos", ' +
+          '"Menções a marcas", "Público e engajamento". ' +
+          'PROIBIDO tópico ou bullet sobre toxicidade, moderação ou atritos entre usuários; ' +
+          'esse tema não entra no relatório. ' +
+          'REGRAS para os bullets (3 a 5 por tópico, 1 frase curta cada, máx ~140 chars): ' +
           '(1) cite números exatos dos dados (%, contagens, picos); ' +
-          '(2) quando fizer sentido, parafraseie ou referencie palavras-chave, marcas e ' +
-          'falas reais da amostra do chat para ilustrar; ' +
+          '(2) quando fizer sentido, referencie palavras-chave, marcas e falas reais ' +
+          'da amostra do chat para ilustrar; ' +
           '(3) explique o que o dado significa, sem dar conselhos nem listar ações; ' +
-          '(4) proibido frase de enchimento genérica que serviria para qualquer live. ' +
+          '(4) proibido bullet genérico que serviria para qualquer live.' +
           'Use SOMENTE os dados fornecidos; não invente fatos.',
         items: {
           type: 'object',
           properties: {
             titulo: { type: 'string' },
-            corpo: { type: 'string' },
+            tag: {
+              type: 'string',
+              description:
+                'Etiqueta de 1 palavra, minúscula, ex.: sentimento, conversas, momentos, marcas, audiência.',
+            },
+            bullets: { type: 'array', items: { type: 'string' } },
           },
-          required: ['titulo', 'corpo'],
+          required: ['titulo', 'tag', 'bullets'],
+        },
+      },
+      citacoes: {
+        type: 'array',
+        description:
+          '2 a 3 falas REAIS e marcantes da amostra do chat (copiadas literalmente, com o ' +
+          'username do autor). Escolha as que melhor representam o clima do período. ' +
+          'Se a amostra estiver vazia, retorne lista vazia.',
+        items: {
+          type: 'object',
+          properties: {
+            usuario: { type: 'string' },
+            frase: { type: 'string' },
+          },
+          required: ['usuario', 'frase'],
         },
       },
     },
-    required: ['resumo_executivo', 'secoes'],
+    required: ['resumo_executivo', 'topicos'],
   },
 } as const;
 
@@ -136,15 +181,18 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 3000,
-        system:
+        system: withExtraContext(
           'Você é um analista de comunidades de streaming que escreve relatórios ' +
-          'executivos em português do Brasil para marcas e streamers, no estilo de um ' +
-          'relatório de dados editorial (data storytelling). Cada frase relevante deve estar ' +
-          'ancorada num número, palavra-chave, marca ou fala real presentes nos dados. ' +
-          'Seja específico e analítico: descreva o que aconteceu e por quê. ' +
-          'NÃO escreva recomendações, conselhos nem próximos passos. ' +
-          'NÃO use frases genéricas que serviriam para qualquer live. ' +
-          'Não invente fatos além dos dados fornecidos.',
+            'executivos em português do Brasil para marcas e streamers, no estilo de um ' +
+            'relatório de dados editorial (data storytelling). Cada frase relevante deve estar ' +
+            'ancorada num número, palavra-chave, marca ou fala real presentes nos dados. ' +
+            'Seja específico e analítico: descreva o que aconteceu e por quê. ' +
+            'NÃO escreva recomendações, conselhos nem próximos passos. ' +
+            'NÃO use frases genéricas que serviriam para qualquer live. ' +
+            'Não invente fatos além dos dados fornecidos. ' +
+            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final.',
+          input,
+        ),
         tools: [REPORT_TOOL],
         tool_choice: { type: 'tool', name: 'gerar_relatorio' },
         messages: [
@@ -166,14 +214,31 @@ export class ReportLlmService {
         return null;
       }
       const raw = block.input as Record<string, unknown>;
+      // Defesa extra: mesmo proibido no prompt, descarta tópico de
+      // toxicidade/moderação se a IA insistir — o relatório não cobre o tema.
+      const toxRe = /toxic|modera|atrito/i;
+      const topicos = (
+        Array.isArray(raw['topicos'])
+          ? (raw['topicos'] as Array<Record<string, unknown>>).map((t) => ({
+              titulo: String(t['titulo'] ?? ''),
+              tag: String(t['tag'] ?? ''),
+              bullets: Array.isArray(t['bullets'])
+                ? (t['bullets'] as unknown[]).map((b) => String(b)).filter(Boolean)
+                : [],
+            }))
+          : []
+      ).filter((t) => !toxRe.test(`${t.tag} ${t.titulo}`));
+      const quotes = Array.isArray(raw['citacoes'])
+        ? (raw['citacoes'] as Array<Record<string, unknown>>)
+            .map((q) => ({ user: String(q['usuario'] ?? ''), text: String(q['frase'] ?? '') }))
+            .filter((q) => q.text)
+        : [];
       return {
         resumoExecutivo: String(raw['resumo_executivo'] ?? ''),
-        secoes: Array.isArray(raw['secoes'])
-          ? (raw['secoes'] as Array<Record<string, unknown>>).map((s) => ({
-              titulo: String(s['titulo'] ?? ''),
-              corpo: String(s['corpo'] ?? ''),
-            }))
-          : [],
+        // Prosa derivada dos bullets — mantém o fallback pdfkit funcionando.
+        secoes: topicos.map((t) => ({ titulo: t.titulo, corpo: t.bullets.join(' ') })),
+        topicos,
+        quotes,
       };
     } catch (err) {
       this.logger.error(
@@ -194,9 +259,12 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 700,
-        system:
+        system: withExtraContext(
           'Você analisa o chat de lives de streaming e resume, em português do Brasil, ' +
-          'os assuntos mais comentados. Use só os dados fornecidos, não invente.',
+            'os assuntos mais comentados. Use só os dados fornecidos, não invente. ' +
+            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final.',
+          input,
+        ),
         tools: [TOPICS_TOOL],
         tool_choice: { type: 'tool', name: 'descrever_assuntos' },
         messages: [
@@ -237,9 +305,12 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 400,
-        system:
+        system: withExtraContext(
           'Você analisa blocos de chat de lives e devolve um insight curto e ' +
-          'acionável em português do Brasil (2 a 4 frases). Use só os dados dados, não invente.',
+            'acionável em português do Brasil (2 a 4 frases). Use só os dados dados, não invente. ' +
+            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final.',
+          input,
+        ),
         messages: [
           {
             role: 'user',

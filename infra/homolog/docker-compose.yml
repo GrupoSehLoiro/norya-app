@@ -144,8 +144,13 @@ services:
     # Teto de recursos: no incidente de 2026-07-15 um vazamento de processos
     # filhos levou o nest-api a 7 GiB / 2400 PIDs, o OOM killer matou o mongod
     # e o host inteiro travou. Com limite, só o nest-api reinicia.
+    # pids_limit subiu de 256→512 quando o relatório passou a imprimir via
+    # Chromium (HtmlPdfRendererService): o browser forka vários processos e o
+    # cgroup conta cada thread — 256 era apertado e derrubava o render p/ o
+    # fallback pdfkit (sem emoji). O render é serial e fecha após 60s ociosos,
+    # então 512 dá folga mantendo o teto bem abaixo dos 2400 do incidente.
     mem_limit: 2g
-    pids_limit: 256
+    pids_limit: 512
     environment:
       NODE_ENV: production
       API_PORT: "3000"
@@ -175,6 +180,9 @@ services:
       TWITCH_WEBHOOK_SECRET: ${TWITCH_WEBHOOK_SECRET:-}
       KICK_CLIENT_ID: ${KICK_CLIENT_ID:-}
       KICK_CLIENT_SECRET: ${KICK_CLIENT_SECRET:-}
+      # kick.com/api responde 403 Cloudflare por IP; o chatroomId só resolve
+      # via proxy (template {url}) — sem esta var a ingestão Kick não sobe.
+      KICK_CHATROOM_PROXY: ${KICK_CHATROOM_PROXY:-}
       # Base pública — usada nos redirect_uri de OAuth (Twitch/Kick) e links.
       PUBLIC_API_URL: https://${DOMAIN}
       CONSOLE_URL: https://${DOMAIN}
@@ -241,6 +249,9 @@ services:
       TWITCH_WEBHOOK_SECRET: ${TWITCH_WEBHOOK_SECRET:-}
       KICK_CLIENT_ID: ${KICK_CLIENT_ID:-}
       KICK_CLIENT_SECRET: ${KICK_CLIENT_SECRET:-}
+      # Mesma razão do nest-api: sem o proxy o chatroomId não resolve e a
+      # ingestão Kick fica "chatroomId não resolvido — pulando" em loop.
+      KICK_CHATROOM_PROXY: ${KICK_CHATROOM_PROXY:-}
     networks: [sehloro-net]
     depends_on:
       nest-api:

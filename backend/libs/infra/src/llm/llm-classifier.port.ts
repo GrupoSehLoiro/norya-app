@@ -13,6 +13,12 @@ export interface LlmClassifierInput {
   aggregate: BatchAggregate;
   configs: ClassifierConfigs;
   brandHits: BrandHit[];
+  /**
+   * Bloco "Treinamento IA" já resolvido para o canal (AiContextResolver).
+   * Opcional — mock/fallback ignoram; o classifier real anexa como bloco
+   * de system SEM cache_control (preserva o prompt-cache dos blocos fixos).
+   */
+  aiContext?: string;
 }
 
 export interface LlmClassifier {

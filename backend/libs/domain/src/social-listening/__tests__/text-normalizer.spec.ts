@@ -46,4 +46,25 @@ describe('copypastaKey', () => {
     const b = copypastaKey('PogChamp   LETSGO');
     expect(a).toBe(b);
   });
+
+  it('agrupa variantes de risada no mesmo hash (kkk == KKKKKK == hahaha == rsrs)', () => {
+    const base = copypastaKey('kkk');
+    expect(copypastaKey('KKKKKKKKK')).toBe(base);
+    expect(copypastaKey('hahaha')).toBe(base);
+    expect(copypastaKey('rsrsrs')).toBe(base);
+    expect(copypastaKey('huehuehue')).toBe(base);
+  });
+
+  it('colapsa runs de 3+ do mesmo caractere ("goool" == "gooooooool")', () => {
+    expect(copypastaKey('goool')).toBe(copypastaKey('gooooooool'));
+    expect(copypastaKey('que jogo!!!')).toBe(copypastaKey('que jogo!!!!!!!!'));
+  });
+
+  it('colapsa runs de emoji (run curto == run longo do mesmo emoji)', () => {
+    expect(copypastaKey('😂😂')).toBe(copypastaKey('😂😂😂😂😂'));
+  });
+
+  it('textos diferentes continuam com hash diferente', () => {
+    expect(copypastaKey('kkk')).not.toBe(copypastaKey('que jogo ruim'));
+  });
 });

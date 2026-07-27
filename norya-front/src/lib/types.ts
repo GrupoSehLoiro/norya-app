@@ -1,5 +1,5 @@
 /**
- * Tipos espelhados do backend SEHLORO (M4 IA core).
+ * Tipos espelhados do backend Norya (M4 IA core).
  * Mantidos manualmente — a interface HTTP é o contrato.
  */
 
@@ -31,11 +31,6 @@ export interface LoginResponse {
   };
   activeWorkspaceId?: string | null;
   wsRole?: WsRole | null;
-}
-
-export interface RegisterResponse {
-  status: 'pending_email';
-  email: string;
 }
 
 export interface AuthTokensLite {
@@ -85,6 +80,9 @@ export interface ChannelV2 {
   flags?: Record<string, unknown>;
   active?: boolean;
   externalId?: string | null;
+  displayName?: string | null;
+  /** Foto de perfil do canal na plataforma (quando disponível). */
+  profileImageUrl?: string | null;
   ownerId?: string | null;
   creatorId?: string | null;
   workspaceId?: string | null;

@@ -28,6 +28,7 @@ function mkMsg(id: string, text: string): RawMessage {
 function brand(name: string, aliases: string[] = [], regex?: string): ChannelBrand {
   return {
     id: 'b_' + name,
+    creatorId: 'cr1',
     channelId: 'c1',
     name,
     aliases,

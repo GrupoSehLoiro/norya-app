@@ -13,7 +13,8 @@ export class ChannelBrandMongooseRepository implements ChannelBrandRepository {
 
   async create(input: Parameters<ChannelBrandRepository['create']>[0]): Promise<ChannelBrand> {
     const doc = await this.model.create({
-      channelId: input.channelId,
+      creatorId: input.creatorId,
+      channelId: input.channelId ?? null,
       name: input.name,
       aliases: input.aliases ?? [],
       regex: input.regex ?? null,
@@ -25,8 +26,13 @@ export class ChannelBrandMongooseRepository implements ChannelBrandRepository {
     await this.model.findByIdAndDelete(id).exec();
   }
 
-  async listByChannel(channelId: string): Promise<ChannelBrand[]> {
-    const docs = await this.model.find({ channelId }).exec();
+  async findById(id: string): Promise<ChannelBrand | null> {
+    const doc = await this.model.findById(id).exec();
+    return doc ? this._toEntity(doc) : null;
+  }
+
+  async listByCreator(creatorId: string): Promise<ChannelBrand[]> {
+    const docs = await this.model.find({ creatorId }).exec();
     return docs.map((d) => this._toEntity(d));
   }
 
@@ -35,7 +41,8 @@ export class ChannelBrandMongooseRepository implements ChannelBrandRepository {
   ): ChannelBrand {
     return {
       id: String(doc._id),
-      channelId: doc.channelId,
+      creatorId: doc.creatorId,
+      channelId: doc.channelId ?? null,
       name: doc.name,
       aliases: doc.aliases ?? [],
       regex: doc.regex ?? null,

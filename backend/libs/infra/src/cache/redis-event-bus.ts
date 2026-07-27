@@ -20,6 +20,12 @@ export class RedisEventBus implements EventBus, OnModuleDestroy {
   private readonly sub: Redis;
   private readonly handlers = new Map<string, Array<(payload: unknown) => void>>();
   private ready = false;
+  /**
+   * Memoiza a conexão em andamento: subscribes concorrentes no bootstrap
+   * (vários handlers registrando no onApplicationBootstrap) chamariam
+   * connect() duas vezes e o ioredis lança "Redis is already connecting".
+   */
+  private connecting: Promise<void> | null = null;
 
   constructor(redisUrl: string) {
     this.pub = new Redis(redisUrl, { lazyConnect: true });
@@ -79,8 +85,16 @@ export class RedisEventBus implements EventBus, OnModuleDestroy {
 
   private async _ensureConnected(): Promise<void> {
     if (this.ready) return;
-    await Promise.all([this.pub.connect(), this.sub.connect()]);
-    this.ready = true;
+    if (!this.connecting) {
+      this.connecting = Promise.all([this.pub.connect(), this.sub.connect()])
+        .then(() => {
+          this.ready = true;
+        })
+        .finally(() => {
+          this.connecting = null;
+        });
+    }
+    await this.connecting;
   }
 
   private _dispatch(channel: string, msg: string): void {

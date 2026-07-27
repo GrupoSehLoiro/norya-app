@@ -51,11 +51,11 @@ export function UnlinkedChannelsCard({ platform }: { platform: 'twitch' | 'kick'
     <Card>
       <CardHeader
         title="Canais aguardando vínculo"
-        description="Conectados via OAuth mas ainda sem creator — vincule para o canal aparecer no seletor de canais."
+        description="Você já conectou estes canais. Só falta vinculá-los pra eles aparecerem no seletor de canais."
       />
       {creatorList.length === 0 ? (
         <p className="text-sm text-warn">
-          O workspace ainda não tem creator — complete o onboarding antes de vincular.
+          O workspace ainda não tem creator. Complete o onboarding antes de vincular.
         </p>
       ) : (
         <ul className="divide-y divide-white/[0.05]">

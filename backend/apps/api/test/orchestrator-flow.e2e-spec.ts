@@ -20,9 +20,11 @@ import {
   RedisCopypastaDedupService,
   RedisEventBus,
   AnalyticsModule,
+  PersistenceModule,
   SocialListeningPersistenceModule,
   LLM_CLASSIFIER_TOKEN,
   MockLlmClassifier,
+  FallbackLlmClassifier,
   ConfigsLoaderService,
 } from '@sehloro/infra';
 import { COPYPASTA_DEDUP_TOKEN, EVENT_BUS_TOKEN, type RawMessage } from '@sehloro/domain';
@@ -66,6 +68,9 @@ describe('SocialListeningOrchestrator — flow E2E', () => {
 
   beforeAll(async () => {
     process.env.SOCIAL_LISTENING_CHANNELS = CHANNEL;
+    // Gate de gap-of-silence desligado: o teste empurra msgs e drena na
+    // sequência, sem esperar o idle de 4s do default.
+    process.env.SOCIAL_LISTENING_IDLE_GAP_MS = '0';
     if (!process.env.CLICKHOUSE_URL) process.env.CLICKHOUSE_URL = 'http://clickhouse:8123';
     if (!process.env.CLICKHOUSE_USER) process.env.CLICKHOUSE_USER = 'default';
     if (!process.env.CLICKHOUSE_PASSWORD) process.env.CLICKHOUSE_PASSWORD = 'devpass';
@@ -80,6 +85,7 @@ describe('SocialListeningOrchestrator — flow E2E', () => {
       imports: [
         ConfigModule.forRoot({ isGlobal: true, cache: true, ignoreEnvFile: true }),
         MongooseModule.forRoot(process.env.MONGODB_URI!),
+        PersistenceModule,
         SocialListeningPersistenceModule,
         AnalyticsModule.forRootAsync(),
       ],
@@ -93,6 +99,7 @@ describe('SocialListeningOrchestrator — flow E2E', () => {
         { provide: EVENT_BUS_TOKEN, useValue: bus },
         MockLlmClassifier,
         { provide: LLM_CLASSIFIER_TOKEN, useExisting: MockLlmClassifier },
+        FallbackLlmClassifier,
         ConfigsLoaderService,
         BatchAnalysisWriter,
         PublishInsightService,
@@ -102,7 +109,7 @@ describe('SocialListeningOrchestrator — flow E2E', () => {
     }).compile();
 
     orchestrator = app.get(SocialListeningOrchestrator);
-  });
+  }, 30_000);
 
   afterAll(async () => {
     if (app) await app.close();

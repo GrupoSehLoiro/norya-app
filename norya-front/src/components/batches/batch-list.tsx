@@ -42,7 +42,7 @@ export function BatchList({ channelId }: Props) {
     refetchInterval: 20_000,
   });
 
-  if (isLoading) return <Card>Carregando batches…</Card>;
+  if (isLoading) return <Card>Carregando…</Card>;
   if (error) {
     return (
       <Card className="border border-err/30 bg-err/[0.08] text-err">
@@ -55,8 +55,8 @@ export function BatchList({ channelId }: Props) {
   if (items.length === 0) {
     return (
       <EmptyState
-        title="Sem batches ainda"
-        description="Quando o canal estiver ao vivo e o orchestrator processar mensagens, os batches aparecem aqui."
+        title="Ainda sem janelas"
+        description="Quando você abrir uma live, a IA lê o chat em trechos e eles aparecem aqui."
       />
     );
   }

@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { Badge } from '@/components/ui/badge';
 import { PageHeader } from '@/components/layout/page-header';
+import { ChannelAvatar } from '@/components/ui/channel-avatar';
 import { fetchChannels, fetchSessions } from '@/lib/queries';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -25,8 +25,9 @@ export default function DashboardHomePage() {
     <div className="flex flex-col gap-14 pb-20">
       <PageHeader
         eyebrow={`Olá, ${user?.username ?? ''}`}
-        title={<>Painel <span className="text-accent-400">ao vivo</span><span className="text-accent-700">.</span></>}
-        description="Visão geral."
+        title={<>Início<span className="text-accent-700">.</span></>}
+        description="Seus canais, marcas e análises num só lugar."
+        info="Seu ponto de partida: os canais conectados, as lives que estão no ar agora e atalhos pras principais áreas. Comece conectando um canal: na sua próxima live, a Norya já começa a ler o chat."
       />
 
       {/* Stat cards */}
@@ -34,9 +35,9 @@ export default function DashboardHomePage() {
         <StatCard
           label="Canais cadastrados"
           value={channels.isLoading ? '—' : String(channels.data?.length ?? 0)}
-          foot="ingestão multi-plataforma"
           href="/channels"
           cta="Gerenciar →"
+          className="outline outline-1 -outline-offset-1 outline-pal-cyan-line"
         />
         <StatCard
           label="Sessões ao vivo"
@@ -49,28 +50,52 @@ export default function DashboardHomePage() {
         />
       </section>
 
-      {/* Bento: atalhos do pipeline */}
+      {/* Atalhos principais */}
       <section>
-        <div className="mb-6 flex items-end justify-between gap-6">
-          <div>
-            <p className="eyebrow">IA Core</p>
-            <h2 className="text-2xl font-bold tracking-tight text-ink-800">Atalhos</h2>
-          </div>
-          <Badge tone="accent" eyebrow>Funcionalidades</Badge>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold tracking-tight text-ink-800">Atalhos</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <ShortcutCard href="/insights" title="Análise de sentimentos" desc="Clima do chat e assuntos ao vivo" tag="SSE" />
-          <ShortcutCard href="/batches" title="Mensagens do chat" desc="Busca e recortes por período" tag="chat" />
-          <ShortcutCard href="/brands" title="Marcas" desc="Menções, sentimento e timeline" />
-          <ShortcutCard href="/ad-control" title="Anúncios" desc="Frequência e janelas de AD" />
-          <ShortcutCard href="/channels" title="Canais" desc="Integrações por plataforma" />
-          <ShortcutCard href="/sessions" title="Sessões ao vivo" desc="Lives monitoradas" />
-          <ShortcutCard href="/integrations/twitch" title="Integração Twitch" desc="OAuth + tokens cifrados" />
-          <ShortcutCard href="/integrations/kick" title="Integração Kick" desc="Pusher protocol no chat" />
+          {/* Canais — com foto de perfil + nome */}
+          <Link href="/channels" className="glass-card group block">
+            <p className="font-semibold text-ink-800 group-hover:text-accent-300">Canais</p>
+            {channels.data && channels.data.length > 0 ? (
+              <ul className="mt-3 space-y-2">
+                {channels.data.slice(0, 3).map((c) => (
+                  <li key={c.id} className="flex items-center gap-2.5">
+                    <ChannelAvatar name={c.displayName ?? c.name} src={c.profileImageUrl} size="sm" />
+                    <span className="truncate text-sm text-ink-700">{c.displayName ?? c.name}</span>
+                  </li>
+                ))}
+                {channels.data.length > 3 && (
+                  <li className="text-xs text-ink-400">+{channels.data.length - 3} canais</li>
+                )}
+              </ul>
+            ) : (
+              <p className="mt-2 text-xs text-ink-400">Conecte seu primeiro canal</p>
+            )}
+            <OpenLink />
+          </Link>
+
+          <ShortcutCard href="/brands" title="Marcas" desc="Quanto a audiência cita cada marca que você acompanha" />
+          <ShortcutCard href="/batches" title="Mensagens do chat" desc="Busque o que a galera falou, por termo e período" />
+          <ShortcutCard href="/insights" title="Pulso da live" desc="O clima do chat, os assuntos e os picos, em tempo real" />
         </div>
       </section>
     </div>
+  );
+}
+
+function OpenLink() {
+  return (
+    <span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-ink-600 group-hover:text-accent-300">
+      Abrir
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+        strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 6h6M6 3l3 3-3 3" />
+      </svg>
+    </span>
   );
 }
 
@@ -82,11 +107,12 @@ interface StatCardProps {
   cta?: string;
   accent?: boolean;
   live?: boolean;
+  className?: string;
 }
 
-function StatCard({ label, value, foot, href, cta, accent, live }: StatCardProps) {
+function StatCard({ label, value, foot, href, cta, accent, live, className }: StatCardProps) {
   return (
-    <article className={`glass-card ${accent ? 'glass-card--accent' : ''}`}>
+    <article className={`glass-card ${accent ? 'glass-card--accent' : ''} ${className ?? ''}`}>
       <div className="flex items-start justify-between gap-3">
         <p className="eyebrow">{label}</p>
         {live ? (
@@ -109,23 +135,12 @@ function StatCard({ label, value, foot, href, cta, accent, live }: StatCardProps
   );
 }
 
-function ShortcutCard({
-  href, title, desc, tag,
-}: { href: string; title: string; desc: string; tag?: string }) {
+function ShortcutCard({ href, title, desc }: { href: string; title: string; desc: string }) {
   return (
     <Link href={href} className="glass-card group block">
-      <div className="flex items-start justify-between gap-2">
-        <p className="font-semibold text-ink-800 group-hover:text-accent-300">{title}</p>
-        {tag ? <Badge tone="accent" eyebrow>{tag}</Badge> : null}
-      </div>
+      <p className="font-semibold text-ink-800 group-hover:text-accent-300">{title}</p>
       <p className="mt-2 text-xs text-ink-400">{desc}</p>
-      <span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-ink-600 group-hover:text-accent-300">
-        Abrir
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor"
-          strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M3 6h6M6 3l3 3-3 3" />
-        </svg>
-      </span>
+      <OpenLink />
     </Link>
   );
 }

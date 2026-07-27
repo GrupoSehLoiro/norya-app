@@ -26,7 +26,7 @@ export function ChannelStatusBanner({ channelId }: { channelId: string | null })
             <span className="text-ok/80 text-xs">· há {formatRelative(since)}</span>
           )}
         </div>
-        <Badge tone="positive">extração ativa</Badge>
+        <Badge tone="positive">lendo o chat</Badge>
       </div>
     );
   }
@@ -39,11 +39,11 @@ export function ChannelStatusBanner({ channelId }: { channelId: string | null })
           <span className="inline-block h-2 w-2 rounded-full bg-warn" />
           <span className="font-semibold uppercase tracking-[0.12em] text-[11px]">Canal offline</span>
         </div>
-        <Badge tone="warn">sem extração</Badge>
+        <Badge tone="warn">pausado</Badge>
       </div>
       <p className="text-xs text-warn/80">
-        O orchestrator não vai produzir novos insights enquanto a live não voltar.
-        Os cards abaixo (se existirem) são do último batch processado.
+        Sem novas análises enquanto a live não voltar. Os cards abaixo, se houver,
+        são da última leitura do chat.
       </p>
       {last?.endedAt && (
         <p className="text-xs text-warn/60">

@@ -15,6 +15,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CHANNEL_REPOSITORY, type ChannelRepository } from '@sehloro/domain';
 import {
+  AiContextResolverService,
   BatchMessagesMongooseRepository,
   ReportLlmService,
   type ReportNarrative,
@@ -43,6 +44,8 @@ export interface ReportData {
   narrative: ReportNarrative;
   generatedByAi: boolean;
   sampleSize: number;
+  /** Resumo IA do momento do pico (±10min em torno de metrics.peak). */
+  peakInsight: string | null;
 }
 
 const SAMPLE_TARGET = 60;
@@ -57,6 +60,15 @@ function stripLoneSurrogates(s: string): string {
   return s.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
 }
 
+/**
+ * Marcador nativo do Kick `[emote:123:KEKW]` → `KEKW`. O prompt da IA (e a
+ * narrativa que ela devolve) fica com o CÓDIGO limpo — que o relatório HTML
+ * depois renderiza como imagem via dicionário.
+ */
+function normalizeKickEmotes(s: string): string {
+  return s.replace(/\[emote:\d+:([^\]]+)\]/g, '$1');
+}
+
 @Injectable()
 export class InsightsReportService {
   private readonly logger = new Logger(InsightsReportService.name);
@@ -65,6 +77,7 @@ export class InsightsReportService {
     private readonly insights: InsightsService,
     private readonly batchMessages: BatchMessagesMongooseRepository,
     private readonly reportLlm: ReportLlmService,
+    private readonly aiContext: AiContextResolverService,
     @Inject(CHANNEL_REPOSITORY) private readonly channels: ChannelRepository,
   ) {}
 
@@ -79,8 +92,10 @@ export class InsightsReportService {
     const sample = await this._sampleMessages(channelId, from, to);
 
     const context = this._buildContext(metrics, from, to, sample);
-    const ai = await this.reportLlm.generate({ context, channelName });
+    const extraContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
+    const ai = await this.reportLlm.generate({ context, channelName, extraContext });
     const narrative = ai ?? this._templateNarrative(metrics, channelName);
+    const peakInsight = await this._peakInsight(channelId, channelName, metrics, extraContext);
 
     return {
       channelName,
@@ -90,7 +105,52 @@ export class InsightsReportService {
       narrative,
       generatedByAi: Boolean(ai),
       sampleSize: sample.length,
+      peakInsight,
     };
+  }
+
+  /**
+   * "O que aconteceu no pico" — mesmo recorte do drill-down da timeline
+   * (±10min em torno do pico), resumido pela IA para o relatório.
+   */
+  private async _peakInsight(
+    channelId: string,
+    channelName: string,
+    metrics: ReportMetrics,
+    extraContext?: string,
+  ): Promise<string | null> {
+    if (!metrics.peak) return null;
+    const from = new Date(metrics.peak.at.getTime() - 10 * 60_000);
+    const to = new Date(metrics.peak.at.getTime() + 10 * 60_000);
+    const rows = await this.batchMessages
+      .listByChannelInRange({ channelId, from, to, limit: 40 })
+      .catch(() => []);
+    const texts: string[] = [];
+    for (const r of rows) {
+      for (const m of r.messages) {
+        const t = normalizeKickEmotes((m.text ?? '').trim());
+        if (t) texts.push(`${m.username}: ${t.slice(0, 180)}`);
+        if (texts.length >= 60) break;
+      }
+      if (texts.length >= 60) break;
+    }
+    if (texts.length === 0) return null;
+    return this.reportLlm.quickInsight({
+      channelName,
+      context:
+        `Mensagens do momento de pico da live (${metrics.peak.messages} msgs na janela):\n` +
+        stripLoneSurrogates(texts.join('\n')),
+      extraContext,
+    });
+  }
+
+  /**
+   * Só as métricas agregadas do período (sem narrativa IA) — alimenta os
+   * boxes de resumo da página de análise, os mesmos números do PDF.
+   */
+  async metrics(channelId: string, from: Date, to: Date): Promise<ReportMetrics> {
+    const batches = await this.insights.history(channelId, from, to, 1000);
+    return this._aggregate(batches);
   }
 
   private _aggregate(batches: BatchAnalysis[]): ReportMetrics {
@@ -158,7 +218,7 @@ export class InsightsReportService {
     const all: string[] = [];
     for (const r of rows) {
       for (const m of r.messages) {
-        const text = (m.text ?? '').trim();
+        const text = normalizeKickEmotes((m.text ?? '').trim());
         if (text) all.push(`${m.username}: ${text.slice(0, 180)}`);
       }
     }
@@ -189,9 +249,8 @@ export class InsightsReportService {
       m.brands.length
         ? `Marcas mencionadas: ${m.brands.map((b) => `${b.brand} (${b.count})`).join(', ')}.`
         : '',
-      m.toxicUsers.length
-        ? `Usuários com maior toxicidade: ${m.toxicUsers.map((u) => `${u.username} (${pct(u.ratio)})`).join(', ')}.`
-        : '',
+      // Toxicidade fica de fora do contexto de propósito: o relatório não
+      // cobre moderação, e sem o dado a IA não escreve sobre o tema.
       '',
       sample.length
         ? `Amostra de ${sample.length} mensagens do chat:\n${sample.join('\n')}`
@@ -214,6 +273,64 @@ export class InsightsReportService {
     const avgPerDay = m.activeDays ? Math.round(m.totalMessages / m.activeDays) : m.totalMessages;
     const fmtDate = (d: Date) =>
       `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+    const topicos: NonNullable<ReportNarrative['topicos']> = [
+      {
+        titulo: 'Clima e sentimento',
+        tag: 'sentimento',
+        bullets: [
+          `Sentimento ponderado por volume: ${pct(m.sentiment.pos)} positivo, ${pct(m.sentiment.neu)} neutro, ${pct(m.sentiment.neg)} negativo.`,
+          `O tom dominante do chat foi ${dominante}.`,
+          ...(m.peak
+            ? [
+                `O maior pico concentrou ${m.peak.messages} mensagens numa única janela, em ${fmtDate(m.peak.at)}.`,
+              ]
+            : []),
+        ],
+      },
+      {
+        titulo: 'Pautas do chat',
+        tag: 'conversas',
+        bullets: m.topCategories.length
+          ? [
+              `${m.topCategories.length} pauta(s) dominante(s) identificada(s) no período.`,
+              `Mais comentadas: ${m.topCategories
+                .slice(0, 5)
+                .map((c) => `${c.category} (${c.count})`)
+                .join(', ')}${m.topCategories.length > 5 ? ', entre outras' : ''}.`,
+              `A pauta líder (${m.topCategories[0]?.category}) concentrou ${m.topCategories[0]?.count} menções.`,
+            ]
+          : ['Não houve concentração clara de pautas no período.'],
+      },
+      {
+        titulo: 'Público e palavras-chave',
+        tag: 'audiência',
+        bullets: [
+          `Pico de ${m.peakUsers} usuários únicos numa janela.`,
+          `Média de ${avgPerDay} mensagens por dia ativo.`,
+          m.topKeywords.length
+            ? `Termos mais recorrentes: ${m.topKeywords
+                .slice(0, 10)
+                .map((k) => k.word)
+                .join(', ')}.`
+            : 'Não houve termos com recorrência destacada.',
+        ],
+      },
+      ...(m.brands.length
+        ? [
+            {
+              titulo: 'Menções a marcas',
+              tag: 'marcas',
+              bullets: [
+                `Menções orgânicas a ${m.brands.length} marca(s) detectadas.`,
+                `Mais citadas: ${m.brands.map((b) => `${b.brand} (${b.count})`).join(', ')}.`,
+                `Maior destaque: ${m.brands[0]?.brand}, com ${m.brands[0]?.count} menção(ões).`,
+              ],
+            },
+          ]
+        : []),
+    ];
+
     return {
       resumoExecutivo:
         `No período analisado, o canal ${channelName} registrou ${m.totalMessages} mensagens ` +
@@ -221,63 +338,9 @@ export class InsightsReportService {
         `distribuídas em ${m.windows} janelas de análise. O clima foi predominantemente ${dominante} ` +
         `(${pct(m.sentiment.pos)} positivo / ${pct(m.sentiment.neu)} neutro / ${pct(m.sentiment.neg)} negativo)` +
         (m.peak ? `, com pico de ${m.peak.messages} mensagens em ${fmtDate(m.peak.at)}.` : '.'),
-      secoes: [
-        {
-          titulo: 'Clima e sentimento',
-          corpo:
-            `A análise de sentimento ponderada por volume aponta ${pct(m.sentiment.pos)} de mensagens positivas, ` +
-            `${pct(m.sentiment.neu)} neutras e ${pct(m.sentiment.neg)} negativas. ` +
-            `O tom dominante do chat foi ${dominante}. ` +
-            (m.peak
-              ? `O maior pico de engajamento concentrou ${m.peak.messages} mensagens numa única janela, em ${fmtDate(m.peak.at)}.`
-              : ''),
-        },
-        {
-          titulo: 'Pautas do chat',
-          corpo: m.topCategories.length
-            ? `Foram identificadas ${m.topCategories.length} pautas dominantes. As mais comentadas foram ` +
-              `${m.topCategories
-                .slice(0, 5)
-                .map((c) => `${c.category} (${c.count})`)
-                .join(', ')}` +
-              `${m.topCategories.length > 5 ? ', entre outras' : ''}. ` +
-              `A pauta líder (${m.topCategories[0]?.category}) concentrou ${m.topCategories[0]?.count} menções.`
-            : 'Não houve concentração clara de pautas no período.',
-        },
-        {
-          titulo: 'Público e palavras-chave',
-          corpo:
-            `O pico de usuários únicos numa janela foi de ${m.peakUsers}, com média de ${avgPerDay} mensagens por dia ativo. ` +
-            (m.topKeywords.length
-              ? `Os termos mais recorrentes no chat foram: ${m.topKeywords
-                  .slice(0, 12)
-                  .map((k) => k.word)
-                  .join(', ')}.`
-              : 'Não houve termos com recorrência destacada.'),
-        },
-        ...(m.brands.length
-          ? [
-              {
-                titulo: 'Menções a marcas',
-                corpo:
-                  `Foram detectadas menções orgânicas a ${m.brands.length} marca(s). ` +
-                  `As mais citadas: ${m.brands.map((b) => `${b.brand} (${b.count})`).join(', ')}. ` +
-                  `A marca de maior destaque foi ${m.brands[0]?.brand}, com ${m.brands[0]?.count} menções.`,
-              },
-            ]
-          : []),
-        ...(m.toxicUsers.length
-          ? [
-              {
-                titulo: 'Moderação e atritos',
-                corpo:
-                  `Foram sinalizados ${m.toxicUsers.length} usuário(s) com maior índice de toxicidade no período: ` +
-                  `${m.toxicUsers.map((u) => `${u.username} (${pct(u.ratio)})`).join(', ')}. ` +
-                  `Esses perfis concentraram a maior parte das mensagens classificadas como negativas.`,
-              },
-            ]
-          : []),
-      ],
+      // Prosa derivada dos bullets — alimenta o fallback pdfkit.
+      secoes: topicos.map((t) => ({ titulo: t.titulo, corpo: t.bullets.join(' ') })),
+      topicos,
     };
   }
 }

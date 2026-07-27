@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'sehloro:theme';
+const STORAGE_KEY = 'norya:theme';
 
 /**
  * Botão de troca de tema (claro ↔ escuro). Dark é o padrão; o estado é
@@ -39,8 +39,8 @@ export function ThemeToggle() {
       aria-label={isLight ? 'Mudar para tema escuro' : 'Mudar para tema claro'}
       title={
         isLight
-          ? 'Tema claro — clique para o padrão (escuro)'
-          : 'Tema escuro (padrão) — clique para o claro'
+          ? 'Tema claro. Clique para o padrão (escuro)'
+          : 'Tema escuro (padrão). Clique para o claro'
       }
       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-ink-600 transition-colors hover:bg-white/[0.08] hover:text-ink-800"
     >

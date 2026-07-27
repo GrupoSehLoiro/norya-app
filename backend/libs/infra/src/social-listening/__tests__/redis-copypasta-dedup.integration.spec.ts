@@ -110,4 +110,26 @@ describe('RedisCopypastaDedupService (integration)', () => {
     expect(r.unique.length).toBe(1);
     expect(r.dedupCount).toBe(1);
   });
+
+  it('variantes de risada (kkk/KKKKKK/hahaha) agrupam no mesmo hash', async () => {
+    if (!reachable) return;
+    const r = await service.process([
+      mkMsg('a', 'kkk'),
+      mkMsg('b', 'KKKKKKKKKK'),
+      mkMsg('c', 'hahahaha'),
+      mkMsg('d', 'rsrsrs'),
+    ]);
+    expect(r.unique.length).toBe(1);
+    expect(r.dedupCount).toBe(3);
+  });
+
+  it('countsByMsgId traz o peso por-janela da msg única', async () => {
+    if (!reachable) return;
+    const same = Array.from({ length: 20 }, (_, i) => mkMsg('s' + i, 'KKKK que jogada'));
+    const solo = mkMsg('x1', 'ok entendi tudo');
+    const r = await service.process([...same, solo]);
+    expect(r.unique.length).toBe(2);
+    expect(r.countsByMsgId.get('s0')).toBe(20);
+    expect(r.countsByMsgId.get('x1')).toBe(1);
+  });
 });

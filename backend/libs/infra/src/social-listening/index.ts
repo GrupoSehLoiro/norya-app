@@ -1,4 +1,6 @@
 export * from './configs-loader.service';
+export * from './ai-context-resolver.service';
+export * from '../persistence/mongoose/schemas/ai-training-context.schema';
 export * from './redis-copypasta-dedup.service';
 export * from './social-listening.module';
 export * from './social-listening-persistence.module';

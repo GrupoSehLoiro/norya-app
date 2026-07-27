@@ -35,6 +35,20 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
+# Chromium do sistema para o HtmlPdfRendererService (relatório HTML→PDF via
+# puppeteer-core). Sem ele, isAvailable()=false e a API cai no fallback pdfkit,
+# que usa Helvetica (Latin-1) e não desenha emoji — o texto vira mojibake.
+# As fontes acompanham o binário: ttf-freefont cobre o texto pt-BR e
+# font-noto-emoji desenha os emojis do chat (sem ela, o Chromium mostra tofu □).
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ttf-freefont \
+    font-noto-emoji
+ENV CHROME_PATH=/usr/bin/chromium-browser
+
 RUN npm install -g pnpm@9 \
   && addgroup -S sehloro \
   && adduser -S sehloro -G sehloro

@@ -10,6 +10,7 @@ import { HistoryTable } from '@/components/insights/history-table';
 import { LiveFeed } from '@/components/insights/live-feed';
 import { PageHeader } from '@/components/layout/page-header';
 import { api } from '@/lib/api-client';
+import { dayBoundsIso, todayYmd } from '@/lib/day-range';
 import type { InsightsLatestResponse, InsightsHistoryResponse } from '@/lib/types';
 
 export default function ChannelInsightsPage() {
@@ -42,8 +43,15 @@ export default function ChannelInsightsPage() {
       <ChannelStatusBanner channelId={channelId} />
 
       {latest.data?.analysis
-        ? <InsightCards analysis={latest.data.analysis} />
-        : <EmptyState title="Sem batches" description="Nenhum batch_analysis para este canal ainda." />}
+        ? (
+          <InsightCards
+            analysis={latest.data.analysis}
+            channelId={channelId}
+            from={dayBoundsIso(todayYmd()).from}
+            to={dayBoundsIso(todayYmd()).to}
+          />
+        )
+        : <EmptyState title="Sem análises" description="Nenhuma análise para este canal ainda." />}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">

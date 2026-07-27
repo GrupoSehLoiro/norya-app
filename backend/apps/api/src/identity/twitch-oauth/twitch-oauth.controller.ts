@@ -188,6 +188,7 @@ export class TwitchOAuthController {
               createdAt: existing.getCreatedAt(),
               externalId: user.id,
               displayName: user.display_name,
+              avatarUrl: user.profile_image_url ?? existing.getAvatarUrl(),
               ownerId: userId,
               creatorId: existing.getCreatorId(),
               workspaceId: existing.getWorkspaceId(),
@@ -200,6 +201,7 @@ export class TwitchOAuthController {
               platform: 'twitch',
               externalId: user.id,
               displayName: user.display_name,
+              avatarUrl: user.profile_image_url,
               ownerId: userId,
             }),
           );
@@ -266,12 +268,14 @@ export class TwitchOAuthController {
       );
       const qs = new URLSearchParams({ connected: '1' });
       if (subWarning.length) qs.set('warning', subWarning.join(','));
-      const target = redirect || `${consoleUrl}/integrations/twitch?${qs.toString()}`;
+      // Pós-conexão volta pra Canais (as páginas /integrations foram desativadas).
+      // O `redirect` explícito (ex.: onboarding) continua tendo prioridade.
+      const target = redirect || `${consoleUrl}/channels?${qs.toString()}`;
       return res.redirect(target.startsWith('http') ? target : `${consoleUrl}${target}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'unknown';
       this.logger.error(`OAuth callback falhou: ${msg}`);
-      return res.redirect(`${consoleUrl}/integrations/twitch?error=${encodeURIComponent(msg)}`);
+      return res.redirect(`${consoleUrl}/channels?error=${encodeURIComponent(msg)}`);
     }
   }
 
@@ -335,6 +339,7 @@ export class TwitchOAuthController {
       createdAt: ch.getCreatedAt(),
       externalId: ch.getExternalId(),
       displayName: ch.getDisplayName(),
+      avatarUrl: ch.getAvatarUrl(),
       ownerId: ch.getOwnerId(),
       creatorId: ch.getCreatorId(),
       workspaceId: ch.getWorkspaceId(),

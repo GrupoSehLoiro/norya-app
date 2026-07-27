@@ -71,15 +71,36 @@ export function tokenize(text: string, opts?: NormalizeOptions): string[] {
   return out;
 }
 
+/**
+ * Colapsa repetições que só mudam a INTENSIDADE do texto, não o significado,
+ * para que variantes caiam no MESMO hash de copypasta (o volume real fica
+ * preservado na contagem do grupo):
+ *   - risadas (kkk/haha/rsrs/hue, qualquer comprimento) → token canônico [laugh]
+ *   - runs de 3+ do mesmo caractere (incl. emoji) → 2 ("goool" → "gool",
+ *     "!!!!!" → "!!")
+ */
+export function collapseRepetitions(text: string): string {
+  return text
+    .replace(/k{3,}/gi, '[laugh]')
+    .replace(/(?:ha){2,}h?/gi, '[laugh]') // hahaha, hahah
+    .replace(/ha{2,}/gi, '[laugh]') // haaa
+    .replace(/(?:rs){2,}/gi, '[laugh]')
+    .replace(/(?:hue){2,}/gi, '[laugh]')
+    .replace(/\[laugh\](?:\s*\[laugh\])+/g, '[laugh]')
+    .replace(/(.)\1{2,}/gsu, '$1$1');
+}
+
 /** Hash determinístico para uso no dedup de copypasta. */
 export function copypastaKey(text: string, opts?: NormalizeOptions): string {
-  return normalizeText(text, {
-    ...opts,
-    stripUrls: true,
-    stripMentions: true,
-    stripEmotes: true,
-    stripStopwords: false, // hash do TEXTO, não dos tokens
-    lowercase: true,
-    collapseWhitespace: true,
-  });
+  return collapseRepetitions(
+    normalizeText(text, {
+      ...opts,
+      stripUrls: true,
+      stripMentions: true,
+      stripEmotes: true,
+      stripStopwords: false, // hash do TEXTO, não dos tokens
+      lowercase: true,
+      collapseWhitespace: true,
+    }),
+  );
 }

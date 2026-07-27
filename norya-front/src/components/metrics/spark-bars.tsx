@@ -49,7 +49,8 @@ export function SparkBars({
             y={y}
             width={barW - 1}
             height={h}
-            fill={color}
+            // via style (não attr) para aceitar cores em var(--...) do tema
+            style={{ fill: color }}
             opacity={0.85}
           >
             <title>{labels?.[i] ?? ''}: {v}</title>

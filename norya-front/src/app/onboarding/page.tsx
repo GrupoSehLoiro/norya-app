@@ -3,10 +3,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Ambient } from '@/components/layout/ambient';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Stepper, type StepperStep } from '@/components/ui/stepper';
+import {
+  MenuRow,
+  Scenic,
+  ScenicPanel,
+  SButton,
+  SError,
+  SInput,
+  SLabel,
+} from '@/components/auth/scenic';
+import {
+  IconCheck,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronUp,
+  IconPlus,
+  IconX,
+} from '@/components/ui/icons';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { api, ApiError, getToken } from '@/lib/api-client';
 import {
@@ -25,10 +39,10 @@ import {
   type Taxonomy,
 } from '@/lib/onboarding';
 
-const STEPS: StepperStep[] = [
-  { key: 'creator', label: 'Seu canal' },
-  { key: 'connect', label: 'Conectar' },
-  { key: 'profile', label: 'Perfil' },
+const STEPS: { key: string; label: string }[] = [
+  { key: 'creator', label: 'Seu perfil' },
+  { key: 'connect', label: 'Seus canais' },
+  { key: 'profile', label: 'Nicho' },
   { key: 'brands', label: 'Marcas' },
   { key: 'review', label: 'Revisão' },
 ];
@@ -96,66 +110,113 @@ export default function OnboardingPage() {
 
   if (!ready || !user) {
     return (
-      <div className="grid h-screen place-items-center">
-        <div className="size-6 animate-spin rounded-full border-2 border-accent-400 border-t-transparent" />
-      </div>
+      <>
+        <Scenic />
+        <div className="relative z-10 grid h-screen place-items-center">
+          <div className="size-6 animate-spin rounded-full border-2 border-[#d7fe01] border-t-transparent" />
+        </div>
+      </>
+    );
+  }
+
+  // Conteúdo do passo ativo — renderizado logo abaixo da row correspondente,
+  // como os sub-itens expandidos do menu de referência.
+  function stepContent(i: number): React.ReactNode {
+    if (i === 0) {
+      return (
+        <CreatorStep
+          defaultName={user!.username?.split('@')[0] ?? ''}
+          existingName={creators.data?.[0]?.name}
+          onDone={(id) => {
+            setCreatorId(id);
+            void qc.invalidateQueries({ queryKey: ['creators'] });
+            setStep(1);
+          }}
+        />
+      );
+    }
+    if (!creatorId) return null;
+    if (i === 1) {
+      return (
+        <ConnectStep creatorId={creatorId} onBack={() => setStep(0)} onNext={() => setStep(2)} />
+      );
+    }
+    if (i === 2) {
+      return (
+        <ProfileStep creatorId={creatorId} onBack={() => setStep(1)} onNext={() => setStep(3)} />
+      );
+    }
+    if (i === 3) {
+      return (
+        <BrandsStep creatorId={creatorId} onBack={() => setStep(2)} onNext={() => setStep(4)} />
+      );
+    }
+    return (
+      <ReviewStep creatorId={creatorId} onBack={() => setStep(3)} onDone={finishOnboarding} />
     );
   }
 
   return (
     <>
-      <Ambient />
-      <main className="relative z-10 mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-6 p-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold tracking-tight text-ink-800">Vamos configurar seu canal</h1>
-          <p className="mt-1 text-sm text-ink-400">Leva menos de 2 minutos.</p>
-        </div>
+      <Scenic />
+      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-xl flex-col justify-center p-6">
+        <ScenicPanel>
+          <div className="px-4 pb-3 pt-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d7fe01]">
+              Norya
+            </p>
+            <h1 className="mt-1.5 text-xl font-bold tracking-tight text-[#eef1f5]">
+              Vamos configurar seu perfil
+            </h1>
+            <p className="mt-0.5 text-sm text-[rgba(255,255,255,0.45)]">Leva menos de 2 minutos.</p>
+          </div>
 
-        <Stepper steps={STEPS} current={step} />
-
-        <div className="glass-card space-y-5">
-          {step === 0 && (
-            <CreatorStep
-              defaultName={user.username?.split('@')[0] ?? ''}
-              existingName={creators.data?.[0]?.name}
-              onDone={(id) => {
-                setCreatorId(id);
-                void qc.invalidateQueries({ queryKey: ['creators'] });
-                setStep(1);
-              }}
-            />
-          )}
-          {step === 1 && creatorId && (
-            <ConnectStep
-              creatorId={creatorId}
-              onBack={() => setStep(0)}
-              onNext={() => setStep(2)}
-            />
-          )}
-          {step === 2 && creatorId && (
-            <ProfileStep
-              creatorId={creatorId}
-              onBack={() => setStep(1)}
-              onNext={() => setStep(3)}
-            />
-          )}
-          {step === 3 && creatorId && (
-            <BrandsStep
-              creatorId={creatorId}
-              onBack={() => setStep(2)}
-              onNext={() => setStep(4)}
-            />
-          )}
-          {step === 4 && creatorId && (
-            <ReviewStep
-              creatorId={creatorId}
-              onBack={() => setStep(3)}
-              onDone={finishOnboarding}
-            />
-          )}
-        </div>
+          <div className="space-y-1">
+            {STEPS.map((s, i) => {
+              const done = i < step;
+              const active = i === step;
+              return (
+                <div key={s.key}>
+                  <MenuRow
+                    icon={<StepBadge n={i} done={done} active={active} />}
+                    label={
+                      active ? (
+                        s.label
+                      ) : (
+                        <span className={done ? 'text-[rgba(255,255,255,0.75)]' : 'text-[rgba(255,255,255,0.45)]'}>
+                          {s.label}
+                        </span>
+                      )
+                    }
+                    active={active}
+                    trailing={active ? <IconChevronUp /> : undefined}
+                  />
+                  {active && <div className="space-y-4 px-4 pb-3 pt-4">{stepContent(i)}</div>}
+                </div>
+              );
+            })}
+          </div>
+        </ScenicPanel>
       </main>
     </>
+  );
+}
+
+/** Bolinha do passo: número → check quando concluído; escura sobre o pill lime. */
+function StepBadge({ n, done, active }: { n: number; done: boolean; active: boolean }) {
+  return (
+    <span
+      className={cn(
+        'grid size-6 place-items-center rounded-full text-[11px] font-semibold',
+        active
+          ? 'bg-[rgba(7,9,12,0.9)] text-[#d7fe01]'
+          : done
+            ? 'bg-[rgba(215,254,1,0.16)] text-[#d7fe01]'
+            : 'border border-[rgba(255,255,255,0.22)] text-[rgba(255,255,255,0.5)]',
+      )}
+    >
+      {done ? <IconCheck size={11} /> : n + 1}
+    </span>
   );
 }
 
@@ -175,7 +236,7 @@ function CreatorStep({
 
   async function next() {
     if (name.trim().length === 0) {
-      setError('Dê um nome ao canal.');
+      setError('Dê um nome ao seu perfil.');
       return;
     }
     setBusy(true);
@@ -194,14 +255,14 @@ function CreatorStep({
 
   return (
     <>
-      <StepHeader title="Seu canal" subtitle="Como seu canal/streamer se chama?" />
-      <FieldLabel>Nome do canal</FieldLabel>
-      <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="ex: YoDa" />
+      <StepHeader subtitle="Seu perfil de criador. Os canais que você conectar no próximo passo ficam ligados a ele." />
+      <FieldLabel>Nome do criador</FieldLabel>
+      <SInput value={name} onChange={(e) => setName(e.target.value)} placeholder="ex: YoDa" />
       {error && <ErrorBox>{error}</ErrorBox>}
       <div className="flex justify-end">
-        <Button onClick={next} loading={busy}>
-          Continuar →
-        </Button>
+        <SButton onClick={next} loading={busy}>
+          Continuar <IconChevronRight size={13} />
+        </SButton>
       </div>
     </>
   );
@@ -272,7 +333,7 @@ function ConnectStep({
       setError(totalLinked === 0 && hardError ? hardError : null);
       setNotice(
         planLimited > 0
-          ? `Vinculamos ${planLimited === 1 ? '1 conta e outra fica' : `algumas contas e ${planLimited} ficam`} disponível(is) ao fazer upgrade do plano.`
+          ? `Conectamos ${planLimited === 1 ? '1 canal e outro fica' : `alguns canais e ${planLimited} ficam`} disponível(is) ao fazer upgrade do plano.`
           : null,
       );
       setBusy(false);
@@ -295,37 +356,42 @@ function ConnectStep({
 
   return (
     <>
-      <StepHeader
-        title="Conectar canal"
-        subtitle="Conecte ao menos uma plataforma — vinculamos automaticamente ao voltar."
-      />
+      <StepHeader subtitle="Conecte seus canais: Twitch, Kick. Vinculamos ao seu perfil automaticamente ao voltar." />
 
       <div className="flex gap-2">
-        <Button variant="secondary" className="flex-1" onClick={() => startOAuth('twitch')}>
+        <SButton variant="secondary" className="flex-1" onClick={() => startOAuth('twitch')}>
           Conectar Twitch
-        </Button>
-        <Button variant="secondary" className="flex-1" onClick={() => startOAuth('kick')}>
+        </SButton>
+        <SButton variant="secondary" className="flex-1" onClick={() => startOAuth('kick')}>
           Conectar Kick
-        </Button>
+        </SButton>
       </div>
 
-      {busy && <p className="text-sm text-ink-400">vinculando conta…</p>}
+      {busy && <p className="text-sm text-[rgba(255,255,255,0.45)]">conectando canal…</p>}
 
-      {notice && !busy && <p className="text-sm text-ink-400">{notice}</p>}
+      {notice && !busy && <p className="text-sm text-[rgba(255,255,255,0.45)]">{notice}</p>}
 
       {hasLinked ? (
         <div>
-          <FieldLabel>Conectado a este canal</FieldLabel>
+          <FieldLabel>Canais conectados</FieldLabel>
           <ul className="space-y-2">
             {linked.data!.map((it) => (
-              <IntegrationRow key={it.id} it={it} trailing={<span className="text-xs text-ok">✓ vinculado</span>} />
+              <IntegrationRow
+                key={it.id}
+                it={it}
+                trailing={
+                  <span className="inline-flex items-center gap-1 text-xs text-[#6ee7b7]">
+                    <IconCheck size={12} /> vinculado
+                  </span>
+                }
+              />
             ))}
           </ul>
         </div>
       ) : (
         !busy && (
-          <p className="text-sm text-ink-400">
-            Nenhuma conta conectada ainda. Clique em uma plataforma acima para autorizar.
+          <p className="text-sm text-[rgba(255,255,255,0.45)]">
+            Nenhum canal conectado ainda. Escolha uma plataforma acima para autorizar.
           </p>
         )
       )}
@@ -333,12 +399,12 @@ function ConnectStep({
       {error && <ErrorBox>{error}</ErrorBox>}
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={onBack}>
-          ← Voltar
-        </Button>
-        <Button onClick={onNext} disabled={!hasLinked}>
-          Continuar →
-        </Button>
+        <SButton variant="ghost" onClick={onBack}>
+          <IconChevronLeft size={13} /> Voltar
+        </SButton>
+        <SButton onClick={onNext} disabled={!hasLinked}>
+          Continuar <IconChevronRight size={13} />
+        </SButton>
       </div>
     </>
   );
@@ -346,10 +412,10 @@ function ConnectStep({
 
 function IntegrationRow({ it, trailing }: { it: IntegrationView; trailing: React.ReactNode }) {
   return (
-    <li className="flex items-center justify-between rounded-lg border border-white/[0.06] p-3">
+    <li className="flex items-center justify-between rounded-lg border border-[rgba(255,255,255,0.08)] p-3">
       <div className="min-w-0">
-        <p className="truncate font-medium text-ink-800">{it.displayName || it.name}</p>
-        <p className="text-xs uppercase tracking-wide text-ink-400">{it.platform}</p>
+        <p className="truncate font-medium text-[#eef1f5]">{it.displayName || it.name}</p>
+        <p className="text-xs uppercase tracking-wide text-[rgba(255,255,255,0.45)]">{it.platform}</p>
       </div>
       {trailing}
     </li>
@@ -450,7 +516,7 @@ function ProfileStep({
 
   return (
     <>
-      <StepHeader title="Perfil do canal" subtitle="Categoria e os jogos/assuntos que você cobre." />
+      <StepHeader subtitle="Categoria e os jogos/assuntos que você cobre." />
 
       <Select
         label="Categoria"
@@ -464,7 +530,7 @@ function ProfileStep({
       />
 
       {/* Adicionar interesses (subcategoria + jogo) — vários */}
-      <div className="rounded-lg border border-white/[0.06] p-3">
+      <div className="rounded-lg border border-[rgba(255,255,255,0.08)] p-3">
         <FieldLabel>Jogos / assuntos (adicione quantos quiser)</FieldLabel>
         <div className="flex flex-wrap items-end gap-2">
           <div className="min-w-[140px] flex-1">
@@ -475,9 +541,9 @@ function ProfileStep({
               <Select label="Específico" value={draftItem} onChange={setDraftItem} options={draftItems} />
             </div>
           )}
-          <Button type="button" size="sm" variant="secondary" onClick={addInterest} disabled={!draftSub}>
-            + Adicionar
-          </Button>
+          <SButton type="button" size="sm" variant="secondary" onClick={addInterest} disabled={!draftSub}>
+            <IconPlus size={12} /> Adicionar
+          </SButton>
         </div>
 
         {interests.length > 0 && (
@@ -485,16 +551,16 @@ function ProfileStep({
             {interests.map((i, idx) => (
               <span
                 key={`${i.subcat}/${i.item}/${idx}`}
-                className="inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1 text-sm text-ink-800"
+                className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-3 py-1 text-sm text-[#eef1f5]"
               >
                 {labelOf(i.subcat, i.item)}
                 <button
                   type="button"
                   onClick={() => setInterests((list) => list.filter((_, k) => k !== idx))}
-                  className="text-ink-400 hover:text-err"
+                  className="text-[rgba(255,255,255,0.45)] hover:text-[#f87171]"
                   aria-label="remover"
                 >
-                  ×
+                  <IconX />
                 </button>
               </span>
             ))}
@@ -504,18 +570,18 @@ function ProfileStep({
 
       <div>
         <FieldLabel>Nicho (livre)</FieldLabel>
-        <Input value={niche} onChange={(e) => setNiche(e.target.value)} placeholder="ex: fps competitivo, foco em ranqueada" />
+        <SInput value={niche} onChange={(e) => setNiche(e.target.value)} placeholder="ex: fps competitivo, foco em ranqueada" />
       </div>
 
       {error && <ErrorBox>{error}</ErrorBox>}
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={onBack}>
-          ← Voltar
-        </Button>
-        <Button onClick={next} loading={busy}>
-          Continuar →
-        </Button>
+        <SButton variant="ghost" onClick={onBack}>
+          <IconChevronLeft size={13} /> Voltar
+        </SButton>
+        <SButton onClick={next} loading={busy}>
+          Continuar <IconChevronRight size={13} />
+        </SButton>
       </div>
     </>
   );
@@ -536,21 +602,16 @@ function BrandsStep({
   onBack: () => void;
   onNext: () => void;
 }) {
-  // Marcas são gravadas contra o primeiro canal vinculado (endpoint atual é
-  // por canal; migração para creator é follow-up da Fase 2).
-  const integrations = useQuery({
-    queryKey: ['creator-integrations', creatorId],
-    queryFn: () => fetchCreatorIntegrations(creatorId),
-  });
-  const channelId = integrations.data?.[0]?.id;
-
+  // A allowlist é INDIVIDUAL do criador (creatorId), não do canal: escopar por
+  // canal vazava marcas entre usuários que reaproveitam a mesma conta de
+  // plataforma. O backend carimba/filtra por creatorId.
   const brands = useQuery({
-    queryKey: ['brands', channelId],
+    queryKey: ['brands', 'creator', creatorId],
     queryFn: () =>
       api.get<{ brands?: BrandRow[] } | BrandRow[]>(
-        `/api/v2/social-listening/brands?channelId=${channelId}`,
+        `/api/v2/social-listening/brands?creatorId=${creatorId}`,
       ),
-    enabled: !!channelId,
+    enabled: !!creatorId,
   });
   const brandList: BrandRow[] = Array.isArray(brands.data)
     ? brands.data
@@ -577,7 +638,7 @@ function BrandsStep({
   );
 
   async function add(name: string, aliases: string[]) {
-    if (!channelId || name.trim().length === 0) return;
+    if (!creatorId || name.trim().length === 0) return;
     if (addedNames.has(name.toLowerCase())) {
       setQuery('');
       return;
@@ -586,7 +647,7 @@ function BrandsStep({
     setError(null);
     try {
       await api.post('/api/v2/social-listening/brands', {
-        channelId,
+        creatorId,
         name: name.trim(),
         aliases,
       });
@@ -621,30 +682,27 @@ function BrandsStep({
 
   return (
     <>
-      <StepHeader
-        title="Marcas associadas"
-        subtitle="Adicione as marcas na qual você trabalha (opcional)"
-      />
+      <StepHeader subtitle="Marcas e termos que você quer acompanhar no chat: patrocinadores, seu nick, uma hashtag. Opcional, dá pra ajustar depois." />
 
       <div className="relative">
-        <Input
+        <SInput
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Buscar marca… (ex: Red Bull, Nubank, Nike)"
-          disabled={!channelId}
+          placeholder="Buscar marca ou digitar um termo… (ex: Red Bull, seu nick, #campanha)"
+          disabled={!creatorId}
         />
         {debounced.length > 0 && suggestions.length > 0 && (
-          <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-white/[0.1] bg-bg-1 p-1 shadow-elevated">
+          <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#232b35] p-1 shadow-elevated">
             {suggestions.map((b) => (
               <li key={b.slug}>
                 <button
                   type="button"
                   onClick={() => add(b.name, b.aliases)}
-                  className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm text-ink-800 hover:bg-white/[0.06]"
+                  className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm text-[#eef1f5] hover:bg-[rgba(255,255,255,0.07)]"
                 >
                   <span>{b.name}</span>
-                  <span className="text-[10px] uppercase tracking-wide text-ink-400">
+                  <span className="text-[10px] uppercase tracking-wide text-[rgba(255,255,255,0.45)]">
                     {b.sector}
                     {b.country === 'br' ? ' · BR' : ''}
                   </span>
@@ -654,7 +712,7 @@ function BrandsStep({
           </ul>
         )}
         {debounced.length > 0 && !results.isLoading && suggestions.length === 0 && (
-          <p className="mt-1 text-xs text-ink-400">
+          <p className="mt-1 text-xs text-[rgba(255,255,255,0.45)]">
             Sem resultado no catálogo. Enter adiciona “{query.trim()}” como marca custom.
           </p>
         )}
@@ -665,30 +723,32 @@ function BrandsStep({
           {brandList.map((b) => (
             <span
               key={b.id}
-              className="inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1 text-sm text-ink-800"
+              className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-3 py-1 text-sm text-[#eef1f5]"
             >
               {b.name}
               <button
                 type="button"
                 onClick={() => remove(b.id)}
-                className="text-ink-400 hover:text-err"
+                className="text-[rgba(255,255,255,0.45)] hover:text-[#f87171]"
                 aria-label={`remover ${b.name}`}
               >
-                ×
+                <IconX />
               </button>
             </span>
           ))}
         </div>
       )}
 
-      {busy && <p className="text-xs text-ink-400">adicionando…</p>}
+      {busy && <p className="text-xs text-[rgba(255,255,255,0.45)]">adicionando…</p>}
       {error && <ErrorBox>{error}</ErrorBox>}
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={onBack}>
-          ← Voltar
-        </Button>
-        <Button onClick={onNext}>{brandList.length > 0 ? 'Continuar →' : 'Pular →'}</Button>
+        <SButton variant="ghost" onClick={onBack}>
+          <IconChevronLeft size={13} /> Voltar
+        </SButton>
+        <SButton onClick={onNext}>
+          {brandList.length > 0 ? 'Continuar' : 'Pular'} <IconChevronRight size={13} />
+        </SButton>
       </div>
     </>
   );
@@ -738,11 +798,11 @@ function ReviewStep({
 
   return (
     <>
-      <StepHeader title="Tudo pronto?" subtitle="Revise antes de concluir." />
+      <StepHeader subtitle="Revise antes de concluir." />
       <dl className="space-y-3 text-sm">
-        <Row label="Canal" value={creator?.name ?? '—'} />
+        <Row label="Perfil" value={creator?.name ?? '—'} />
         <Row
-          label="Integrações"
+          label="Canais"
           value={(integrations.data ?? []).map((i) => i.platform).join(', ') || '—'}
         />
         <Row label="Categoria" value={profile.data?.category || '—'} />
@@ -760,45 +820,33 @@ function ReviewStep({
       {error && <ErrorBox>{error}</ErrorBox>}
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={onBack}>
-          ← Voltar
-        </Button>
-        <Button onClick={finish} loading={busy} size="lg">
+        <SButton variant="ghost" onClick={onBack}>
+          <IconChevronLeft size={13} /> Voltar
+        </SButton>
+        <SButton onClick={finish} loading={busy}>
           Concluir e ir ao dashboard
-        </Button>
+        </SButton>
       </div>
     </>
   );
 }
 
 // ── helpers de UI ─────────────────────────────────────────────────────────────
-function StepHeader({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div>
-      <h2 className="text-lg font-semibold text-ink-800">{title}</h2>
-      <p className="mt-0.5 text-sm text-ink-400">{subtitle}</p>
-    </div>
-  );
+// O título do passo agora é a própria row do accordion — aqui só a instrução.
+function StepHeader({ subtitle }: { subtitle: string }) {
+  return <p className="text-sm text-[rgba(255,255,255,0.45)]">{subtitle}</p>;
 }
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <label className="mb-1 block text-[11px] font-medium uppercase tracking-[0.14em] text-ink-400">
-      {children}
-    </label>
-  );
+  return <SLabel>{children}</SLabel>;
 }
 function ErrorBox({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-lg border border-err/30 bg-err/[0.08] px-3 py-2 text-sm text-err">
-      {children}
-    </div>
-  );
+  return <SError>{children}</SError>;
 }
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between border-b border-white/[0.05] pb-2">
-      <dt className="text-ink-400">{label}</dt>
-      <dd className="font-medium text-ink-800">{value}</dd>
+    <div className="flex justify-between border-b border-[rgba(255,255,255,0.07)] pb-2">
+      <dt className="text-[rgba(255,255,255,0.45)]">{label}</dt>
+      <dd className="font-medium text-[#eef1f5]">{value}</dd>
     </div>
   );
 }
@@ -822,11 +870,11 @@ function Select({
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-sm text-ink-800 focus:border-accent-400/60 focus:outline-none focus:ring-2 focus:ring-accent-400/20 disabled:opacity-50"
+        className="h-11 w-full rounded-xl border border-[rgba(255,255,255,0.09)] bg-[rgba(13,18,24,0.45)] px-3 text-sm text-[#eef1f5] transition-colors focus:border-[rgba(255,255,255,0.28)] focus:outline-none disabled:opacity-50"
       >
         <option value="">—</option>
         {options.map((o) => (
-          <option key={o.value} value={o.value} className="bg-bg-1 text-ink-800">
+          <option key={o.value} value={o.value} className="bg-[#232b35] text-[#eef1f5]">
             {o.label}
           </option>
         ))}

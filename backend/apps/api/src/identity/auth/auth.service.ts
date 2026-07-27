@@ -3,13 +3,12 @@
  * de email (1x) + tenancy (workspace ativo nos claims).
  *
  * Fluxos:
- *  - `register`: cria User (pending_email) + Workspace pessoal + Membership
- *    owner, gera código e envia por email. NÃO emite JWT.
- *  - `verifyEmail`: valida o código → ativa a conta → emite par access/refresh
- *    com claims de workspace.
- *  - `resendCode`: reenvia código (idempotente, anti-enumeration).
- *  - `login`: valida credenciais (email ou username); bloqueia se pendente de
- *    verificação; emite par com claims de workspace.
+ *  - `register`: cria User (ativo, sem verificação por email) + Workspace
+ *    pessoal + Membership owner, e já emite o par access/refresh (loga direto).
+ *  - `verifyEmail` / `resendCode`: legado do fluxo de código por email — mantidos
+ *    para compatibilidade, mas não fazem parte do sign-up atual.
+ *  - `login`: valida credenciais (email ou username) e emite par com claims de
+ *    workspace.
  *  - `refresh` / `logout`: rotação + revogação (detecção de reuse — OAuth BCP §4.12).
  *  - `getMe` / `activateWorkspace`: contexto de tenancy para o console.
  *
@@ -18,6 +17,7 @@
  */
 import { createHash, randomBytes, randomInt } from 'node:crypto';
 import {
+  BadRequestException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -52,6 +52,7 @@ import type { RefreshDto } from './dto/refresh.dto';
 import type { RegisterDto } from './dto/register.dto';
 import type { VerifyEmailDto } from './dto/verify-email.dto';
 import type { ResendCodeDto } from './dto/resend-code.dto';
+import type { UpdateMeDto } from './dto/update-me.dto';
 import { PasswordHasher } from './password-hasher';
 
 const MAX_CODE_ATTEMPTS = 5;
@@ -74,11 +75,6 @@ export interface LoginResult extends AuthTokens {
   user: AuthenticatedUser;
   activeWorkspaceId: string | null;
   wsRole: WsRole | null;
-}
-
-export interface RegisterResult {
-  status: 'pending_email';
-  email: string;
 }
 
 export interface MeResult {
@@ -137,12 +133,11 @@ export class AuthService {
   // Sign-up + verificação de email
   // ─────────────────────────────────────────────────────────────────────
 
-  async register(dto: RegisterDto): Promise<RegisterResult> {
+  async register(dto: RegisterDto): Promise<LoginResult> {
     const email = dto.email.trim().toLowerCase();
 
     const existing = await this.userRepo.findByEmail(email);
     if (existing) {
-      // Não vaza se está ativo ou pendente — só impede duplicar.
       throw new ForbiddenException({
         message: 'Email já cadastrado',
         code: 'EMAIL_TAKEN',
@@ -152,16 +147,17 @@ export class AuthService {
     const passwordHash = await this.hasher.hash(dto.password);
     const displayName = dto.displayName?.trim() || email.split('@')[0];
 
+    // Sign-up direto: a conta nasce ativa e verificada (sem código por email).
     // username legado = email (schema exige username único).
-    const user = await this.userRepo.save(
-      User.create({
-        username: email,
-        email,
-        passwordHash,
-        status: 'pending_email',
-        displayName,
-      }),
-    );
+    const entity = User.create({
+      username: email,
+      email,
+      passwordHash,
+      status: 'active',
+      displayName,
+    });
+    entity.markEmailVerified();
+    const user = await this.userRepo.save(entity);
 
     // Tipo de conta → tipo do workspace (streamer = creator).
     const accountType = dto.accountType ?? 'streamer';
@@ -190,8 +186,9 @@ export class AuthService {
       }),
     );
 
-    await this.issueAndSendCode(user.getId(), email);
-    return { status: 'pending_email', email };
+    // Loga na hora: emite o par access/refresh já com o workspace ativo.
+    const ws = await this.resolveActiveWorkspace(user.getId());
+    return this.buildLoginResult(user, ws);
   }
 
   async verifyEmail(dto: VerifyEmailDto): Promise<LoginResult> {
@@ -204,19 +201,19 @@ export class AuthService {
     const code = await this.codeRepo.findLatestActiveByEmail(email);
     if (!code) {
       throw new UnauthorizedException({
-        message: 'Nenhum código ativo — solicite um novo',
+        message: 'Nenhum código ativo. Solicite um novo',
         code: 'NO_ACTIVE_CODE',
       });
     }
     if (code.isExpired()) {
       throw new UnauthorizedException({
-        message: 'Código expirado — solicite um novo',
+        message: 'Código expirado. Solicite um novo',
         code: 'CODE_EXPIRED',
       });
     }
     if (!code.canAttempt(MAX_CODE_ATTEMPTS)) {
       throw new UnauthorizedException({
-        message: 'Muitas tentativas — solicite um novo código',
+        message: 'Muitas tentativas. Solicite um novo código',
         code: 'TOO_MANY_ATTEMPTS',
       });
     }
@@ -267,13 +264,6 @@ export class AuthService {
       throw new UnauthorizedException({ message: 'Credenciais inválidas' });
     }
 
-    if (user.getStatus() === 'pending_email') {
-      throw new ForbiddenException({
-        message: 'Confirme seu email para continuar',
-        code: 'EMAIL_NOT_VERIFIED',
-        email: user.getEmail(),
-      });
-    }
     if (user.getStatus() === 'disabled') {
       throw new ForbiddenException({ message: 'Conta desativada' });
     }
@@ -295,7 +285,7 @@ export class AuthService {
       );
       await this.refreshRepo.revokeAllByUserId(found.getUserId());
       throw new UnauthorizedException({
-        message: 'Refresh reutilizado — sessão revogada',
+        message: 'Refresh reutilizado. Sessão revogada',
       });
     }
     if (found.isExpired()) {
@@ -371,6 +361,28 @@ export class AuthService {
       wsRole: active?.role ?? null,
       workspaces,
     };
+  }
+
+  /**
+   * Auto-edição da conta pelo próprio usuário. Só toca em `displayName` e
+   * `locale` — nunca em role/email/status. Ignora chaves ausentes (patch
+   * parcial) e falha se o body vier vazio. Devolve o `/me` já atualizado para
+   * o cliente reidratar sem uma segunda ida ao servidor.
+   */
+  async updateMe(userId: string, dto: UpdateMeDto): Promise<MeResult> {
+    if (dto.displayName === undefined && dto.locale === undefined) {
+      throw new BadRequestException({ message: 'Nada para atualizar' });
+    }
+    const user = await this.userRepo.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException({ message: 'Usuário não encontrado' });
+    }
+    user.updateProfile({
+      ...(dto.displayName !== undefined ? { displayName: dto.displayName } : {}),
+      ...(dto.locale !== undefined ? { locale: dto.locale || null } : {}),
+    });
+    await this.userRepo.save(user);
+    return this.getMe(userId);
   }
 
   /** Reemite o access token apontando para outro workspace do usuário. */
@@ -487,7 +499,7 @@ export class AuthService {
     );
     await this.email.send({
       to: email,
-      subject: 'Seu código de verificação SEHLORO',
+      subject: 'Seu código de verificação Norya',
       text:
         `Seu código de verificação é: ${code}\n\n` +
         `Ele expira em ${ttlMin} minutos. Se você não criou uma conta, ignore este email.`,

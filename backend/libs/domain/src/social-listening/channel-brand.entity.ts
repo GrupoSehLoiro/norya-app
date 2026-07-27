@@ -7,7 +7,17 @@
  */
 export interface ChannelBrand {
   id: string;
-  channelId: string;
+  /**
+   * Creator dono da marca — eixo PRINCIPAL de escopo. A allowlist é individual
+   * do criador (não do canal): a mesma conta de plataforma pode ser reaproveitada
+   * por creators/donos diferentes, então marca por canal vazava entre usuários.
+   */
+  creatorId: string;
+  /**
+   * Canal de origem no momento da criação (proveniência/legado). Opcional — a
+   * detecção e a listagem passaram a operar por `creatorId`.
+   */
+  channelId?: string | null;
   /** Nome canônico mostrado no insight (ex: "YoDaSnacks"). */
   name: string;
   aliases: string[];

@@ -18,15 +18,16 @@ export default function SessionsPage() {
   return (
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
-        eyebrow="Ingestão"
+        eyebrow="Ao vivo"
         title="Sessões ao vivo"
-        description="Endpoint /api/v2/monitoring/sessions — atualiza a cada 10s."
+        description="As lives que a Norya acompanhou: as que estão no ar agora e as já encerradas."
+        info="Cada live que você faz num canal conectado vira uma sessão: aqui você vê quais estão no ar neste momento e o histórico das que já terminaram, com início, fim e duração."
       />
 
       {sessions.isLoading ? (
         <Card>carregando…</Card>
       ) : sessions.data && sessions.data.length > 0 ? (
-        <Card>
+        <Card className="border-l-2 border-l-pal-green">
           <CardHeader eyebrow="Sessões" title={`${sessions.data.length} sessões registradas`} />
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px] text-sm">
@@ -59,8 +60,8 @@ export default function SessionsPage() {
         </Card>
       ) : (
         <EmptyState
-          title="Nenhuma sessão registrada"
-          description="Sessões são criadas pelo handler `twitch.stream.online` (M3). Inicie uma live ou simule um evento."
+          title="Nenhuma sessão ainda"
+          description="Assim que você abrir uma live num canal conectado, ela aparece aqui e fica no histórico quando encerrar."
         />
       )}
     </div>

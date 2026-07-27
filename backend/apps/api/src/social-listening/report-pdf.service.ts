@@ -26,7 +26,6 @@ const OLIVE = '#5f6b00'; // "lime" legível como texto no claro (eyebrows)
 const POS = '#1f9d6b';
 const NEU = '#cfd5db';
 const NEG = '#dd5a4f';
-const NEG_TRACK = '#f6e3e1';
 const HILITE_BG = '#fbfde8';
 const HILITE_LINE = '#e4f19a';
 
@@ -74,6 +73,12 @@ export class ReportPdfService {
 
     this._metrics(doc, m, left, width);
     this._highlight(doc, m, left, width);
+    if (data.peakInsight) {
+      ensureSpace(doc, 60);
+      label(doc, 'O que aconteceu no pico', left);
+      body(doc, data.peakInsight, width);
+      doc.moveDown(0.6);
+    }
     this._sentiment(doc, m, left, width);
 
     // ── Conversas ──
@@ -106,17 +111,6 @@ export class ReportPdfService {
         width,
       );
     }
-    if (m.toxicUsers.length) {
-      label(doc, 'Moderação · maior toxicidade', left);
-      rankedBars(
-        doc,
-        m.toxicUsers.map((u) => ({ label: u.username, value: Math.round(u.ratio * 100) })),
-        left,
-        width,
-        { suffix: '%', color: NEG, track: NEG_TRACK },
-      );
-    }
-
     // ── Análise (IA) ──
     eyebrow(doc, 'Análise', left);
     for (const s of data.narrative.secoes) {
@@ -204,7 +198,7 @@ export class ReportPdfService {
       .fillColor(COVER_SUB)
       .font('Helvetica')
       .fontSize(13)
-      .text(`${fmtLong(data.from)} — ${fmtLong(data.to)}`, left, doc.y + 22, { width });
+      .text(`${fmtLong(data.from)} a ${fmtLong(data.to)}`, left, doc.y + 22, { width });
 
     // Rodapé da capa — duas colunas limpas
     const fy = H - 92;
@@ -235,11 +229,6 @@ export class ReportPdfService {
       .font('Helvetica')
       .fontSize(10)
       .text(`${compact(data.metrics.totalMessages)} mensagens`, c2, fy + 26);
-    doc
-      .fillColor(COVER_MUTE)
-      .font('Helvetica')
-      .fontSize(8.5)
-      .text(`Emitido em ${fmt(new Date())}`, left, fy + 26, { width, align: 'right' });
   }
 
   /** Quatro cartões de métrica (claros, com tick lime). */

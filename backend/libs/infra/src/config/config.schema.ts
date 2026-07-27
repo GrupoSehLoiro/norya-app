@@ -67,6 +67,12 @@ export const configSchema = z.object({
   TWITCH_BOT_USER_ID: z.string().optional(),
   KICK_CLIENT_ID: z.string().optional(),
   KICK_CLIENT_SECRET: z.string().optional(),
+  /**
+   * Fetcher externo p/ resolver o chatroomId quando o WAF da Kick bloqueia o
+   * IP do servidor (403 "security policy"). Template com `{url}`.
+   * Ex.: https://r.jina.ai/{url}
+   */
+  KICK_CHATROOM_PROXY: z.string().optional(),
 
   CORS_ORIGIN: z.string().optional(),
 
@@ -101,15 +107,6 @@ export const configSchema = z.object({
   /** Driver do EventBus: memory | redis. Default redis se REDIS_URL setado. */
   EVENT_BUS_DRIVER: z.enum(['memory', 'redis']).optional(),
 
-  // ── Página/endpoint de logs (GET /api/v2/logs) ─────────────────────────
-  /**
-   * Credencial de Basic Auth do endpoint de access logs. Os DOIS precisam
-   * estar setados para o endpoint existir; sem eles responde 404. Credencial
-   * operacional, separada do JWT do produto de propósito.
-   */
-  LOGS_USER: z.string().optional(),
-  LOGS_PASSWORD: z.string().min(12, 'LOGS_PASSWORD precisa de no mínimo 12 caracteres').optional(),
-
   // ── Bootstrap do primeiro admin (gestão de acesso) ─────────────────────
   /**
    * Se AMBOS setados, o boot garante que esse usuário exista com role=admin
@@ -129,7 +126,13 @@ export const configSchema = z.object({
   RESEND_API_KEY: z.string().optional(),
   /** SMTP (EMAIL_DRIVER=smtp) — ex.: Mailpit local em localhost:1025. */
   SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().int().positive().optional(),
+  // O compose injeta `${SMTP_PORT:-}` → a var chega como STRING VAZIA quando
+  // não está no .env; `.optional()` só cobre undefined e `coerce` faria ""→0.
+  // Trata vazio como ausente pra não derrubar o boot de quem não usa SMTP.
+  SMTP_PORT: z.preprocess(
+    (v) => (v === '' || v == null ? undefined : v),
+    z.coerce.number().int().positive().optional(),
+  ),
   SMTP_SECURE: z.string().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),

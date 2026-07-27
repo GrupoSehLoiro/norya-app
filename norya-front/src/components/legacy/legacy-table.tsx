@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api, getToken } from '@/lib/api-client';
 import { fetchChannels } from '@/lib/queries';
@@ -9,8 +9,8 @@ import { cn, formatDate } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
+import { DateRangeFilter, type DateRangeValue } from '@/components/ui/date-range';
 import type { PagedResponse } from '@/lib/legacy-types';
 
 export interface LegacyColumn<T> {
@@ -22,225 +22,188 @@ export interface LegacyColumn<T> {
   mono?: boolean;
 }
 
-interface Filters {
-  channel: string;
-  startDate: string;
-  endDate: string;
-}
-
 interface Props<T> {
   /** Resource path: bans, timeouts, removed, predictions, polls, emojis. */
   resource: string;
   /** queryKey prefix used by TanStack Query cache. */
   queryKey: string;
   columns: LegacyColumn<T>[];
-  /** Caso o endpoint devolva `channels` (predictions/polls), passa um picker. */
-  showChannelsFromResponse?: boolean;
-  /** Lista de canais conhecidos. Se ausente, mostra input livre. */
-  knownChannels?: string[];
+  /** Substantivo do registro (plural) — usado na contagem. Ex.: "bans". */
+  noun?: string;
   /** Mensagem do estado vazio. */
   emptyTitle?: string;
   emptyDescription?: string;
 }
 
 const DEFAULT_PAGE_SIZE = 20;
+const EMPTY_RANGE: DateRangeValue = { from: '', to: '' };
 
+/** yyyy-mm-dd → ISO no início/fim do dia (local), ou undefined se vazio. */
+function toIso(day: string, endOfDay = false): string | undefined {
+  if (!day) return undefined;
+  return new Date(`${day}T${endOfDay ? '23:59:59' : '00:00:00'}`).toISOString();
+}
+
+/**
+ * Tabela compartilhada das 6 telas de histórico (bans, timeouts, mensagens
+ * removidas, emojis, enquetes, predictions). O canal NÃO é escolhido aqui: os
+ * dados seguem o canal ativo global (o mesmo do menu da conta). Aqui o usuário
+ * só recorta o período e exporta.
+ */
 export function LegacyTable<T extends { id: string }>({
   resource,
   queryKey,
   columns,
-  showChannelsFromResponse,
-  knownChannels,
-  emptyTitle = 'Nada encontrado',
-  emptyDescription = 'Ajuste os filtros ou aguarde novos registros vindos dos bots.',
+  noun = 'registros',
+  emptyTitle = 'Nada por aqui ainda',
+  emptyDescription = 'Assim que houver registros deste canal no período, eles aparecem aqui.',
 }: Props<T>) {
   const { channelId: selectedChannelId } = useSelectedChannel();
-  // Resolve UUID → nome do canal (collections legadas indexam por nome de canal).
+
+  // Resolve UUID → nome/plataforma do canal (as coleções legadas indexam por
+  // nome de canal, não por id).
   const { data: channelsList } = useQuery({
     queryKey: ['legacy:channels-lookup'],
     queryFn: fetchChannels,
     staleTime: 60_000,
   });
-  const selectedChannelName = useMemo(() => {
-    if (!selectedChannelId || !channelsList) return null;
-    return channelsList.find((c) => c.id === selectedChannelId)?.name ?? null;
-  }, [selectedChannelId, channelsList]);
+  const channel = useMemo(
+    () => channelsList?.find((c) => c.id === selectedChannelId) ?? null,
+    [channelsList, selectedChannelId],
+  );
+  const channelName = channel?.name ?? null;
 
   const [page, setPage] = useState(1);
-  const [pendingFilters, setPendingFilters] = useState<Filters>({
-    channel: '',
-    startDate: '',
-    endDate: '',
-  });
-  const [appliedFilters, setAppliedFilters] = useState<Filters>({
-    channel: '',
-    startDate: '',
-    endDate: '',
-  });
-
-  // Auto-aplica o canal selecionado no sidebar como filtro inicial.
-  // Só reaplica quando o selectedChannelName muda (mudança de canal no picker)
-  // — não sobrescreve mudanças manuais subsequentes do usuário no dropdown.
-  const lastAutoApplied = useRef<string | null>(null);
-  useEffect(() => {
-    if (selectedChannelName && selectedChannelName !== lastAutoApplied.current) {
-      lastAutoApplied.current = selectedChannelName;
-      setPendingFilters((p) => ({ ...p, channel: selectedChannelName }));
-      setAppliedFilters((a) => ({ ...a, channel: selectedChannelName }));
-      setPage(1);
-    } else if (!selectedChannelName && lastAutoApplied.current !== null) {
-      // Canal foi limpo no picker → limpa o filtro (mas só se o que estava aplicado
-      // foi a gente quem aplicou; respeita escolha manual).
-      lastAutoApplied.current = null;
-    }
-  }, [selectedChannelName]);
-
-  const queryString = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set('page', String(page));
-    params.set('pageSize', String(DEFAULT_PAGE_SIZE));
-    if (appliedFilters.channel) params.set('channel', appliedFilters.channel);
-    if (appliedFilters.startDate) {
-      params.set('startDate', new Date(appliedFilters.startDate).toISOString());
-    }
-    if (appliedFilters.endDate) {
-      params.set('endDate', new Date(appliedFilters.endDate).toISOString());
-    }
-    return params.toString();
-  }, [page, appliedFilters]);
+  const [range, setRange] = useState<DateRangeValue>(EMPTY_RANGE);
+  const [applied, setApplied] = useState<DateRangeValue>(EMPTY_RANGE);
+  const hasRange = Boolean(applied.from || applied.to);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: [queryKey, page, appliedFilters],
-    queryFn: () =>
-      api.get<PagedResponse<T> & { channels?: string[] }>(
-        `/api/v2/legacy/${resource}?${queryString}`,
-      ),
+    enabled: !!channelName,
+    queryKey: [queryKey, channelName, page, applied],
+    queryFn: () => {
+      const params = new URLSearchParams();
+      params.set('page', String(page));
+      params.set('pageSize', String(DEFAULT_PAGE_SIZE));
+      params.set('channel', channelName!);
+      const start = toIso(applied.from);
+      const end = toIso(applied.to, true);
+      if (start) params.set('startDate', start);
+      if (end) params.set('endDate', end);
+      return api.get<PagedResponse<T>>(`/api/v2/legacy/${resource}?${params.toString()}`);
+    },
   });
 
-  function applyFilters(e: React.FormEvent) {
-    e.preventDefault();
+  function apply() {
     setPage(1);
-    setAppliedFilters({ ...pendingFilters });
+    setApplied({ ...range });
   }
-
-  function resetFilters() {
-    const empty: Filters = { channel: '', startDate: '', endDate: '' };
-    setPendingFilters(empty);
-    setAppliedFilters(empty);
+  function clear() {
+    setRange(EMPTY_RANGE);
+    setApplied(EMPTY_RANGE);
     setPage(1);
   }
 
   async function downloadCsv() {
     const params = new URLSearchParams();
-    if (appliedFilters.channel) params.set('channel', appliedFilters.channel);
-    if (appliedFilters.startDate) {
-      params.set('startDate', new Date(appliedFilters.startDate).toISOString());
-    }
-    if (appliedFilters.endDate) {
-      params.set('endDate', new Date(appliedFilters.endDate).toISOString());
-    }
+    if (channelName) params.set('channel', channelName);
+    const start = toIso(applied.from);
+    const end = toIso(applied.to, true);
+    if (start) params.set('startDate', start);
+    if (end) params.set('endDate', end);
     const token = getToken();
     const res = await fetch(`/api/v2/legacy/${resource}/export/csv?${params.toString()}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!res.ok) {
       // eslint-disable-next-line no-alert
-      alert(`Falha ao exportar CSV: HTTP ${res.status}`);
+      alert(`Não foi possível exportar agora (HTTP ${res.status}). Tente de novo em instantes.`);
       return;
     }
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${resource}-${Date.now()}.csv`;
+    a.download = `${resource}-${channelName ?? 'canal'}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
-  // Opções do dropdown de canal:
-  //  - predictions/polls: o endpoint devolve `channels` (canais com registros);
-  //  - demais features: usa os canais CONECTADOS (fetchChannels) pra escopar
-  //    o filtro aos canais reais, evitando typo de nome em input livre.
-  const channelOptions = showChannelsFromResponse
-    ? data?.channels ?? []
-    : knownChannels ?? channelsList?.map((c) => c.name) ?? [];
+  // Sem canal ativo → não há o que mostrar. Convida a escolher um.
+  if (!selectedChannelId || (channelsList && !channel)) {
+    return (
+      <EmptyState
+        title="Selecione um canal"
+        description="Escolha um canal ativo no menu da conta (canto superior direito) pra ver o histórico deste canal."
+      />
+    );
+  }
+
+  const periodLabel = hasRange
+    ? `${applied.from || 'início'} → ${applied.to || 'hoje'}`
+    : 'todo o histórico';
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
+      {/* Toolbar: escopo do canal (só leitura) + período + exportação */}
       <Card padding="sm">
-        <form
-          onSubmit={applyFilters}
-          className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_1fr_auto]"
-        >
-          <div className="flex flex-col gap-1">
-            <label className="eyebrow text-[10px]" htmlFor="legacy-channel">canal</label>
-            {channelOptions.length > 0 ? (
-              <select
-                id="legacy-channel"
-                value={pendingFilters.channel}
-                onChange={(e) => setPendingFilters((p) => ({ ...p, channel: e.target.value }))}
-                className={cn(
-                  'h-10 w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-sm text-ink-800',
-                  'focus:border-accent-400/60 focus:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-accent-400/20',
-                )}
-              >
-                <option value="">todos</option>
-                {channelOptions.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            ) : (
-              <Input
-                id="legacy-channel"
-                placeholder="ex: leozeraplay"
-                value={pendingFilters.channel}
-                onChange={(e) => setPendingFilters((p) => ({ ...p, channel: e.target.value }))}
-              />
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="flex items-center gap-2.5 pb-1">
+            <span
+              className={cn(
+                'inline-block h-2 w-2 rounded-full',
+                channel?.platform === 'twitch' ? 'bg-platform-twitch' : 'bg-platform-kick',
+              )}
+              aria-hidden
+            />
+            <span className="text-sm font-semibold text-ink-800">
+              {channelName ?? 'carregando…'}
+            </span>
+            {channel && (
+              <Badge tone={channel.platform === 'twitch' ? 'twitch' : 'kick'}>
+                {channel.platform}
+              </Badge>
             )}
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="eyebrow text-[10px]" htmlFor="legacy-start">de</label>
-            <Input
-              id="legacy-start"
-              type="datetime-local"
-              value={pendingFilters.startDate}
-              onChange={(e) => setPendingFilters((p) => ({ ...p, startDate: e.target.value }))}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="eyebrow text-[10px]" htmlFor="legacy-end">até</label>
-            <Input
-              id="legacy-end"
-              type="datetime-local"
-              value={pendingFilters.endDate}
-              onChange={(e) => setPendingFilters((p) => ({ ...p, endDate: e.target.value }))}
-            />
-          </div>
-
-          <div className="flex items-end gap-2">
-            <Button type="submit" size="sm">Aplicar</Button>
-            <Button type="button" size="sm" variant="ghost" onClick={resetFilters}>
-              Limpar
-            </Button>
-            <Button type="button" size="sm" variant="secondary" onClick={downloadCsv}>
-              CSV
+          <div className="flex flex-wrap items-end gap-2">
+            <DateRangeFilter value={range} onChange={setRange} onApply={apply}>
+              {hasRange && (
+                <Button type="button" size="sm" variant="ghost" onClick={clear}>
+                  Limpar
+                </Button>
+              )}
+            </DateRangeFilter>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={downloadCsv}
+              title="Baixar o período filtrado em CSV"
+            >
+              Exportar CSV
             </Button>
           </div>
-        </form>
+        </div>
       </Card>
 
       {isLoading ? (
-        <Card>Carregando…</Card>
+        <TableSkeleton columns={columns.length} />
       ) : error ? (
-        <Card className="border border-err/30 bg-err/[0.08] text-err">
-          {(error as Error).message}
+        <Card className="border border-err/30 bg-err/[0.08] text-sm text-err">
+          Não foi possível carregar agora. Tente de novo em instantes.
         </Card>
       ) : !data || data.items.length === 0 ? (
         <EmptyState title={emptyTitle} description={emptyDescription} />
       ) : (
         <>
+          <div className="flex items-center justify-between px-1 text-xs text-ink-400">
+            <span>
+              <b className="text-ink-700">{data.total.toLocaleString('pt-BR')}</b> {noun}
+            </span>
+            <span>{periodLabel}</span>
+          </div>
+
           <Card padding="none" className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm">
@@ -249,7 +212,7 @@ export function LegacyTable<T extends { id: string }>({
                     {columns.map((c) => (
                       <th
                         key={c.key}
-                        className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-400"
+                        className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-400"
                         style={c.width ? { width: c.width } : undefined}
                       >
                         {c.header}
@@ -261,13 +224,13 @@ export function LegacyTable<T extends { id: string }>({
                   {data.items.map((row) => (
                     <tr
                       key={row.id}
-                      className="border-b border-white/[0.04] last:border-0 transition-colors hover:bg-white/[0.02]"
+                      className="border-b border-white/[0.04] last:border-0 transition-colors hover:bg-white/[0.03]"
                     >
                       {columns.map((c) => (
                         <td
                           key={c.key}
                           className={cn(
-                            'px-4 py-2.5 align-top text-ink-800',
+                            'px-4 py-3 align-top text-ink-800',
                             c.mono && 'font-mono text-[12.5px] text-ink-600',
                           )}
                         >
@@ -283,45 +246,52 @@ export function LegacyTable<T extends { id: string }>({
             </div>
           </Card>
 
-          <Pagination
-            page={data.page}
-            totalPages={data.totalPages}
-            total={data.total}
-            onChange={setPage}
-          />
+          <Pagination page={data.page} totalPages={data.totalPages} onChange={setPage} />
         </>
       )}
     </div>
   );
 }
 
-function Pagination({
-  page, totalPages, total, onChange,
-}: { page: number; totalPages: number; total: number; onChange: (p: number) => void }) {
+function TableSkeleton({ columns }: { columns: number }) {
   return (
-    <div className="flex items-center justify-between gap-3 text-sm text-ink-400">
-      <Badge tone="neutral">{total.toLocaleString('pt-BR')} registros</Badge>
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={page <= 1}
-          onClick={() => onChange(page - 1)}
-        >
-          ← Anterior
-        </Button>
-        <span className="px-2 text-xs text-ink-600">
-          {page} / {totalPages}
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={page >= totalPages}
-          onClick={() => onChange(page + 1)}
-        >
-          Próxima →
-        </Button>
+    <Card padding="none" className="overflow-hidden">
+      <div className="divide-y divide-white/[0.04]">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 px-4 py-3.5">
+            {Array.from({ length: columns }).map((__, j) => (
+              <div
+                key={j}
+                className="h-3.5 flex-1 animate-pulse rounded bg-white/[0.06]"
+                style={{ maxWidth: j === columns - 1 ? '40%' : undefined }}
+              />
+            ))}
+          </div>
+        ))}
       </div>
+    </Card>
+  );
+}
+
+function Pagination({
+  page, totalPages, onChange,
+}: { page: number; totalPages: number; onChange: (p: number) => void }) {
+  return (
+    <div className="flex items-center justify-end gap-2 text-sm text-ink-400">
+      <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onChange(page - 1)}>
+        ← Anterior
+      </Button>
+      <span className="px-1 text-xs tabular-nums text-ink-600">
+        {page} / {totalPages}
+      </span>
+      <Button
+        variant="ghost"
+        size="sm"
+        disabled={page >= totalPages}
+        onClick={() => onChange(page + 1)}
+      >
+        Próxima →
+      </Button>
     </div>
   );
 }

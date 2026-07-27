@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { useQueryClient } from '@tanstack/react-query';
-import { getToken } from '@/lib/api-client';
+import { ensureFreshToken, getToken } from '@/lib/api-client';
 import type { BatchAnalysis, SseInsightMessage } from '@/lib/types';
 
 interface SseState {
@@ -49,6 +49,14 @@ export function useSseInsights(channelId: string | null): SseState {
       `?token=${encodeURIComponent(token)}`;
 
     void fetchEventSource(url, {
+      // Token FRESCO a cada (re)conexao: o access de 15min expiraria no meio
+      // de streams longos; o refresh rotaciona antes de reconectar.
+      fetch: async (input, init) => {
+        const fresh = (await ensureFreshToken()) ?? '';
+        const u = new URL(String(input), window.location.origin);
+        u.searchParams.set('token', fresh);
+        return fetch(u.toString(), init);
+      },
       signal: c.signal,
       openWhenHidden: true,
       async onopen(resp) {

@@ -13,16 +13,15 @@ function fmtDuration(seconds: number): string {
 }
 
 const columns: LegacyColumn<TimeoutRow>[] = [
-  { key: 'timestamp', header: 'Quando', width: '170px', render: (r) => fmtDate(r.timestamp) },
-  { key: 'channel',   header: 'Canal',  width: '160px' },
-  { key: 'userName',  header: 'Usuário', width: '180px', mono: true },
+  { key: 'timestamp', header: 'Quando', width: '180px', render: (r) => fmtDate(r.timestamp) },
+  { key: 'userName',  header: 'Usuário', width: '200px', mono: true },
   {
     key: 'tempoDeTO',
     header: 'Duração',
-    width: '110px',
+    width: '120px',
     render: (r) => <Badge tone="warn">{fmtDuration(r.tempoDeTO)}</Badge>,
   },
-  { key: 'modName',   header: 'Mod', width: '160px', mono: true },
+  { key: 'modName',   header: 'Mod', width: '180px', mono: true },
   { key: 'reason',    header: 'Motivo', render: (r) => r.reason || <span className="text-ink-400">—</span> },
 ];
 
@@ -30,15 +29,18 @@ export default function TimeoutsPage() {
   return (
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
-        eyebrow="Legado · Moderação"
+        eyebrow="Moderação"
         title="Timeouts"
-        description="Silenciamentos temporários aplicados pelos moderadores. `tempoDeTO` em segundos."
+        description="Silenciamentos temporários deste canal: quem levou, por quanto tempo e por quê."
+        info="Os timeouts aplicados pelos seus mods, com a duração de cada um. Recorte por período e exporte quando precisar. O canal acompanha o que estiver ativo no menu da conta."
       />
       <LegacyTable<TimeoutRow>
         resource="timeouts"
         queryKey="legacy:timeouts"
         columns={columns}
-        emptyTitle="Nenhum timeout encontrado"
+        noun="timeouts"
+        emptyTitle="Nenhum timeout por aqui"
+        emptyDescription="Este canal não tem silenciamentos no período. Assim que um mod der um timeout, ele aparece aqui."
       />
     </div>
   );

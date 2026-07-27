@@ -31,6 +31,20 @@ export interface HelixUserResult {
   id: string;
   login: string;
   displayName: string;
+  profileImageUrl?: string;
+}
+
+export interface HelixEmoteResult {
+  /** Texto que aparece na mensagem (ex.: "Kappa", "gabsHype"). */
+  code: string;
+  url1x: string;
+  url2x?: string;
+}
+
+interface HelixEmoteRaw {
+  id: string;
+  name: string;
+  images?: { url_1x?: string; url_2x?: string; url_4x?: string };
 }
 
 interface AppToken {
@@ -77,7 +91,26 @@ export class TwitchHelixService {
     const data = await this._request<{ data: HelixUserRaw[] }>('GET', '/users', { login });
     const user = data?.data?.[0];
     if (!user) return null;
-    return { id: user.id, login: user.login, displayName: user.display_name };
+    return {
+      id: user.id,
+      login: user.login,
+      displayName: user.display_name,
+      profileImageUrl: user.profile_image_url,
+    };
+  }
+
+  /** Emotes globais da Twitch (visíveis em qualquer chat). */
+  async getGlobalChatEmotes(): Promise<HelixEmoteResult[]> {
+    const data = await this._request<{ data: HelixEmoteRaw[] }>('GET', '/chat/emotes/global');
+    return (data?.data ?? []).map(mapHelixEmote).filter((e): e is HelixEmoteResult => e !== null);
+  }
+
+  /** Emotes próprios do canal (sub/bits/follower emotes). */
+  async getChannelChatEmotes(broadcasterId: string): Promise<HelixEmoteResult[]> {
+    const data = await this._request<{ data: HelixEmoteRaw[] }>('GET', '/chat/emotes', {
+      broadcaster_id: broadcasterId,
+    });
+    return (data?.data ?? []).map(mapHelixEmote).filter((e): e is HelixEmoteResult => e !== null);
   }
 
   // ─── token management ────────────────────────────────────────────────────
@@ -194,6 +227,7 @@ interface HelixUserRaw {
   id: string;
   login: string;
   display_name: string;
+  profile_image_url?: string;
 }
 
 interface AppTokenResponse {
@@ -203,4 +237,10 @@ interface AppTokenResponse {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((res) => setTimeout(res, ms));
+}
+
+function mapHelixEmote(raw: HelixEmoteRaw): HelixEmoteResult | null {
+  const url1x = raw.images?.url_1x ?? raw.images?.url_2x;
+  if (!raw.name || !url1x) return null;
+  return { code: raw.name, url1x, url2x: raw.images?.url_2x };
 }

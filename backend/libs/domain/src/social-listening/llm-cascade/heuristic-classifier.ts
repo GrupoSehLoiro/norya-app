@@ -14,6 +14,7 @@
  */
 import type { RawMessage } from '../../ingestion/raw-message';
 import type { EmoteDictionary } from '../../ingestion/emote-dictionary';
+import { getEmojiMatchers, findUnicodeEmoteCodes } from '../../ingestion/emote-dictionary';
 import { RawMessage as RawMessageNs } from '../../ingestion/raw-message';
 import type { HeuristicResult, SentimentHint } from '../types';
 import { tokenize } from '../text-normalizer';
@@ -47,14 +48,17 @@ export function classifyHeuristic({
   }
 
   const text = msg.text.trim();
+  const emojiMatchers = emoteDictionary ? getEmojiMatchers(emoteDictionary) : null;
+  const hasKnownEmoji = emojiMatchers ? emojiMatchers.single.test(text) : false;
 
   // 3. Command (starts with ! or /)
   if (COMMAND_PREFIX_RE.test(text)) {
     return { kind: 'drop_command', reason: text.slice(0, 1) };
   }
 
-  // 4. Muito curta
-  if (text.length < MIN_TEXT_LEN) {
+  // 4. Muito curta. Um único emoji tem length < 3 em UTF-16 mas carrega
+  // sentimento — emoji conhecido segue para o check emote-only abaixo.
+  if (text.length < MIN_TEXT_LEN && !hasKnownEmoji) {
     return { kind: 'drop_short' };
   }
 
@@ -76,7 +80,14 @@ export function classifyHeuristic({
     msg,
     emoteDictionary ? new Set([...emoteDictionary.entries()].map(([k]) => k)) : undefined,
   );
-  if (emoteOnly) {
+  // 7b. Só emojis Unicode conhecidos — isEmoteOnly não cobre porque runs
+  // colados (sem espaço entre emojis) não batem no split por whitespace.
+  const emojiOnly =
+    !emoteOnly &&
+    hasKnownEmoji &&
+    emojiMatchers !== null &&
+    text.replace(emojiMatchers.global, '').trim() === '';
+  if (emoteOnly || emojiOnly) {
     const hint = emoteSentimentHint(msg, emoteDictionary);
     return { kind: 'keep', sentimentHint: hint, categoryHint: 'emote_only' };
   }
@@ -103,6 +114,14 @@ function emoteSentimentHint(
     if (typeof e.polarity === 'number') polarities.push(e.polarity);
     else if (dictionary) {
       const entry = dictionary.get(e.code);
+      if (entry) polarities.push(entry.polarity);
+    }
+  }
+  // Emojis Unicode não vêm em msg.emotes (ranges são só de emote de
+  // plataforma) — extrai do texto.
+  if (dictionary) {
+    for (const code of findUnicodeEmoteCodes(msg.text, dictionary)) {
+      const entry = dictionary.get(code);
       if (entry) polarities.push(entry.polarity);
     }
   }

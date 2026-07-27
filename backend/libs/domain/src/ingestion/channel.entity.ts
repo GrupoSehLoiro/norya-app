@@ -37,6 +37,8 @@ export interface ChannelPersistenceShape {
   creatorId?: string;
   /** Workspace (tenant) da integração. Opcional na transição. */
   workspaceId?: string;
+  /** Foto de perfil do canal na plataforma (Helix profile_image_url / Kick). */
+  profileImageUrl?: string;
 }
 
 export class InvalidChannelError extends DomainError {
@@ -57,6 +59,7 @@ export class Channel {
     private readonly flags?: Record<string, boolean>,
     private creatorId?: string,
     private workspaceId?: string,
+    private readonly avatarUrl?: string,
   ) {}
 
   static create(props: {
@@ -70,6 +73,7 @@ export class Channel {
     createdAt?: Date;
     creatorId?: string;
     workspaceId?: string;
+    avatarUrl?: string;
   }): Channel {
     Channel.assertInvariants(props);
     return new Channel(
@@ -84,6 +88,7 @@ export class Channel {
       props.flags,
       props.creatorId,
       props.workspaceId,
+      props.avatarUrl,
     );
   }
 
@@ -99,6 +104,7 @@ export class Channel {
     flags?: Record<string, boolean>;
     creatorId?: string;
     workspaceId?: string;
+    avatarUrl?: string;
   }): Channel {
     return new Channel(
       props.id,
@@ -112,6 +118,7 @@ export class Channel {
       props.flags,
       props.creatorId,
       props.workspaceId,
+      props.avatarUrl,
     );
   }
 
@@ -171,6 +178,10 @@ export class Channel {
     return this.workspaceId;
   }
 
+  getAvatarUrl(): string | undefined {
+    return this.avatarUrl;
+  }
+
   /** Vincula a integração a um Creator/Workspace (linking do onboarding). */
   linkToCreator(creatorId: string, workspaceId: string): void {
     this.creatorId = creatorId;
@@ -207,6 +218,7 @@ export class Channel {
       flags: this.flags,
       creatorId: this.creatorId,
       workspaceId: this.workspaceId,
+      profileImageUrl: this.avatarUrl,
     };
   }
 }

@@ -4,17 +4,17 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader } from '@/components/ui/card';
 import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
+import { BrandAvatar } from '@/components/brands/brand-avatar';
+import { IconX } from '@/components/ui/icons';
 import { useSelectedChannel } from '@/hooks/use-selected-channel';
 import { useMe, canManage } from '@/hooks/use-me';
 import { api, ApiError } from '@/lib/api-client';
 import { fetchBrandAnalytics } from '@/lib/analytics';
 import { searchBrandCatalog } from '@/lib/onboarding';
+import { brandLogoUrl, brandAccent } from '@/lib/brand-visuals';
 import type { ChannelBrand } from '@/lib/types';
-import { formatDate } from '@/lib/utils';
 
 export default function BrandsPage() {
   const qc = useQueryClient();
@@ -63,87 +63,94 @@ export default function BrandsPage() {
   return (
     <div className="flex flex-col gap-10 pb-20">
       <PageHeader
-        eyebrow="IA Core"
-        title="Marcas (allowlist)"
-        description="Por canal. Detecção via regex barato; LLM enriquece quando ligado."
+        eyebrow="Social listening"
+        title="Marcas"
+        description="Acompanhe marcas, nomes, tags e veja o engajamento que eles geram no seu chat."
+        info="Cadastre o que quiser acompanhar: a marca de um patrocinador, o seu próprio nick, a hashtag de uma campanha, o nome de um jogo. A plataforma conta cada menção no chat ao vivo e mostra a evolução dia a dia."
       />
 
       {!channelId ? (
-        <EmptyState title="Selecione um canal" />
+        <EmptyState title="Selecione um canal para começar a acompanhar" />
       ) : (
         <>
           <Card>
             <CardHeader
-              title="Menções por marca"
-              description="Quantas vezes cada marca do allowlist foi citada no chat (histórico recente)."
+              title="O que a audiência mais cita"
+              description="Menções de cada termo acompanhado no chat (histórico recente). Quanto maior a barra, mais a galera fala sobre ele."
             />
             {analytics.isError ? (
               <p className="text-sm text-err">Falha ao carregar (precisa do ClickHouse no ar).</p>
             ) : (analytics.data?.totals.length ?? 0) === 0 ? (
-              <p className="text-sm text-ink-400">Nenhuma menção registrada ainda.</p>
+              <p className="text-sm text-ink-400">
+                Ainda sem menções. Assim que sua audiência citar um termo acompanhado no chat, ele aparece aqui.
+              </p>
             ) : (
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {analytics.data!.totals.map((t) => (
                   <li key={t.brand} className="flex items-center gap-3 text-sm">
-                    <span className="w-32 shrink-0 truncate font-medium text-ink-800">{t.brand}</span>
-                    <span className="h-3 rounded bg-accent-400/70" style={{ width: `${(t.count / maxMentions) * 100}%` }} />
-                    <span className="text-ink-600">{t.count}</span>
+                    <BrandAvatar name={t.brand} size={26} />
+                    <span className="w-28 shrink-0 truncate font-medium text-ink-800">{t.brand}</span>
+                    <span className="h-2.5 flex-1">
+                      <span
+                        className="block h-full rounded-full"
+                        style={{
+                          width: `${(t.count / maxMentions) * 100}%`,
+                          background: brandAccent(t.brand).solid,
+                        }}
+                      />
+                    </span>
+                    <span className="w-10 shrink-0 text-right tabular-nums text-ink-600">{t.count}</span>
                   </li>
                 ))}
               </ul>
             )}
           </Card>
 
-          {manage && (
+          {/* Adicionar + lista, juntos numa só experiência. */}
           <Card>
             <CardHeader
-              title="Adicionar marca"
-              description="Busque no catálogo e navegue com ↑ ↓ · Enter adiciona · sem match, adicione como marca custom."
+              title={`Acompanhando (${brands.data?.length ?? 0})`}
+              description={
+                manage
+                  ? 'Busque uma marca no catálogo ou digite qualquer termo: um nome, uma tag, um jogo. Sem match, entra como termo custom.'
+                  : 'Tudo que este canal acompanha hoje.'
+              }
             />
-            <BrandCombobox
-              addedNames={addedNames}
-              onAdd={addBrand}
-              pending={create.isPending}
-            />
-            {serverError && (
-              <p className="mt-2 rounded-lg border border-err/30 bg-err/[0.08] px-3 py-2 text-sm text-err">{serverError}</p>
-            )}
-          </Card>
-          )}
 
-          <Card>
-            <CardHeader title={`Marcas (${brands.data?.length ?? 0})`} />
+            {manage && (
+              <div className="mb-5">
+                <BrandCombobox
+                  addedNames={addedNames}
+                  onAdd={addBrand}
+                  pending={create.isPending}
+                />
+                {serverError && (
+                  <p className="mt-2 rounded-lg border border-err/30 bg-err/[0.08] px-3 py-2 text-sm text-err">
+                    {serverError}
+                  </p>
+                )}
+              </div>
+            )}
+
             {brands.isLoading ? (
               <p className="text-sm text-ink-400">carregando…</p>
             ) : brands.data && brands.data.length > 0 ? (
-              <ul className="divide-y divide-white/[0.05]">
+              <div className="flex flex-wrap gap-2.5">
                 {brands.data.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between py-3">
-                    <div>
-                      <p className="font-medium text-ink-800">{b.name}</p>
-                      <p className="text-xs text-ink-400">
-                        {b.aliases.length > 0 ? <>aliases: {b.aliases.join(', ')} · </> : null}
-                        {b.regex ? <>regex: <code>{b.regex}</code> · </> : null}
-                        criada {formatDate(b.createdAt)}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge tone="accent">{b.aliases.length} alias</Badge>
-                      {manage && (
-                        <Button
-                          size="sm" variant="ghost"
-                          onClick={() => remove.mutate(b.id)}
-                          disabled={remove.isPending}
-                        >
-                          remover
-                        </Button>
-                      )}
-                    </div>
-                  </li>
+                  <BrandChip
+                    key={b.id}
+                    name={b.name}
+                    aliasCount={b.aliases.length}
+                    canRemove={manage}
+                    removing={remove.isPending}
+                    onRemove={() => remove.mutate(b.id)}
+                  />
                 ))}
-              </ul>
+              </div>
             ) : (
-              <p className="text-sm text-ink-400">Nenhuma marca cadastrada para este canal.</p>
+              <p className="text-sm text-ink-400">
+                Você ainda não acompanha nada neste canal. Adicione uma marca ou um termo acima pra começar.
+              </p>
             )}
           </Card>
         </>
@@ -153,10 +160,88 @@ export default function BrandsPage() {
 }
 
 /**
+ * Chip de uma marca cadastrada. Duas formas:
+ * - com logo conhecido → card com o avatar da marca + nome;
+ * - sem logo → pill "#palavra" numa cor vibrante determinística (estilo hashtag).
+ */
+function BrandChip({
+  name,
+  aliasCount,
+  canRemove,
+  removing,
+  onRemove,
+}: {
+  name: string;
+  aliasCount: number;
+  canRemove: boolean;
+  removing: boolean;
+  onRemove: () => void;
+}) {
+  const hasLogo = brandLogoUrl(name) !== null;
+  const accent = brandAccent(name);
+
+  if (hasLogo) {
+    return (
+      <div className="group relative flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] py-1.5 pl-1.5 pr-3 transition-colors hover:border-white/20">
+        <BrandAvatar name={name} size={34} />
+        <div className="min-w-0 pr-1">
+          <p className="truncate text-sm font-semibold leading-tight text-ink-800">{name}</p>
+          {aliasCount > 0 && (
+            <p className="truncate text-[11px] leading-tight text-ink-400">
+              {aliasCount} {aliasCount === 1 ? 'apelido' : 'apelidos'}
+            </p>
+          )}
+        </div>
+        {canRemove && <RemoveButton onClick={onRemove} disabled={removing} label={name} />}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="group relative inline-flex items-center gap-1.5 rounded-2xl border px-3 py-2 transition-colors"
+      style={{ borderColor: accent.border, background: accent.bg }}
+    >
+      <span className="text-sm font-bold tracking-tight" style={{ color: accent.text }}>
+        #{name}
+      </span>
+      {canRemove && (
+        <RemoveButton onClick={onRemove} disabled={removing} label={name} color={accent.text} />
+      )}
+    </div>
+  );
+}
+
+function RemoveButton({
+  onClick,
+  disabled,
+  label,
+  color,
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  label: string;
+  color?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={`remover ${label}`}
+      className="grid h-5 w-5 place-items-center rounded-full text-ink-400 opacity-60 transition hover:bg-white/10 hover:text-err hover:opacity-100 disabled:opacity-30"
+      style={color ? { color } : undefined}
+    >
+      <IconX size={11} />
+    </button>
+  );
+}
+
+/**
  * Combobox de catálogo de marcas — dropdown sólido (glass-surface, mesmo
  * padrão do picker da sidebar), navegação por teclado (↑ ↓ Enter Esc),
- * highlight sincronizado com o mouse e opção explícita de marca custom
- * quando a busca não tem match exato. Clique fora fecha.
+ * highlight sincronizado com o mouse, avatar da marca em cada opção e opção
+ * explícita de marca custom quando a busca não tem match exato. Clique fora fecha.
  */
 function BrandCombobox({
   addedNames,
@@ -266,7 +351,8 @@ function BrandCombobox({
         onFocus={() => setOpen(true)}
         onKeyDown={onKeyDown}
         disabled={pending}
-        placeholder="Buscar marca… (ex: Red Bull, Nubank, Nike)"
+        className="focus:border-pal-pink focus:ring-pal-pink-soft"
+        placeholder="Buscar marca ou digitar um termo… (ex: Red Bull, seu nick, #campanha)"
         role="combobox"
         aria-expanded={showPanel}
         aria-autocomplete="list"
@@ -277,7 +363,7 @@ function BrandCombobox({
             <p className="px-3 py-2 text-xs text-ink-400">buscando no catálogo…</p>
           ) : options.length === 0 ? (
             <p className="px-3 py-2 text-xs text-ink-400">
-              nada para adicionar — marca já cadastrada ou busca vazia
+              nada para adicionar: você já acompanha esse termo ou a busca está vazia
             </p>
           ) : (
             <ul role="listbox" className="flex flex-col gap-0.5">
@@ -296,15 +382,16 @@ function BrandCombobox({
                         pick(opt);
                       }}
                       className={
-                        'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ease-glass ' +
+                        'flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm transition-colors ease-glass ' +
                         (active
                           ? 'bg-gradient-to-br from-accent-300 to-accent-400 text-bg-0'
                           : 'text-ink-700 hover:text-ink-800')
                       }
                     >
+                      <BrandAvatar name={opt.name} size={26} />
                       {opt.kind === 'catalog' ? (
                         <>
-                          <span className="truncate font-medium">{opt.name}</span>
+                          <span className="min-w-0 flex-1 truncate font-medium">{opt.name}</span>
                           <span
                             className={
                               'shrink-0 text-[10px] uppercase tracking-[0.1em] ' +
@@ -317,7 +404,7 @@ function BrandCombobox({
                         </>
                       ) : (
                         <>
-                          <span className="truncate">
+                          <span className="min-w-0 flex-1 truncate">
                             adicionar <span className="font-semibold">“{opt.name}”</span>
                           </span>
                           <span

@@ -2,7 +2,8 @@ import type { ChannelBrand } from './channel-brand.entity';
 
 export interface ChannelBrandRepository {
   create(input: {
-    channelId: string;
+    creatorId: string;
+    channelId?: string | null;
     name: string;
     aliases?: string[];
     regex?: string | null;
@@ -10,7 +11,14 @@ export interface ChannelBrandRepository {
 
   delete(id: string): Promise<void>;
 
-  listByChannel(channelId: string): Promise<ChannelBrand[]>;
+  findById(id: string): Promise<ChannelBrand | null>;
+
+  /**
+   * Allowlist do criador — eixo principal. Substitui `listByChannel`: a marca é
+   * individual do creator, não do canal (evita vazamento entre usuários que
+   * reaproveitam a mesma conta de plataforma).
+   */
+  listByCreator(creatorId: string): Promise<ChannelBrand[]>;
 }
 
 export const CHANNEL_BRAND_REPOSITORY = Symbol('CHANNEL_BRAND_REPOSITORY');

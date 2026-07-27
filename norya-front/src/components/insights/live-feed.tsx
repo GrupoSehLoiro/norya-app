@@ -1,15 +1,17 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { SseIndicator } from '@/components/ui/sse-indicator';
 import { useChannelStatus } from '@/hooks/use-channel-status';
+import { useChannelEmotes } from '@/hooks/use-channel-emotes';
 import { useSseInsights } from '@/hooks/use-sse-insights';
-import { fetchBatchInsight } from '@/lib/analytics';
-import { api } from '@/lib/api-client';
-import type { BatchAnalysis, InsightsHistoryResponse } from '@/lib/types';
-import { classifySentiment, formatDate, formatPct, formatRelative } from '@/lib/utils';
+import { useLiveChat } from '@/hooks/use-live-chat';
+import { ChatLine, ChatSkinStyles } from '@/components/ui/chat-skin';
+import { searchMessages, type MessageHit } from '@/lib/analytics';
+import { fetchChannels } from '@/lib/queries';
+import { formatRelative } from '@/lib/utils';
 
 const STATUS_TONE = {
   idle: 'neutral',
@@ -19,43 +21,202 @@ const STATUS_TONE = {
   error: 'negative',
 } as const;
 
-export function LiveFeed({ channelId }: { channelId: string | null }) {
-  const { status, events, lastPing, error } = useSseInsights(channelId);
-  // "Conectado" (transporte SSE) ≠ "ao vivo" (live real): o badge verde só
-  // acende com a live rolando; SSE aberto com canal offline vira "aguardando
-  // live" — senão o card parece live com o canal fora do ar.
-  const channelStatus = useChannelStatus(channelId);
-  const channelOnline = channelStatus.data?.online === true;
-  const [openId, setOpenId] = useState<string | null>(null);
+function ts(m: MessageHit): number {
+  const t = new Date(m.receivedAt).getTime();
+  return Number.isNaN(t) ? 0 : t;
+}
 
-  // Lastro persistido: histórico recente de batches (ClickHouse via REST). O
-  // cache do react-query sobrevive a remontagem/reconexão do SSE, então o feed
-  // não "some" e agrega de verdade. O SSE só prependa os blocos novos ao vivo.
-  const history = useQuery({
+const WINDOW_MS = 6 * 60 * 60 * 1000; // janela de busca (6h) — histórico inicial e por página
+
+/**
+ * Feed ao vivo — chat CRU do canal, em tempo real, no comportamento da Twitch:
+ *
+ *  - Cada mensagem chega msg-a-msg via SSE (`/stream/:channelId/chat`), sem
+ *    esperar o batch. O backend faz backfill das últimas ~60s ao conectar.
+ *  - O histórico inicial (antes do backfill) vem de uma busca única em
+ *    batch_messages; rolar até o topo puxa mais páginas antigas.
+ *  - Mensagens novas entram AOS POUCOS por baixo, empurrando as antigas para
+ *    cima (fila de exibição gradual — uma rajada não "estoura" de uma vez).
+ *  - Colado no fim = acompanha sozinho; rolou pra cima = posição preservada.
+ */
+export function LiveFeed({ channelId }: { channelId: string | null }) {
+  // Mantém a invalidação dos gráficos (insights-history/latest) viva; o status
+  // e as mensagens do feed vêm do SSE de chat cru abaixo.
+  useSseInsights(channelId);
+  const { status, lastPing, error, messages: liveMessages } = useLiveChat(channelId);
+  const channelStatus = useChannelStatus(channelId);
+  const emotes = useChannelEmotes(channelId);
+  const channelOnline = channelStatus.data?.online === true;
+
+  // Plataforma do canal selecionado → skin do chat (Twitch ou Kick). Reusa o
+  // cache da lista do ChannelPicker (mesma queryKey).
+  const channelsQ = useQuery({
+    queryKey: ['channels-v2'],
+    queryFn: fetchChannels,
+    staleTime: 60_000,
+  });
+  const platform: 'twitch' | 'kick' =
+    channelsQ.data?.find((c) => c.id === channelId)?.platform === 'kick' ? 'kick' : 'twitch';
+
+  // Mensagens exibidas (ascendente: antiga → nova) + fila de entrada gradual.
+  const [displayed, setDisplayed] = useState<MessageHit[]>([]);
+  const [noMore, setNoMore] = useState(false);
+  const queueRef = useRef<MessageHit[]>([]);
+  const seenRef = useRef<Set<string>>(new Set());
+  const liveIdsRef = useRef<Set<string>>(new Set());
+  const bootedRef = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const atBottomRef = useRef(true);
+  const prependDeltaRef = useRef<number | null>(null);
+  const loadingOlderRef = useRef(false);
+
+  // Reset ao trocar de canal.
+  useEffect(() => {
+    setDisplayed([]);
+    setNoMore(false);
+    queueRef.current = [];
+    seenRef.current = new Set();
+    liveIdsRef.current = new Set();
+    bootedRef.current = false;
+  }, [channelId]);
+
+  // Histórico inicial (últimas 6h): busca ÚNICA em batch_messages só pra
+  // preencher a tela quando o feed abre. O tempo real vem do SSE, não daqui —
+  // por isso sem refetchInterval.
+  const latest = useQuery({
     enabled: !!channelId,
-    queryKey: ['insights-history', channelId, 'feed'],
-    queryFn: () =>
-      api.get<InsightsHistoryResponse>(
-        `/api/v2/social-listening/insights/history?channelId=${encodeURIComponent(channelId!)}&limit=40`,
-      ),
-    refetchInterval: 15_000,
+    queryKey: ['live-feed-latest', channelId],
+    queryFn: () => {
+      const to = new Date();
+      const from = new Date(to.getTime() - WINDOW_MS);
+      return searchMessages(channelId!, '', from.toISOString(), to.toISOString());
+    },
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
-  // Merge SSE (ao vivo) + histórico (persistido), dedup por batchId, mais recente primeiro.
-  const merged = useMemo<BatchAnalysis[]>(() => {
-    const byId = new Map<string, BatchAnalysis>();
-    for (const b of history.data?.items ?? []) byId.set(b.batchId, b);
-    for (const b of events) byId.set(b.batchId, b); // SSE sobrescreve (mais fresco)
-    return [...byId.values()]
-      .sort((a, b) => new Date(b.windowStart).getTime() - new Date(a.windowStart).getTime())
-      .slice(0, 50);
-  }, [history.data, events]);
+  // Boot do histórico: a 1ª resposta é prependada (é mais antiga que qualquer
+  // mensagem ao vivo que já tenha entrado pelo SSE). Sem animação — é backdrop.
+  useEffect(() => {
+    const items = latest.data?.items;
+    if (!items || bootedRef.current) return;
+    bootedRef.current = true;
+    const fresh = items
+      .filter((m) => !seenRef.current.has(m.messageId))
+      .sort((a, b) => ts(a) - ts(b));
+    if (fresh.length === 0) return;
+    for (const m of fresh) seenRef.current.add(m.messageId);
+    const el = scrollRef.current;
+    // Se o usuário já rolou pra ler, preserva a posição ao prepend; senão cola no fim.
+    prependDeltaRef.current = el && !atBottomRef.current ? el.scrollHeight - el.scrollTop : null;
+    setDisplayed((prev) => [...fresh, ...prev]);
+    if (prependDeltaRef.current === null) {
+      requestAnimationFrame(() => {
+        const e = scrollRef.current;
+        if (e) e.scrollTop = e.scrollHeight;
+      });
+    }
+  }, [latest.data]);
+
+  // Tempo real: cada mensagem do SSE (backfill + ao vivo) entra na fila de
+  // exibição gradual. Dedup por messageId cobre a sobreposição com o histórico.
+  useEffect(() => {
+    if (liveMessages.length === 0) return;
+    const fresh = liveMessages
+      .filter((m) => !seenRef.current.has(m.messageId))
+      .sort((a, b) => ts(a) - ts(b));
+    if (fresh.length === 0) return;
+    for (const m of fresh) seenRef.current.add(m.messageId);
+    queueRef.current.push(...fresh);
+  }, [liveMessages]);
+
+  // Drenagem da fila: replay no ritmo REAL do chat — o intervalo entre uma
+  // mensagem e a próxima na tela segue o intervalo dos timestamps em que elas
+  // chegaram na Twitch. Rajada aparece como rajada, pausa como pausa. Quando a
+  // fila acumula (lote grande, chat rápido), o replay acelera em fast-forward
+  // progressivo para nunca ficar para trás — mas nunca despeja em bloco.
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      if (cancelled) return;
+      const q = queueRef.current;
+      if (q.length === 0) {
+        timer = setTimeout(tick, 150);
+        return;
+      }
+      const next = q.shift()!;
+      liveIdsRef.current.add(next.messageId);
+      setDisplayed((prev) => [...prev, next]);
+      let delay = 320; // fallback: última da fila, sem próxima como referência
+      if (q.length > 0) {
+        const gap = ts(q[0]!) - ts(next);
+        const factor = q.length > 60 ? 0.15 : q.length > 30 ? 0.3 : q.length > 12 ? 0.6 : 1;
+        delay = Math.max(70, Math.min(1600, Math.round(gap * factor)));
+      }
+      timer = setTimeout(tick, delay);
+    };
+    timer = setTimeout(tick, 150);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, []);
+
+  // Auto-acompanhar quando o usuário está colado no fim.
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (prependDeltaRef.current !== null) {
+      // Histórico prependado: preserva a posição visual.
+      el.scrollTop = el.scrollHeight - prependDeltaRef.current;
+      prependDeltaRef.current = null;
+      return;
+    }
+    if (atBottomRef.current) el.scrollTop = el.scrollHeight;
+  }, [displayed]);
+
+  // Rolar até o topo → puxa a página anterior do histórico.
+  const loadOlder = useCallback(async () => {
+    if (!channelId || loadingOlderRef.current || noMore) return;
+    const oldest = displayed[0];
+    if (!oldest) return;
+    loadingOlderRef.current = true;
+    try {
+      const to = new Date(ts(oldest));
+      const from = new Date(to.getTime() - WINDOW_MS);
+      const res = await searchMessages(channelId, '', from.toISOString(), to.toISOString());
+      const older = res.items
+        .filter((m) => !seenRef.current.has(m.messageId))
+        .sort((a, b) => ts(a) - ts(b));
+      if (older.length === 0) {
+        setNoMore(true);
+        return;
+      }
+      for (const m of older) seenRef.current.add(m.messageId);
+      const el = scrollRef.current;
+      prependDeltaRef.current = el ? el.scrollHeight - el.scrollTop : null;
+      setDisplayed((prev) => [...older, ...prev]);
+    } finally {
+      loadingOlderRef.current = false;
+    }
+  }, [channelId, displayed, noMore]);
+
+  function onScroll() {
+    const el = scrollRef.current;
+    if (!el) return;
+    atBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+    if (el.scrollTop < 60) void loadOlder();
+  }
+
+  const empty = displayed.length === 0;
+  const list = useMemo(() => displayed, [displayed]);
 
   return (
-    <div className="glass-card flex h-full flex-col">
+    <div className="glass-card flex h-[34rem] flex-col outline outline-1 -outline-offset-1 outline-pal-orchid-line">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="eyebrow mb-1">SSE live</p>
+          <p className="eyebrow mb-1">Ao vivo</p>
           <h2 className="text-base font-semibold text-ink-800">Feed ao vivo</h2>
         </div>
         <div className="flex items-center gap-2 text-xs">
@@ -63,7 +224,7 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
             channelOnline ? (
               <SseIndicator>ao vivo</SseIndicator>
             ) : (
-              <Badge tone="neutral">aguardando live</Badge>
+              <Badge tone="neutral">últimas mensagens</Badge>
             )
           ) : (
             <Badge tone={STATUS_TONE[status]}>{status}</Badge>
@@ -79,75 +240,39 @@ export function LiveFeed({ channelId }: { channelId: string | null }) {
 
       {error && <p className="mb-3 text-xs text-err">{error}</p>}
 
-      {merged.length === 0 ? (
+      {empty ? (
         <p className="my-auto text-center text-sm text-ink-400">
-          {status !== 'open'
-            ? 'Selecione um canal ativo para receber insights ao vivo.'
+          {latest.isLoading
+            ? 'carregando o chat…'
             : channelOnline
-            ? 'Ao vivo — aguardando o primeiro batch do orchestrator…'
-            : 'Canal offline — o feed retoma automaticamente quando a live abrir.'}
+            ? 'Ao vivo, aguardando as primeiras mensagens…'
+            : 'Sem mensagens recentes. O feed retoma quando o chat voltar a falar.'}
         </p>
       ) : (
-        <ul className="max-h-[28rem] space-y-2 overflow-y-auto pr-1">
-          {merged.map((e) => {
-            const s = classifySentiment(e.climaGeral);
-            const open = openId === e.batchId;
-            return (
-              <li
-                key={e.batchId}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.025] text-sm"
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenId(open ? null : e.batchId)}
-                  className="w-full p-3 text-left transition-colors hover:bg-white/[0.05] rounded-xl"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-ink-700">{formatDate(e.windowStart)}</span>
-                    <Badge tone={s.label === 'positivo' ? 'positive' : s.label === 'negativo' ? 'negative' : 'neutral'}>
-                      {s.label}
-                    </Badge>
-                  </div>
-                  <div className="mt-1.5 grid grid-cols-2 gap-1 text-xs text-ink-600 md:grid-cols-4">
-                    <span>msgs <b className="text-ink-800">{e.messageCount}</b></span>
-                    <span>users <b className="text-ink-800">{e.uniqueUsers}</b></span>
-                    <span>pos <b className="text-ok">{formatPct(e.climaGeral.pos)}</b></span>
-                    <span>neg <b className="text-err">{formatPct(e.climaGeral.neg)}</b></span>
-                  </div>
-                  <p className="mt-1 flex items-center justify-between truncate text-xs text-ink-400">
-                    <span>pauta: {e.pautaMaisComentada?.category ?? '—'}</span>
-                    <span className="text-accent-400">{open ? 'fechar ▲' : 'insight ▾'}</span>
-                  </p>
-                </button>
-                {open && <BatchInsightBlock batchId={e.batchId} />}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
-  );
-}
+        <div
+          ref={scrollRef}
+          onScroll={onScroll}
+          className={`chat-skin skin-${platform} min-h-0 flex-1 overflow-y-auto rounded-xl px-2 py-2`}
+        >
+          {noMore && (
+            <p className="pb-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] opacity-40">
+              início do histórico
+            </p>
+          )}
+          <ul className="flex min-h-full flex-col justify-end">
+            {list.map((m) => (
+              <ChatLine
+                key={m.messageId}
+                m={m}
+                platform={platform}
+                emotes={emotes}
+                className={liveIdsRef.current.has(m.messageId) ? 'msg-in' : undefined}
+              />
+            ))}
+          </ul>
 
-function BatchInsightBlock({ batchId }: { batchId: string }) {
-  const q = useQuery({
-    queryKey: ['batch-insight', batchId],
-    queryFn: () => fetchBatchInsight(batchId),
-    staleTime: 5 * 60_000,
-  });
-  return (
-    <div className="border-t border-white/[0.06] px-3 py-2.5">
-      {q.isLoading ? (
-        <p className="text-xs text-ink-400">gerando insight…</p>
-      ) : q.isError ? (
-        <p className="text-xs text-err">Falha ao gerar insight.</p>
-      ) : (
-        <>
-          <p className="text-[13px] leading-relaxed text-ink-700">{q.data!.insight}</p>
-          <p className="mt-1.5 text-[10px] uppercase tracking-wide text-ink-400">
-            {q.data!.messageCount} msgs · {q.data!.aiEnabled ? 'via Haiku' : 'sem IA (ative LLM_DRIVER=real)'}
-          </p>
-        </>
+          <ChatSkinStyles />
+        </div>
       )}
     </div>
   );
