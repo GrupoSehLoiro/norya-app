@@ -16,7 +16,7 @@
  * Eixo X = windowStart (tempo). Y1 = messageCount, Y2 = uniqueUsers.
  * O dia selecionado e o modo "ao vivo" são controlados pela página.
  */
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { AreaClosed, LinePath } from '@visx/shape';
@@ -444,9 +444,9 @@ export function ActivityAreaChart({
         </div>
       )}
 
-      {chartEl('h-72')}
+      {!expanded && chartEl('h-72')}
 
-      {channelId && visualSel && liveStats && (
+      {!expanded && channelId && visualSel && liveStats && (
         <RangeDrilldown
           channelId={channelId}
           committed={sel}
@@ -638,6 +638,9 @@ function TimelineChart({
   const innerHeight = Math.max(0, height - margin.top - margin.bottom);
 
   const svgRef = useRef<SVGSVGElement>(null);
+  // IDs de defs únicos por instância — o chart do card e o expandido montam
+  // juntos, e url(#…) resolve pro primeiro id do documento.
+  const uid = useId().replace(/:/g, '');
   const dragRef = useRef<{
     mode: DragMode;
     startX: number;
@@ -828,15 +831,15 @@ function TimelineChart({
   return (
     <svg ref={svgRef} width={width} height={height} aria-label="atividade do chat" style={{ userSelect: 'none' }}>
       <defs>
-        <linearGradient id="grad-msgs" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`grad-msgs-${uid}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor={COLOR_MSGS} stopOpacity={0.40} />
           <stop offset="100%" stopColor={COLOR_MSGS} stopOpacity={0.02} />
         </linearGradient>
-        <linearGradient id="grad-users" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`grad-users-${uid}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor={COLOR_USERS} stopOpacity={0.30} />
           <stop offset="100%" stopColor={COLOR_USERS} stopOpacity={0.02} />
         </linearGradient>
-        <clipPath id="plot-clip">
+        <clipPath id={`plot-clip-${uid}`}>
           <rect x={0} y={-margin.top} width={innerWidth} height={innerHeight + margin.top} />
         </clipPath>
       </defs>
@@ -850,13 +853,13 @@ function TimelineChart({
           />
         ))}
 
-        <g clipPath="url(#plot-clip)">
+        <g clipPath={`url(#plot-clip-${uid})`}>
           <AreaClosed<Point>
             data={visible}
             x={(d) => xScale(d.ts) ?? 0}
             y={(d) => yScale(d.msgs) ?? 0}
             yScale={yScale}
-            fill="url(#grad-msgs)"
+            fill={`url(#grad-msgs-${uid})`}
             curve={curveMonotoneX}
           />
           <LinePath<Point>
@@ -871,7 +874,7 @@ function TimelineChart({
             x={(d) => xScale(d.ts) ?? 0}
             y={(d) => yScale(d.users) ?? 0}
             yScale={yScale}
-            fill="url(#grad-users)"
+            fill={`url(#grad-users-${uid})`}
             curve={curveMonotoneX}
           />
           <LinePath<Point>
