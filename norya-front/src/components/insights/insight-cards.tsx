@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Pie } from '@visx/shape';
 import { Group } from '@visx/group';
 import type { BatchAnalysis } from '@/lib/types';
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { InsightText } from '@/components/ui/insight-text';
 import { api, ApiError } from '@/lib/api-client';
 import { fetchWindowInsight, fetchBrandCounts } from '@/lib/analytics';
+import { dayBoundsIso } from '@/lib/day-range';
 import { humanizeCategory } from '@/lib/category-labels';
 import { classifySentiment, formatPct } from '@/lib/utils';
 
@@ -28,6 +29,12 @@ interface InsightCardsProps {
   /** Período selecionado no topo da página — usado no contexto por marca. */
   from: string;
   to: string;
+  /**
+   * Dias selecionados (YYYY-MM-DD), possivelmente não contíguos. Quando
+   * presente, as contagens de menção agregam por dia (dias excluídos ficam
+   * fora); sem ele, cai no range from..to único (página do canal, testes).
+   */
+  dates?: string[];
 }
 
 const SLICE_COLORS = {
@@ -36,7 +43,7 @@ const SLICE_COLORS = {
   neg: '#f87171', // token err
 } as const;
 
-export function InsightCards({ analysis, brandsOverride, channelId, from, to }: InsightCardsProps) {
+export function InsightCards({ analysis, brandsOverride, channelId, from, to, dates }: InsightCardsProps) {
   const sent = classifySentiment(analysis.climaGeral);
   const brands = brandsOverride ?? analysis.marcasMencionadas;
 
@@ -46,7 +53,7 @@ export function InsightCards({ analysis, brandsOverride, channelId, from, to }: 
           primeiro e sempre renderiza (tem empty state), ocupando o slot do
           antigo card standalone de palavras-chave — que sumia em dia sem
           atividade e fazia o layout pular. */}
-      <BrandsCard brands={brands} channelId={channelId} from={from} to={to} />
+      <BrandsCard brands={brands} channelId={channelId} from={from} to={to} dates={dates} />
 
       {/* #2 — Clima geral (pizza) */}
       <Card>
@@ -137,12 +144,13 @@ function SentimentDonut({ clima }: { clima: { pos: number; neu: number; neg: num
 }
 
 function BrandsCard({
-  brands, channelId, from, to,
+  brands, channelId, from, to, dates,
 }: {
   brands: BatchAnalysis['marcasMencionadas'];
   channelId: string;
   from: string;
   to: string;
+  dates?: string[];
 }) {
   const qc = useQueryClient();
   const [selected, setSelected] = useState<string | null>(null);
@@ -154,13 +162,39 @@ function BrandsCard({
   // primária do card: a palavra aparece assim que é cadastrada (mesmo com 0
   // menções), e a contagem reflete o que já foi dito no período. Enquanto
   // carrega, cai no que o batch detectou (`brands`) pra não piscar vazio.
+  // Com seleção multi-dia: uma query por dia + soma client-side, para que
+  // dias excluídos da seleção fiquem fora da conta.
+  const multiDay = !!dates && dates.length > 1;
   const countsQuery = useQuery({
-    enabled: !!channelId,
+    enabled: !!channelId && !multiDay,
     queryKey: ['brands-counts', channelId, from, to],
     queryFn: () => fetchBrandCounts(channelId, from, to),
     staleTime: 30_000,
   });
-  const displayBrands = countsQuery.data ?? brands;
+  const dayCountQueries = useQueries({
+    queries: (multiDay ? dates : []).map((d) => {
+      const bounds = dayBoundsIso(d);
+      return {
+        enabled: !!channelId,
+        queryKey: ['brands-counts', channelId, bounds.from, bounds.to],
+        queryFn: () => fetchBrandCounts(channelId, bounds.from, bounds.to),
+        staleTime: 5 * 60_000,
+      };
+    }),
+  });
+  const multiDayCounts = (() => {
+    if (!multiDay) return null;
+    const loaded = dayCountQueries.map((q) => q.data).filter((c): c is NonNullable<typeof c> => !!c);
+    if (loaded.length === 0) return null;
+    const acc = new Map<string, number>();
+    for (const day of loaded) {
+      for (const c of day) acc.set(c.brand, (acc.get(c.brand) ?? 0) + c.count);
+    }
+    return Array.from(acc.entries())
+      .map(([brand, count]) => ({ brand, count }))
+      .sort((a, b) => b.count - a.count);
+  })();
+  const displayBrands = (multiDay ? multiDayCounts : countsQuery.data) ?? brands;
 
   // Contexto da marca clicada — resumo das mensagens que a mencionam no
   // período. A busca é por substring: normaliza o nome ("Coca-Cola" → "coca")

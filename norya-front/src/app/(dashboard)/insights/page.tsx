@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ChannelPicker } from '@/components/insights/channel-picker';
+import { DayMultiPicker } from '@/components/insights/day-multi-picker';
 import { ChannelStatusBanner } from '@/components/insights/channel-status-banner';
 import { InsightCards } from '@/components/insights/insight-cards';
 import { LiveFeed } from '@/components/insights/live-feed';
@@ -13,19 +14,23 @@ import { ActivityAreaChart } from '@/components/insights/activity-area-chart';
 import { PageHeader } from '@/components/layout/page-header';
 import { api } from '@/lib/api-client';
 import { fetchInsightsSummary } from '@/lib/analytics';
-import { dayBoundsIso, shiftYmd, todayYmd } from '@/lib/day-range';
+import { dayBoundsIso, rangeBoundsIso, shiftYmd, todayYmd } from '@/lib/day-range';
 import { useSelectedChannel } from '@/hooks/use-selected-channel';
 import type { BatchAnalysis, InsightsLatestResponse, InsightsHistoryResponse } from '@/lib/types';
 
 export default function InsightsPage() {
   const { channelId, setChannelId } = useSelectedChannel();
 
-  // Período selecionado (dia) + modo ao vivo — compartilhados por gráfico,
-  // boxes, palavras-chave, assuntos e marcas.
-  const [date, setDate] = useState<string>(todayYmd());
+  // Período selecionado (um ou MAIS dias, possivelmente não contíguos — um
+  // canal pode alternar tipos de conteúdo no mês) + modo ao vivo. Os números
+  // dos boxes agregam por dia; resumos de IA usam o intervalo min..max.
+  const [dates, setDates] = useState<string[]>([todayYmd()]);
   const [live, setLive] = useState(true);
-  const { from, to } = useMemo(() => dayBoundsIso(date), [date]);
-  const isToday = date === todayYmd();
+  // Dia em foco no gráfico: o mais recente da seleção. Navegar pelo gráfico
+  // reduz a seleção àquele único dia (mesmo comportamento de antes).
+  const date = dates[dates.length - 1] ?? todayYmd();
+  const { from, to } = useMemo(() => rangeBoundsIso(dates), [dates]);
+  const isToday = dates.includes(todayYmd());
   const refetch = live && isToday ? 15_000 : false;
 
   const latest = useQuery({
@@ -46,13 +51,36 @@ export default function InsightsPage() {
     refetchInterval: live && isToday ? 30_000 : false,
   });
 
-  // Boxes do relatório (mensagens/pico/janelas) para o dia selecionado…
-  const summary = useQuery({
-    enabled: !!channelId,
-    queryKey: ['insights-summary', channelId, date],
-    queryFn: () => fetchInsightsSummary(channelId!, from, to),
-    refetchInterval: refetch ? 60_000 : false,
+  // Boxes do relatório (mensagens/pico/janelas): uma query POR DIA
+  // selecionado (cache reaproveitável) + agregação client-side — assim dias
+  // excluídos da seleção ficam fora da conta mesmo com seleção não contígua.
+  const dayQueries = useQueries({
+    queries: dates.map((d) => {
+      const bounds = dayBoundsIso(d);
+      return {
+        enabled: !!channelId,
+        queryKey: ['insights-summary', channelId, d],
+        queryFn: () => fetchInsightsSummary(channelId!, bounds.from, bounds.to),
+        refetchInterval: refetch && d === todayYmd() ? 60_000 : (false as const),
+        staleTime: d === todayYmd() ? 30_000 : 5 * 60_000,
+      };
+    }),
   });
+  const summaryAgg = (() => {
+    const loaded = dayQueries.map((q) => q.data).filter((s): s is NonNullable<typeof s> => !!s);
+    if (loaded.length === 0) return null;
+    let totalMessages = 0;
+    let windows = 0;
+    let peakUsers = 0;
+    let peak: { at: string; messages: number } | null = null;
+    for (const s of loaded) {
+      totalMessages += s.totalMessages;
+      windows += s.windows;
+      peakUsers = Math.max(peakUsers, s.peakUsers);
+      if (s.peak && (!peak || s.peak.messages > peak.messages)) peak = s.peak;
+    }
+    return { totalMessages, windows, peakUsers, peak };
+  })();
   // …e dias ativos no mês corrente (30 dias pra trás).
   const monthSummary = useQuery({
     enabled: !!channelId,
@@ -100,32 +128,39 @@ export default function InsightsPage() {
 
       <ClimateAlert items={history.data?.items ?? []} />
 
-      {/* Canal em análise — troca aqui muda o estado global (sidebar, feed, etc). */}
-      <div className="w-full max-w-xs">
-        <ChannelPicker value={channelId} onChange={setChannelId} />
+      {/* Canal em análise + período (dias específicos, incluindo/excluindo). */}
+      <div className="flex flex-wrap items-end gap-4">
+        <div className="w-full max-w-xs">
+          <ChannelPicker value={channelId} onChange={setChannelId} />
+        </div>
+        <DayMultiPicker value={dates} onChange={setDates} />
       </div>
 
       {channelId ? (
         <ActivityAreaChart
           channelId={channelId}
           date={date}
-          onDateChange={setDate}
+          onDateChange={(d) => setDates([d])}
           live={live}
           onLiveChange={setLive}
         />
       ) : null}
 
       {/* Boxes do relatório na página (mensagens, dias ativos, picos, janelas) */}
-      {channelId && summary.data ? (
+      {channelId && summaryAgg ? (
         <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <StatBox label="Mensagens" value={summary.data.totalMessages.toLocaleString('pt-BR')} foot="no dia selecionado" />
+          <StatBox
+            label="Mensagens"
+            value={summaryAgg.totalMessages.toLocaleString('pt-BR')}
+            foot={dates.length > 1 ? `nos ${dates.length} dias selecionados` : 'no dia selecionado'}
+          />
           <StatBox
             label="Dias ativos"
             value={monthSummary.data ? String(monthSummary.data.activeDays) : '—'}
             foot="últimos 30 dias"
           />
-          <StatBox label="Pico de usuários" value={summary.data.peakUsers.toLocaleString('pt-BR')} foot="no melhor momento" />
-          <StatBox label="Janelas" value={summary.data.windows.toLocaleString('pt-BR')} foot="trechos lidos pela IA" />
+          <StatBox label="Pico de usuários" value={summaryAgg.peakUsers.toLocaleString('pt-BR')} foot="no melhor momento" />
+          <StatBox label="Janelas" value={summaryAgg.windows.toLocaleString('pt-BR')} foot="trechos lidos pela IA" />
         </section>
       ) : null}
 
@@ -143,6 +178,7 @@ export default function InsightsPage() {
           channelId={channelId}
           from={from}
           to={to}
+          dates={dates}
         />
       ) : (
         <EmptyState
@@ -153,7 +189,7 @@ export default function InsightsPage() {
 
       {channelId ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <ChatTopicsPanel channelId={channelId} from={from} to={to} />
+          <ChatTopicsPanel channelId={channelId} from={from} to={to} dates={dates} />
           <LiveFeed channelId={channelId} />
         </div>
       ) : null}

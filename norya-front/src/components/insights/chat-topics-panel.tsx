@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { fetchChatTopics, fetchChatTopicsHistory } from '@/lib/analytics';
+import { isContiguousYmds, parseUtcDate, ymdFromDate } from '@/lib/day-range';
 
 function fmtHour(iso: string): string {
   const d = new Date(iso.replace(' ', 'T') + (iso.endsWith('Z') ? '' : 'Z'));
@@ -21,10 +22,18 @@ export function ChatTopicsPanel({
   channelId,
   from,
   to,
+  dates,
 }: {
   channelId: string | null;
   from: string;
   to: string;
+  /**
+   * Dias selecionados (YYYY-MM-DD), possivelmente não contíguos. O histórico
+   * por hora é filtrado para os dias da seleção; o resumo da IA cobre o
+   * intervalo completo from..to (uma chamada só) — com buracos na seleção,
+   * um aviso sinaliza a diferença.
+   */
+  dates?: string[];
 }) {
   // Assuntos ocultados pelo usuário (por sessão de visualização).
   const [hidden, setHidden] = useState<Set<string>>(() => new Set());
@@ -49,6 +58,13 @@ export function ChatTopicsPanel({
   }
 
   const visibleLabels = (topics.data?.labels ?? []).filter((l) => !hidden.has(l));
+  const gappedSelection = !!dates && dates.length > 1 && !isContiguousYmds(dates);
+  // Buckets do histórico: só os dos dias selecionados (o bucket vem em UTC;
+  // convertemos pro dia local antes de comparar).
+  const selectedDays = dates ? new Set(dates) : null;
+  const visibleBuckets = (history.data ?? []).filter(
+    (b) => !selectedDays || selectedDays.has(ymdFromDate(parseUtcDate(b.bucket))),
+  );
 
   return (
     <Card>
@@ -101,6 +117,12 @@ export function ChatTopicsPanel({
             </div>
           )}
           <p className="text-sm leading-relaxed text-ink-700">{topics.data!.summary}</p>
+          {gappedSelection && (
+            <p className="text-[11px] text-ink-400">
+              A seleção tem dias excluídos — o resumo da IA cobre o intervalo completo entre o
+              primeiro e o último dia; o histórico abaixo mostra só os dias selecionados.
+            </p>
+          )}
           <div className="flex items-center justify-between text-[11px] text-ink-400">
             <span>{topics.data!.messageCount} mensagens no período</span>
             <Badge tone={topics.data!.aiEnabled ? 'positive' : 'neutral'}>
@@ -111,13 +133,13 @@ export function ChatTopicsPanel({
       )}
 
       {/* Histórico de assuntos por timestamp */}
-      {channelId && (history.data?.length ?? 0) > 0 && (
+      {channelId && visibleBuckets.length > 0 && (
         <div className="mt-5 border-t border-white/[0.06] pt-4">
           <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.14em] text-ink-400">
             Histórico (por hora)
           </p>
           <ul className="max-h-64 space-y-2 overflow-y-auto pr-1">
-            {history.data!.map((b) => (
+            {visibleBuckets.map((b) => (
               <li key={b.bucket} className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-ink-700">{fmtHour(b.bucket)}</span>
