@@ -17,6 +17,7 @@
  * O dia selecionado e o modo "ao vivo" são controlados pela página.
  */
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { AreaClosed, LinePath } from '@visx/shape';
 import { Group } from '@visx/group';
@@ -104,9 +105,16 @@ function selStats(points: Point[], sel: Sel) {
 
 interface Props {
   channelId: string | null;
-  /** Dia selecionado (YYYY-MM-DD) — controlado pela página. */
+  /** Dia em FOCO no gráfico grande (YYYY-MM-DD) — controlado pela página. */
   date: string;
+  /** Seleção única de um dia (chevrons/Hoje/Ontem): colapsa o período. */
   onDateChange: (ymd: string) => void;
+  /** Todos os dias do período (multi-seleção via calendário). */
+  dates?: string[];
+  /** Toggle de um dia no calendário; `touched` é o dia clicado. */
+  onDatesChange?: (dates: string[], touched: string) => void;
+  /** Troca só o dia em foco (clique numa miniatura), sem mexer na seleção. */
+  onFocusChange?: (ymd: string) => void;
   /** Modo ao vivo: segue o dia de hoje com refresh automático. */
   live: boolean;
   onLiveChange: (live: boolean) => void;
@@ -114,7 +122,7 @@ interface Props {
 }
 
 export function ActivityAreaChart({
-  channelId, date, onDateChange, live, onLiveChange, limit = 500,
+  channelId, date, onDateChange, dates, onDatesChange, onFocusChange, live, onLiveChange, limit = 500,
 }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -201,11 +209,28 @@ export function ActivityAreaChart({
 
   const today = todayYmd();
   const yesterday = shiftYmd(today, -1);
-  const isYesterday = date === yesterday;
+  const selectedDates = dates && dates.length > 0 ? dates : [date];
+  const multiDay = selectedDates.length > 1;
+  const isYesterday = date === yesterday && !multiDay;
   const canGoForward = date < today;
 
   function changeDate(ymd: string) {
     onDateChange(ymd);
+    if (ymd !== today && live) onLiveChange(false);
+  }
+
+  function toggleDate(ymd: string) {
+    if (!onDatesChange) {
+      // Sem suporte a multi-dia (página do canal): comporta como antes.
+      changeDate(ymd);
+      setPickerOpen(false);
+      return;
+    }
+    const next = selectedDates.includes(ymd)
+      ? selectedDates.filter((d) => d !== ymd)
+      : [...selectedDates, ymd].sort();
+    if (next.length === 0) return; // nunca vazio
+    onDatesChange(next, ymd);
     if (ymd !== today && live) onLiveChange(false);
   }
 
@@ -348,7 +373,14 @@ export function ActivityAreaChart({
                     }
                   >
                     <CalendarIcon />
-                    <span className="tabular-nums">{formatYmdLabel(date)}</span>
+                    <span className="tabular-nums">
+                      {formatYmdLabel(date)}
+                      {multiDay ? (
+                        <span className="ml-1.5 rounded-full bg-accent-400/15 px-1.5 py-0.5 text-[10px] font-semibold text-accent-300">
+                          +{selectedDates.length - 1}
+                        </span>
+                      ) : null}
+                    </span>
                   </button>
 
                   <IconBtn
@@ -363,8 +395,10 @@ export function ActivityAreaChart({
                 {pickerOpen && (
                   <CalendarPopover
                     value={date}
+                    selected={selectedDates}
                     maxYmd={today}
-                    onSelect={(ymd) => {
+                    onToggle={toggleDate}
+                    onReset={(ymd) => {
                       changeDate(ymd);
                       setPickerOpen(false);
                     }}
@@ -393,6 +427,23 @@ export function ActivityAreaChart({
         ) : null}
       </div>
 
+      {/* Faixa de miniaturas — um sparkline por dia da seleção; clique foca
+          o dia no gráfico grande sem mexer na seleção. */}
+      {channelId && multiDay && (
+        <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+          {selectedDates.map((d) => (
+            <DayThumb
+              key={d}
+              channelId={channelId}
+              ymd={d}
+              active={d === date}
+              limit={limit}
+              onClick={() => (onFocusChange ?? onDateChange)(d)}
+            />
+          ))}
+        </div>
+      )}
+
       {chartEl('h-72')}
 
       {channelId && visualSel && liveStats && (
@@ -406,8 +457,9 @@ export function ActivityAreaChart({
         />
       )}
 
-      {/* Modo expandido — overlay em tela cheia */}
-      {expanded && (
+      {/* Modo expandido — portal pro body: o hover do card aplica transform,
+          que viraria containing block do fixed e prenderia o overlay no card. */}
+      {expanded && createPortal(
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-bg-0/85 p-6"
           style={{ backdropFilter: 'blur(14px)' }}
@@ -454,7 +506,8 @@ export function ActivityAreaChart({
               />
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </Card>
   );
@@ -1080,6 +1133,84 @@ function ZoomIcon() {
   );
 }
 
+// ─── DayThumb ──────────────────────────────────────────────────────────────
+
+const thumbDayLabel = timeFormat('%d/%m');
+
+/**
+ * Miniatura de um dia da seleção: sparkline de mensagens + total do dia.
+ * Usa a MESMA queryKey do gráfico grande — focar um dia já encontra os
+ * dados quentes no cache.
+ */
+function DayThumb({
+  channelId, ymd, active, limit, onClick,
+}: {
+  channelId: string;
+  ymd: string;
+  active: boolean;
+  limit: number;
+  onClick: () => void;
+}) {
+  const bounds = dayBoundsIso(ymd);
+  const q = useQuery({
+    queryKey: ['insights-history', channelId, 'chart', ymd, limit],
+    queryFn: () => api.get<InsightsHistoryResponse>(
+      `/api/v2/social-listening/insights/history?channelId=${encodeURIComponent(channelId)}` +
+        `&from=${encodeURIComponent(bounds.from)}&to=${encodeURIComponent(bounds.to)}&limit=${limit}`,
+    ),
+    staleTime: ymd === todayYmd() ? 30_000 : 5 * 60_000,
+  });
+
+  const { path, total } = useMemo(() => {
+    const items = q.data?.items ?? [];
+    const msgs = [...items].reverse().map((b: BatchAnalysis) => b.messageCount);
+    const total_ = msgs.reduce((a, b) => a + b, 0);
+    if (msgs.length < 2) return { path: null, total: total_ };
+    const W = 120;
+    const H = 30;
+    const peak = Math.max(...msgs, 1);
+    const pts = msgs.map((m, i) => {
+      const x = (i / (msgs.length - 1)) * W;
+      const y = H - (m / peak) * (H - 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    });
+    return { path: `M0,${H} L${pts.join(' L')} L${W},${H} Z`, total: total_ };
+  }, [q.data]);
+
+  const [y, m, d] = parseYmd(ymd);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      title={`Focar ${formatYmdLabel(ymd)} no gráfico`}
+      className={
+        'flex flex-shrink-0 flex-col gap-1 rounded-xl border px-3 py-2 text-left transition-colors ' +
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60 ' +
+        (active
+          ? 'border-accent-400/50 bg-accent-400/[0.08]'
+          : 'border-white/[0.07] bg-white/[0.02] hover:border-white/[0.16]')
+      }
+    >
+      <span className="flex w-full items-baseline justify-between gap-3">
+        <span className={'text-[11px] font-semibold tabular-nums ' + (active ? 'text-accent-300' : 'text-ink-700')}>
+          {thumbDayLabel(new Date(y, m - 1, d))}
+        </span>
+        <span className="text-[10px] text-ink-400">
+          {q.isLoading ? '…' : `${total.toLocaleString('pt-BR')} msgs`}
+        </span>
+      </span>
+      <svg width="120" height="30" aria-hidden className="overflow-visible">
+        {path ? (
+          <path d={path} fill={active ? 'rgba(215,254,1,0.28)' : 'rgba(215,254,1,0.12)'} stroke={COLOR_MSGS} strokeWidth="1" />
+        ) : (
+          <line x1="0" y1="29" x2="120" y2="29" stroke={COLOR_AXIS} strokeDasharray="3 3" />
+        )}
+      </svg>
+    </button>
+  );
+}
+
 function CalendarIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -1100,13 +1231,18 @@ const MONTH_NAMES = [
 ];
 
 interface CalendarPopoverProps {
-  value: string; // ymd
+  value: string; // ymd em foco (define o mês inicial)
+  /** Dias selecionados — clique alterna inclusão/exclusão (multi-dia). */
+  selected: string[];
   maxYmd: string; // limite superior (ex: hoje)
-  onSelect: (ymd: string) => void;
+  /** Toggle de um dia; o popover fica aberto pra permitir vários cliques. */
+  onToggle: (ymd: string) => void;
+  /** Reset da seleção para um único dia (atalho "Hoje") — fecha o popover. */
+  onReset: (ymd: string) => void;
   onClose: () => void;
 }
 
-function CalendarPopover({ value, maxYmd, onSelect, onClose }: CalendarPopoverProps) {
+function CalendarPopover({ value, selected, maxYmd, onToggle, onReset, onClose }: CalendarPopoverProps) {
   const [vy, vm] = parseYmd(value);
   const [year, setYear] = useState(vy);
   const [month, setMonth] = useState(vm - 1); // 0-based
@@ -1208,7 +1344,7 @@ function CalendarPopover({ value, maxYmd, onSelect, onClose }: CalendarPopoverPr
                 return <div key={i} className="h-8" />;
               }
               const ymd = formatYmdParts(year, month, cell);
-              const isSelected = ymd === value;
+              const isSelected = selected.includes(ymd);
               const isToday_ = ymd === today;
               const isDisabled =
                 year > maxY ||
@@ -1220,7 +1356,8 @@ function CalendarPopover({ value, maxYmd, onSelect, onClose }: CalendarPopoverPr
                   key={i}
                   type="button"
                   disabled={isDisabled}
-                  onClick={() => onSelect(ymd)}
+                  aria-pressed={isSelected}
+                  onClick={() => onToggle(ymd)}
                   className={
                     'flex h-8 w-full items-center justify-center rounded-lg text-xs font-medium tabular-nums ' +
                     'transition-all duration-150 focus:outline-none ' +
@@ -1242,16 +1379,18 @@ function CalendarPopover({ value, maxYmd, onSelect, onClose }: CalendarPopoverPr
         </>
       )}
 
-      {/* Footer: atalho pra hoje */}
+      {/* Footer: atalho pra hoje + contagem da seleção */}
       <div className="mt-3 flex items-center justify-between border-t border-white/[0.05] pt-3">
         <button
           type="button"
-          onClick={() => onSelect(today)}
+          onClick={() => onReset(today)}
           className="rounded-md px-2 py-1 text-xs font-medium text-accent-300 transition-colors hover:bg-accent-400/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60"
         >
           Hoje
         </button>
-        <span className="text-[10px] text-ink-500">esc pra fechar</span>
+        <span className="text-[10px] text-ink-500">
+          {selected.length > 1 ? `${selected.length} dias · ` : ''}clique alterna o dia · esc fecha
+        </span>
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ import { useQueries, useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ChannelPicker } from '@/components/insights/channel-picker';
-import { DayMultiPicker } from '@/components/insights/day-multi-picker';
 import { ChannelStatusBanner } from '@/components/insights/channel-status-banner';
 import { InsightCards } from '@/components/insights/insight-cards';
 import { LiveFeed } from '@/components/insights/live-feed';
@@ -22,16 +21,31 @@ export default function InsightsPage() {
   const { channelId, setChannelId } = useSelectedChannel();
 
   // Período selecionado (um ou MAIS dias, possivelmente não contíguos — um
-  // canal pode alternar tipos de conteúdo no mês) + modo ao vivo. Os números
-  // dos boxes agregam por dia; resumos de IA usam o intervalo min..max.
+  // canal pode alternar tipos de conteúdo no mês) + modo ao vivo. A seleção
+  // vive no calendário do gráfico; os números dos boxes agregam por dia e os
+  // resumos de IA usam o intervalo min..max. `date` é o dia em FOCO no
+  // gráfico grande (sempre um dos selecionados).
   const [dates, setDates] = useState<string[]>([todayYmd()]);
+  const [date, setDate] = useState<string>(todayYmd());
   const [live, setLive] = useState(true);
-  // Dia em foco no gráfico: o mais recente da seleção. Navegar pelo gráfico
-  // reduz a seleção àquele único dia (mesmo comportamento de antes).
-  const date = dates[dates.length - 1] ?? todayYmd();
   const { from, to } = useMemo(() => rangeBoundsIso(dates), [dates]);
   const isToday = dates.includes(todayYmd());
   const refetch = live && isToday ? 15_000 : false;
+
+  /** Chevrons/Hoje/Ontem no gráfico: colapsa o período para aquele dia. */
+  function selectSingleDay(d: string) {
+    setDates([d]);
+    setDate(d);
+  }
+
+  /** Toggle no calendário: mantém o foco no dia clicado (se incluído). */
+  function handleDatesChange(next: string[], touched: string) {
+    const sorted = [...new Set(next)].sort();
+    if (sorted.length === 0) return;
+    setDates(sorted);
+    if (sorted.includes(touched)) setDate(touched);
+    else if (!sorted.includes(date)) setDate(sorted[sorted.length - 1]!);
+  }
 
   const latest = useQuery({
     enabled: !!channelId,
@@ -128,19 +142,20 @@ export default function InsightsPage() {
 
       <ClimateAlert items={history.data?.items ?? []} />
 
-      {/* Canal em análise + período (dias específicos, incluindo/excluindo). */}
-      <div className="flex flex-wrap items-end gap-4">
-        <div className="w-full max-w-xs">
-          <ChannelPicker value={channelId} onChange={setChannelId} />
-        </div>
-        <DayMultiPicker value={dates} onChange={setDates} />
+      {/* Canal em análise — troca aqui muda o estado global (sidebar, feed, etc).
+          O período (multi-dia) é escolhido no calendário do próprio gráfico. */}
+      <div className="w-full max-w-xs">
+        <ChannelPicker value={channelId} onChange={setChannelId} />
       </div>
 
       {channelId ? (
         <ActivityAreaChart
           channelId={channelId}
           date={date}
-          onDateChange={(d) => setDates([d])}
+          onDateChange={selectSingleDay}
+          dates={dates}
+          onDatesChange={handleDatesChange}
+          onFocusChange={setDate}
           live={live}
           onLiveChange={setLive}
         />
