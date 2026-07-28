@@ -46,6 +46,27 @@ export function formatYmdLabel(ymd: string): string {
 }
 
 /**
+ * Bounds ISO do intervalo min..max de uma seleção de dias (possivelmente não
+ * contígua). Usado pelos consumidores que precisam de UM range (ex.: resumos
+ * de IA) — os números exatos vêm da agregação por dia.
+ */
+export function rangeBoundsIso(dates: string[]): { from: string; to: string } {
+  const sorted = [...dates].sort();
+  const first = sorted[0] ?? todayYmd();
+  const last = sorted[sorted.length - 1] ?? first;
+  return { from: dayBoundsIso(first).from, to: dayBoundsIso(last).to };
+}
+
+/** true quando os dias selecionados formam uma sequência sem buracos. */
+export function isContiguousYmds(dates: string[]): boolean {
+  const sorted = [...dates].sort();
+  for (let i = 1; i < sorted.length; i++) {
+    if (shiftYmd(sorted[i - 1]!, 1) !== sorted[i]) return false;
+  }
+  return true;
+}
+
+/**
  * Timestamps do ClickHouse chegam como 'YYYY-MM-DD HH:mm:ss.SSS' SEM sufixo
  * de fuso — mas são UTC. Sem normalizar, o navegador interpreta como hora
  * local e desloca gráfico e recortes em horas. (Eventos do SSE já vêm em
