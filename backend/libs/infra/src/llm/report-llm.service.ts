@@ -25,11 +25,50 @@ export interface ReportLlmInput {
    * categoria/subcategoria/game/marca. Anexado ao system quando presente.
    */
   extraContext?: string;
+  /** Idioma do texto gerado. Default pt-BR; 'en' escreve o relatório em inglês. */
+  lang?: 'pt' | 'en';
 }
 
 /** Anexa o contexto de treinamento (quando houver) ao system base. */
 function withExtraContext(system: string, input: ReportLlmInput): string {
   return input.extraContext ? `${system}\n\n${input.extraContext}` : system;
+}
+
+/**
+ * Sobrepõe o idioma de saída quando o caller pediu inglês. Os prompts base
+ * continuam em pt-BR (mesmo prompt cache); a instrução final vence.
+ */
+function withLanguage(system: string, input: ReportLlmInput): string {
+  if (input.lang !== 'en') return system;
+  return (
+    `${system}\n\nIMPORTANT: Write ALL of your output text in ENGLISH (US) — ` +
+    'titles, tags, bullets and summaries. The report will be delivered to an ' +
+    'English-speaking audience. Keep usernames and literal chat quotes in their ' +
+    'original language.'
+  );
+}
+
+/**
+ * Reforço de idioma na mensagem do usuário: só a instrução no system perde
+ * para as descriptions das tools (todas em pt-BR) — o modelo respondia em
+ * português mesmo com lang=en.
+ */
+function withUserLanguage(content: string, input: ReportLlmInput): string {
+  if (input.lang !== 'en') return content;
+  return `${content}\n\nWrite your ENTIRE response in ENGLISH (US), regardless of the language of the data above.`;
+}
+
+/**
+ * Versão da tool com as descriptions traduzidas quando lang=en — as menções a
+ * "português do Brasil" nas descriptions puxavam a resposta de volta pro pt.
+ */
+function localizedTool<T>(tool: T, input: ReportLlmInput): T {
+  if (input.lang !== 'en') return tool;
+  return JSON.parse(
+    JSON.stringify(tool)
+      .replaceAll('português do Brasil', 'inglês (US English)')
+      .replaceAll('em português', 'em inglês'),
+  ) as T;
 }
 
 export interface ReportNarrative {
@@ -65,7 +104,8 @@ const REPORT_TOOL = {
         description:
           '2 a 4 frases que contam a história do período em números concretos: volume de ' +
           'mensagens, clima dominante (com o % real), e o momento ou pauta que mais marcou. ' +
-          'Nada de generalidades — cite os valores fornecidos.',
+          'Nada de generalidades — cite os valores fornecidos. ' +
+          'MÁXIMO de 420 caracteres no total: o espaço no PDF é fixo e texto além disso é cortado.',
       },
       topicos: {
         type: 'array',
@@ -181,7 +221,7 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 3000,
-        system: withExtraContext(
+        system: withLanguage(withExtraContext(
           'Você é um analista de comunidades de streaming que escreve relatórios ' +
             'executivos em português do Brasil para marcas e streamers, no estilo de um ' +
             'relatório de dados editorial (data storytelling). Cada frase relevante deve estar ' +
@@ -190,17 +230,21 @@ export class ReportLlmService {
             'NÃO escreva recomendações, conselhos nem próximos passos. ' +
             'NÃO use frases genéricas que serviriam para qualquer live. ' +
             'Não invente fatos além dos dados fornecidos. ' +
-            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final.',
+            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final. ' +
+            'Não cite horários de relógio (hh:mm, "às 14h41") no texto; situe momentos ' +
+            'como "no pico" ou pelo dia.',
           input,
-        ),
-        tools: [REPORT_TOOL],
+        ), input),
+        tools: [localizedTool(REPORT_TOOL, input)],
         tool_choice: { type: 'tool', name: 'gerar_relatorio' },
         messages: [
           {
             role: 'user',
-            content:
+            content: withUserLanguage(
               `Gere o relatório da live do canal "${input.channelName}" com base nestes dados:\n\n` +
-              input.context,
+                input.context,
+              input,
+            ),
           },
         ],
       });
@@ -259,20 +303,22 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 700,
-        system: withExtraContext(
+        system: withLanguage(withExtraContext(
           'Você analisa o chat de lives de streaming e resume, em português do Brasil, ' +
             'os assuntos mais comentados. Use só os dados fornecidos, não invente. ' +
             'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final.',
           input,
-        ),
-        tools: [TOPICS_TOOL],
+        ), input),
+        tools: [localizedTool(TOPICS_TOOL, input)],
         tool_choice: { type: 'tool', name: 'descrever_assuntos' },
         messages: [
           {
             role: 'user',
-            content:
+            content: withUserLanguage(
               `Descreva os assuntos mais comentados no chat do canal "${input.channelName}" ` +
-              `com base nestes dados:\n\n${input.context}`,
+                `com base nestes dados:\n\n${input.context}`,
+              input,
+            ),
           },
         ],
       });
@@ -305,16 +351,20 @@ export class ReportLlmService {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: 400,
-        system: withExtraContext(
+        system: withLanguage(withExtraContext(
           'Você analisa blocos de chat de lives e devolve um insight curto e ' +
             'acionável em português do Brasil (2 a 4 frases). Use só os dados dados, não invente. ' +
-            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final.',
+            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final. ' +
+            'Não cite horários de relógio (hh:mm) no texto.',
           input,
-        ),
+        ), input),
         messages: [
           {
             role: 'user',
-            content: `Gere um insight curto sobre este bloco de mensagens do chat do canal "${input.channelName}":\n\n${input.context}`,
+            content: withUserLanguage(
+              `Gere um insight curto sobre este bloco de mensagens do chat do canal "${input.channelName}":\n\n${input.context}`,
+              input,
+            ),
           },
         ],
       });

@@ -35,6 +35,8 @@ export class InsightsController {
     @Query('from') fromStr: string,
     @Query('to') toStr: string,
     @Res() res: Response,
+    @Query('tz') tzStr?: string,
+    @Query('lang') langStr?: string,
   ): Promise<void> {
     if (!channelId) throw new BadRequestException('channelId obrigatório');
     const to = toStr ? new Date(toStr) : new Date();
@@ -42,7 +44,23 @@ export class InsightsController {
     if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
       throw new BadRequestException('from/to inválido');
     }
-    const data = await this.reports.build(channelId, from, to);
+    // Fuso IANA escolhido no console para as datas exibidas no PDF. Ausente →
+    // Brasília. NUNCA o fuso do servidor: a máquina de deploy pode estar em
+    // qualquer lugar (ex.: NY) e imprimia horários deslocados no relatório.
+    let tz = 'America/Sao_Paulo';
+    if (tzStr) {
+      try {
+        new Intl.DateTimeFormat('pt-BR', { timeZone: tzStr });
+        tz = tzStr;
+      } catch {
+        throw new BadRequestException('tz inválido (use um identificador IANA)');
+      }
+    }
+    if (langStr && langStr !== 'pt' && langStr !== 'en') {
+      throw new BadRequestException("lang inválido (use 'pt' ou 'en')");
+    }
+    const lang = (langStr as 'pt' | 'en' | undefined) ?? 'pt';
+    const data = await this.reports.build(channelId, from, to, tz, lang);
     const buffer = await this._renderPdf(channelId, data);
     const fname = `relatorio-${channelId}-${to.toISOString().slice(0, 10)}.pdf`;
     res.set({
@@ -68,7 +86,9 @@ export class InsightsController {
           .forChannel(channelId)
           .then((r) => r.emotes)
           .catch(() => []);
-        return await this.htmlPdf.render(buildReportHtml(data, dict));
+        // Emotes nativos do Kick vistos no período entram por último: para o
+        // nome citado pela narrativa, a imagem do próprio Kick ganha do dict.
+        return await this.htmlPdf.render(buildReportHtml(data, [...dict, ...data.kickEmotes]));
       } catch (err) {
         this.logger.warn(`render HTML→PDF falhou, caindo p/ pdfkit: ${(err as Error).message}`);
       }

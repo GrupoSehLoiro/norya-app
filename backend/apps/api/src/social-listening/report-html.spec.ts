@@ -35,6 +35,8 @@ function baseData(overrides: Partial<ReportData> = {}): ReportData {
     generatedByAi: true,
     sampleSize: 60,
     peakInsight: 'Pico puxado por clipe — chat spammou KEKW.',
+    kickEmotes: [],
+    lang: 'pt',
     ...overrides,
   };
 }

@@ -62,7 +62,14 @@ function wordsToHtml(text: string, emotes: Map<string, ReportEmote>): string {
     .split(/(\s+)/)
     .map((tok) => {
       const e = emotes.get(tok);
-      return e ? emoteImg(e.url, e.code) : escapeHtml(tok);
+      if (e) return emoteImg(e.url, e.code);
+      // A narrativa da IA cita emotes entre aspas/pontuação ("'emojiAngry',");
+      // tenta de novo sem a pontuação das bordas, preservando-a no output.
+      const m = /^([^\p{L}\p{N}]*)(.*?)([^\p{L}\p{N}]*)$/su.exec(tok);
+      const core = m?.[2] ? emotes.get(m[2]) : undefined;
+      return core
+        ? `${escapeHtml(m![1]!)}${emoteImg(core.url, core.code)}${escapeHtml(m![3]!)}`
+        : escapeHtml(tok);
     })
     .join('');
 }
@@ -71,16 +78,59 @@ function emoteImg(url: string, code: string): string {
   return `<img class="emote" src="${escapeHtml(url)}" alt="${escapeHtml(code)}" title="${escapeHtml(code)}">`;
 }
 
-// ── Formatação ───────────────────────────────────────────────────────────────
-const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-
-function fmtLong(d: Date): string {
-  return `${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`;
+/**
+ * Texto de bullet/resumo com marcação leve da IA: '# Rótulo: ...' vira
+ * <b>Rótulo:</b> e '#hashtag' vira negrito — o '#' cru no PDF parecia defeito.
+ * Emotes continuam virando imagem (cada segmento passa pelo emotesToHtml).
+ */
+export function richText(text: string, emotes: Map<string, ReportEmote>): string {
+  let body = text.trim();
+  let head = '';
+  const heading = /^#+\s*([^:#]{1,60}):\s*/.exec(body);
+  if (heading) {
+    head = `<b>${emotesToHtml(`${heading[1]!.trim()}:`, emotes)}</b> `;
+    body = body.slice(heading[0].length);
+  } else {
+    body = body.replace(/^#+\s*/, '');
+  }
+  const parts = body
+    .split(/(#[\p{L}\p{N}_-]+)/gu)
+    .map((seg) => (seg.startsWith('#') ? `<b>${escapeHtml(seg)}</b>` : emotesToHtml(seg, emotes)));
+  return head + parts.join('');
 }
 
-function fmtPeak(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)} · ${pad(d.getHours())}h${pad(d.getMinutes())}`;
+// ── Formatação ───────────────────────────────────────────────────────────────
+const MESES = {
+  pt: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+} as const;
+
+type ReportLang = 'pt' | 'en';
+
+/** Componentes da data no fuso pedido (tz ausente → fuso do servidor). */
+function dateParts(d: Date, tz?: string) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(d);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '00';
+  return { y: get('year'), m: Number(get('month')), d: get('day'), hh: get('hour'), mm: get('minute') };
+}
+
+function fmtLong(d: Date, tz?: string, lang: ReportLang = 'pt'): string {
+  const p = dateParts(d, tz);
+  return `${Number(p.d)} ${MESES[lang][p.m - 1]} ${p.y}`;
+}
+
+// Só dia/mês — hora fica de fora do relatório (pedido de produto).
+function fmtPeak(d: Date, tz?: string): string {
+  const p = dateParts(d, tz);
+  return `${p.d}/${String(p.m).padStart(2, '0')}`;
 }
 
 function compact(n: number): string {
@@ -160,11 +210,103 @@ function keywordChip(word: string, count: number, emotes: Map<string, ReportEmot
 /** Pastéis do design system (tailwind `pal-*`), rotacionados nas caixas. */
 const PASTEIS = ['#cdeefc', '#c5bff7', '#f7b3f3', '#fcafc8', '#c2f0b0', '#fde5b4'];
 
+/**
+ * Wordmark "norya" full preto (ref/preto full.svg) embutido como data URI —
+ * o Chromium do renderer não depende de rede/filesystem pra pintar o topo.
+ */
+const NORYA_LOGO_BLACK = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTEuNTYgMjcuNTYiPgogIDxnIGlkPSJMYXllcl8xLTIiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTMwLjgxLDUuMTFoNC43NGw2LjQ2LDkuOTlWNS4xMWg0Ljg3djE3LjY2aC00Ljc3bC02LjQzLTkuOTl2OS45OWgtNC44N1Y1LjExWiIvPgogICAgICA8cGF0aCBkPSJNNDcuNzgsMTMuOTRjMC01LjA3LDMuOTgtOS4xOCw5LjA4LTkuMThzOS4wOCw0LjE0LDkuMDgsOS4xOC0zLjk5LDkuMTgtOS4wOCw5LjE4LTkuMDgtNC4xNC05LjA4LTkuMThaTTYwLjk1LDEzLjk0YzAtMi43NS0xLjg0LTQuNjItNC4wOS00LjYycy00LjA5LDEuODctNC4wOSw0LjYyLDEuODcsNC42Miw0LjA5LDQuNjIsNC4wOS0xLjg3LDQuMDktNC42MloiLz4KICAgICAgPHBhdGggZD0iTTY2Ljg2LDUuMTFoOC4wN2MzLjg4LDAsNi41MSwyLjU3LDYuNTEsNi4wMywwLDIuMTctMS4yMSwzLjk2LTMuMjUsNC45OWwzLjkzLDYuNjNoLTUuNTVsLTMuMjMtNS42MmgtMS40OXY1LjYyaC00Ljk5VjUuMTFaTTc0LjI1LDEzLjE2YzEuMjYsMCwyLjA5LS44MSwyLjA5LTEuOTdzLS44My0xLjk3LTIuMDktMS45N2gtMi41N3YzLjkzaDIuNTdaIi8+CiAgICAgIDxwYXRoIGQ9Ik04Ni4zMSwxNi42N2wtNS44NS0xMS41NWg1LjQ1bDMsNi40NiwyLjk4LTYuNDZoNS4yN2wtNS44NSwxMS41NXY2LjFoLTQuOTl2LTYuMVoiLz4KICAgICAgPHBhdGggZD0iTTEwMC4wOCw1LjExaDUuMDJsNi40NiwxNy42NmgtNS4zbC0uOTgtMy4yNWgtNS41NWwtLjk4LDMuMjVoLTUuMTJsNi40Ni0xNy42NlpNMTA0LjIyLDE1LjQzbC0xLjcxLTUuNC0xLjcyLDUuNGgzLjQzWiIvPgogICAgPC9nPgogICAgPHBhdGggZD0iTTI0LjIzLDE0LjI0bDMuMzQtMi4xNmMtLjA1LTIuMS0xLjg5LTIuNjYtMy42OS0yLjQ3LDEuNDItMS4xNCwyLjMzLTIuOS44MS00LjRsLTIuMTEsMi4xMWMtLjQ2LjQ2LTEuMjMuMDMtMS4wOS0uNmwuODQtMy44OGgtLjAxYy0xLjUxLTEuNDQtMy4yMy0uNTMtNC4zNS44Ni4xOC0xLjg1LS4zOC0zLjY3LTIuNTMtMy43djNjMCwuNjUtLjg0Ljg5LTEuMTkuMzVsLTIuMTYtMy4zNWMtMi4xMi4wNS0yLjY3LDEuODktMi40OCwzLjctMS4xNy0xLjQ0LTIuODUtMi4zMS00LjQtLjgybDIuMTIsMi4xMWMuNDUuNDYuMDMsMS4yMy0uNiwxLjA5bC0zLjg4LS44NGMtMS40NSwxLjUtLjU1LDMuMjQuODUsNC4zNy0xLjg0LS4xOC0zLjY2LjM5LTMuNjksMi41M2gyLjk5Yy42NSwwLC45Ljg0LjM1LDEuMmwtMy4zNCwyLjE0Yy4wNSwyLjExLDEuODgsMi42NywzLjY5LDIuNDgtMS40MiwxLjE0LTIuMzMsMi45LS44MSw0LjRsMi4xMS0yLjExYy40Ni0uNDYsMS4yMy0uMDQsMS4wOS41OWwtLjg0LDMuODhjMS41LDEuNDYsMy4yMy41NCw0LjM1LS44NS0uMTgsMS44NC4zOCwzLjY2LDIuNTQsMy42OXYtMi45OWMwLS42NS44NC0uOSwxLjE5LS4zNWwyLjE2LDMuMzRjMi4xMi0uMDcsMi42NS0xLjg3LDIuNDctMy42OSwxLjE2LDEuNDMsMi44OCwyLjMyLDQuNC44MmwtMi4xMS0yLjExYy0uNDYtLjQ2LS4wMy0xLjI0LjYtMS4wOWwzLjg4LjgzaC4wMWMxLjQ0LTEuNTEuNTMtMy4yMy0uODYtNC4zNSwxLjg1LjE4LDMuNjYtLjM5LDMuNjktMi41NGgtMi45OWMtLjY2LDAtLjktLjg0LS4zNS0xLjE5Wk0yMS43MiwxMy4zNGwtMy4zNSwyLjE2YzAsMS4xLjc2LDIuMTEsMS44MywyLjM5LjU4LjQyLjI1LDEuMzQtLjQ4LDEuMiwwLDAtMy45LS44NC0zLjktLjg0LS4wNS4wNS0uMS4xLS4xMy4xNS0uNjguNzctLjc4LDEuOTMtLjI2LDIuODEuMTIuNzEtLjc4LDEuMTQtMS4xOS41MywwLDAtMi4xNy0zLjM1LTIuMTctMy4zNS0xLjEsMC0yLjEyLjc2LTIuMzksMS44My0uNDEuNTgtMS4zNC4yMy0xLjItLjQ5LDAsMCwuODQtMy45Ljg0LTMuOS0uNzgtLjc3LTIuMDItLjk2LTIuOTctLjM5LS43MS4xMi0xLjE0LS43OC0uNTEtMS4xOSwwLDAsMy4zNS0yLjE3LDMuMzUtMi4xNywwLTEuMDktLjc2LTIuMS0xLjgzLTIuMzctLjU4LS40Mi0uMjUtMS4zNi40OC0xLjIsMCwwLDMuOS44MywzLjkuODMuNzctLjc4Ljk2LTIuMDIuMzktMi45Ny0uMTItLjcxLjc4LTEuMTQsMS4xOS0uNTEsMCwwLDIuMTcsMy4zNSwyLjE3LDMuMzUsMS4wOSwwLDIuMTEtLjc3LDIuMzctMS44My40Mi0uNTgsMS4zNi0uMjQsMS4yLjQ4LDAsMC0uODMsMy45MS0uODMsMy45MS43OC43OCwyLjA0Ljk1LDIuOTkuMzguNy0uMTEsMS4xMS43OS40OSwxLjJaIi8+CiAgPC9nPgo8L3N2Zz4=';
+
+/** Rótulos estáticos do relatório, por idioma. */
+const STR = {
+  pt: {
+    docTitle: 'Relatório de comunidade da live',
+    footerBrand: 'norya · relatório de comunidade da live',
+    heroOver: 'Análise do chat da live',
+    activeDays: (n: number) => `${n} dia(s) de atividade`,
+    execSummary: 'Resumo <i>executivo</i>',
+    periodNumbers: 'Números <i>do período</i>',
+    messages: 'Mensagens',
+    perActiveDay: (v: string) => `${v}/dia ativo`,
+    peakUsers: 'Pico de usuários',
+    uniqueInWindow: 'únicos numa janela',
+    windows: 'Janelas',
+    analyzed: 'analisadas',
+    peakPerWindow: 'Pico / janela',
+    noPeakShort: 'sem pico destacado',
+    sentiment: 'Sentimento geral',
+    positive: 'Positivo',
+    neutral: 'Neutro',
+    negative: 'Negativo',
+    highlight: 'Destaque',
+    messagesAt: (when: string) => `mensagens · ${when}`,
+    noPeakPeriod: 'sem pico no período',
+    peakTitle: 'O que aconteceu no <em>pico</em>',
+    noPeakTitle: 'Sem pico de engajamento destacado no período',
+    peakFallback: (w: number, avg: string, users: string) =>
+      `${w} janelas analisadas · ${avg} mensagens/dia ativo · ${users} usuários no pico.`,
+    convMeta: 'conversas',
+    convRule: 'Conversas <i>o que moveu o chat</i>',
+    topCategories: 'Pautas mais comentadas',
+    keywords: 'Palavras-chave',
+    brands: 'Marcas mencionadas',
+    noBrands: 'Sem menções comerciais diretas no período.',
+    topEmotes: 'Emotes em destaque',
+    chatVoices: 'Vozes do chat',
+    topicsMeta: 'tópicos',
+    topicsRule: 'Tópicos <i>abordados na live</i>',
+    analysisTag: 'análise',
+    closingTag: 'Inteligência de comunidade para criadores, marcas e patrocinadores.',
+    closingCta: 'Relatório gerado automaticamente a partir do chat da live',
+  },
+  en: {
+    docTitle: 'Live community report',
+    footerBrand: 'norya · live community report',
+    heroOver: 'Live chat analysis',
+    activeDays: (n: number) => `${n} active day(s)`,
+    execSummary: 'Executive <i>summary</i>',
+    periodNumbers: 'Period <i>numbers</i>',
+    messages: 'Messages',
+    perActiveDay: (v: string) => `${v}/active day`,
+    peakUsers: 'Peak users',
+    uniqueInWindow: 'unique in a window',
+    windows: 'Windows',
+    analyzed: 'analyzed',
+    peakPerWindow: 'Peak / window',
+    noPeakShort: 'no standout peak',
+    sentiment: 'Overall sentiment',
+    positive: 'Positive',
+    neutral: 'Neutral',
+    negative: 'Negative',
+    highlight: 'Highlight',
+    messagesAt: (when: string) => `messages · ${when}`,
+    noPeakPeriod: 'no peak in the period',
+    peakTitle: 'What happened at the <em>peak</em>',
+    noPeakTitle: 'No standout engagement peak in the period',
+    peakFallback: (w: number, avg: string, users: string) =>
+      `${w} windows analyzed · ${avg} messages/active day · ${users} users at the peak.`,
+    convMeta: 'conversations',
+    convRule: 'Conversations <i>what moved the chat</i>',
+    topCategories: 'Most discussed topics',
+    keywords: 'Keywords',
+    brands: 'Brands mentioned',
+    noBrands: 'No direct commercial mentions in the period.',
+    topEmotes: 'Top emotes',
+    chatVoices: 'Chat voices',
+    topicsMeta: 'topics',
+    topicsRule: 'Topics <i>covered in the live</i>',
+    analysisTag: 'analysis',
+    closingTag: 'Community intelligence for creators, brands and sponsors.',
+    closingCta: 'Report generated automatically from the live chat',
+  },
+} as const;
+
 // ── Documento ────────────────────────────────────────────────────────────────
 
 export function buildReportHtml(data: ReportData, emoteList: ReportEmote[]): string {
   const emotes = new Map(emoteList.map((e) => [e.code, e]));
   const m = data.metrics;
+  const lang: ReportLang = data.lang ?? 'pt';
+  const t = STR[lang];
   const avgPerDay = m.activeDays ? Math.round(m.totalMessages / m.activeDays) : m.totalMessages;
 
   const topicos = (
@@ -203,25 +345,25 @@ export function buildReportHtml(data: ReportData, emoteList: ReportEmote[]): str
     .slice(0, 3);
 
   const footer = (n: number) =>
-    `<div class="pfoot"><span>norya · relatório de comunidade da live</span><span>${escapeHtml(
+    `<div class="pfoot"><span>${t.footerBrand}</span><span>${escapeHtml(
       data.channelName,
     )} — 0${n} / 03</span></div>`;
 
   const topbar = (meta: string) =>
-    `<div class="topbar"><div class="brand">norya</div><div class="topmeta">${meta}</div></div>`;
+    `<div class="topbar"><img class="brand-logo" src="${NORYA_LOGO_BLACK}" alt="norya"><div class="topmeta">${meta}</div></div>`;
 
   // ── Página 2: caixas de "Conversas" (span2 cada; a última vira span4 se ímpar)
   const convTiles: string[] = [];
   if (m.topCategories.length) {
     convTiles.push(
-      `<div class="tile"><p class="k">Pautas mais comentadas</p>${bars(
+      `<div class="tile"><p class="k">${t.topCategories}</p>${bars(
         m.topCategories.slice(0, 6).map((c) => ({ label: c.category, value: c.count })),
       )}</div>`,
     );
   }
   if (m.topKeywords.length) {
     convTiles.push(
-      `<div class="tile"><p class="k">Palavras-chave</p><div class="chips">${m.topKeywords
+      `<div class="tile"><p class="k">${t.keywords}</p><div class="chips">${m.topKeywords
         .slice(0, 12)
         .map((k) => keywordChip(k.word, k.count, emotes))
         .join('')}</div></div>`,
@@ -230,15 +372,15 @@ export function buildReportHtml(data: ReportData, emoteList: ReportEmote[]): str
   // Marcas: sempre presente — a ausência de menções também é informação
   // relevante para um patrocinador.
   convTiles.push(
-    `<div class="tile"><p class="k">Marcas mencionadas</p>${
+    `<div class="tile"><p class="k">${t.brands}</p>${
       m.brands.length
         ? bars(m.brands.slice(0, 5).map((b) => ({ label: b.brand, value: b.count })))
-        : '<p class="empty">Sem menções comerciais diretas no período.</p>'
+        : `<p class="empty">${t.noBrands}</p>`
     }</div>`,
   );
   if (emoteHighlights.length) {
     convTiles.push(
-      `<div class="tile"><p class="k">Emotes em destaque</p>${emoteHighlights
+      `<div class="tile"><p class="k">${t.topEmotes}</p>${emoteHighlights
         .map(
           (e) =>
             `<div class="emote-row"><img class="emote-big" src="${escapeHtml(e.url)}" alt="${escapeHtml(e.code)}">` +
@@ -249,7 +391,7 @@ export function buildReportHtml(data: ReportData, emoteList: ReportEmote[]): str
   }
   if (quotes.length) {
     convTiles.push(
-      `<div class="tile"><p class="k">Vozes do chat</p>${quotes
+      `<div class="tile"><p class="k">${t.chatVoices}</p>${quotes
         .map(
           (q) =>
             `<div class="quote"><p class="q-text">&ldquo;${emotesToHtml(q.text, emotes)}&rdquo;</p>` +
@@ -266,34 +408,26 @@ export function buildReportHtml(data: ReportData, emoteList: ReportEmote[]): str
     .join('');
 
   // ── Página 3: tópicos em caixas pastel (nº ímpar → última caixa vira full-width)
+  // 5+ caixas não cabem na altura fixa da página com 4 bullets de 3 linhas
+  // cada — o modo denso corta para 3 bullets de até 2 linhas.
+  const denseTopics = topicos.length > 4;
+  const maxBullets = denseTopics ? 3 : 4;
   const topicCards = topicos
-    .map((t, i) => {
+    .map((tp, i) => {
       const wide = topicos.length % 2 === 1 && i === topicos.length - 1;
       return (
         `<div class="topic${wide ? ' wide' : ''}" style="background:${PASTEIS[i % PASTEIS.length]}">` +
-        `<div class="topic-head"><span class="topic-tag">${escapeHtml(t.tag || 'análise')}</span><h3>${escapeHtml(t.titulo)}</h3></div>` +
-        `<ul>${t.bullets
-          .slice(0, 4)
-          .map((b) => `<li>${emotesToHtml(b, emotes)}</li>`)
+        `<div class="topic-head"><span class="topic-tag">${escapeHtml(tp.tag || t.analysisTag)}</span><h3>${escapeHtml(tp.titulo)}</h3></div>` +
+        `<ul>${tp.bullets
+          .slice(0, maxBullets)
+          .map((b) => `<li>${richText(b, emotes)}</li>`)
           .join('')}</ul></div>`
       );
     })
     .join('');
 
-  const methodology = [
-    `Análise sobre ${compact(m.totalMessages)} mensagens do chat em ${m.windows} janelas, no período de ${fmtLong(data.from)} a ${fmtLong(data.to)}.`,
-    data.generatedByAi
-      ? 'Sentimento e pautas classificados automaticamente; texto-síntese assistido por IA e revisável.'
-      : 'Sentimento, pautas e texto-síntese gerados automaticamente a partir das métricas do período.',
-    data.sampleSize
-      ? `Amostra editorial de ${data.sampleSize} mensagens usada para contexto qualitativo.`
-      : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-
   return `<!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="${lang === 'en' ? 'en' : 'pt-BR'}">
 <head>
 <meta charset="utf-8">
 <style>
@@ -331,8 +465,7 @@ img.emote { height: 1.2em; width: auto; vertical-align: text-bottom; }
 
 /* topo */
 .topbar { display: flex; justify-content: space-between; align-items: center; flex: 0 0 auto; }
-.brand { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 15px; letter-spacing: .3px; }
-.brand::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--lime); outline: 4px solid rgba(215,254,1,.35); }
+.brand-logo { height: 17px; width: auto; display: block; }
 .topmeta { font-size: 9px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: var(--ink-55); max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* herói */
@@ -346,7 +479,7 @@ img.emote { height: 1.2em; width: auto; vertical-align: text-bottom; }
 .rule { border-top: 1.5px solid var(--line-strong); margin-top: 30px; padding-top: 12px; flex: 0 0 auto; }
 .rule .lbl { font-size: 9.5px; font-weight: 900; letter-spacing: 2.4px; text-transform: uppercase; }
 .rule .lbl i { font-style: normal; color: var(--olive); }
-.lead { font-size: 12.5px; line-height: 1.6; color: var(--ink-70); margin-top: 10px; max-width: 660px; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.lead { font-size: 12.5px; line-height: 1.6; color: var(--ink-70); margin-top: 10px; max-width: 700px; display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* bento */
 .bento { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
@@ -418,16 +551,19 @@ ul.lime-list li::before { content: ''; position: absolute; left: 0; top: 6px; wi
 .topic ul { list-style: none; }
 .topic li { position: relative; padding-left: 14px; font-size: 10px; line-height: 1.5; color: var(--ink-70); margin-top: 5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .topic li::before { content: ''; position: absolute; left: 0; top: 6px; width: 7px; height: 2.5px; background: var(--ink); opacity: .5; }
+/* 5+ caixas de tópico: modo denso pra caber na altura fixa da página sem
+   cortar caixa no meio (padding menor + bullets em até 2 linhas). */
+.topics.dense .topic { padding: 14px 18px; }
+.topics.dense .topic li { -webkit-line-clamp: 2; margin-top: 4px; }
+.topics.dense .topic-head { margin-bottom: 6px; }
 
 /* fechamento */
-.closing { background: var(--ink); border-radius: 18px; padding: 24px 28px; margin-top: 18px; display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex: 0 0 auto; }
+.closing { background: var(--ink); border-radius: 18px; padding: 24px 28px; margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex: 0 0 auto; }
 .closing .c-brand { color: var(--lime); font-size: 24px; font-weight: 900; letter-spacing: -.5px; }
 .closing .c-tag { color: rgba(255,255,255,.75); font-size: 10.5px; margin-top: 6px; max-width: 320px; line-height: 1.5; }
 .closing .c-cta { color: rgba(255,255,255,.45); font-size: 8.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; text-align: right; }
 
-/* metodologia + rodapé */
-.metodo { margin-top: auto; padding-top: 14px; flex: 0 0 auto; }
-.metodo p { font-size: 8.5px; line-height: 1.55; color: var(--ink-40); margin-top: 8px; max-width: 660px; }
+/* rodapé */
 .pfoot { position: absolute; left: 46px; right: 46px; bottom: 28px; border-top: 1px solid var(--line); padding-top: 10px; display: flex; justify-content: space-between; font-size: 8.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-40); }
 .pfoot span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
@@ -436,48 +572,48 @@ ul.lime-list li::before { content: ''; position: absolute; left: 0; top: 6px; wi
 
 <!-- ═══ PÁGINA 1 — herói + números ═══ -->
 <div class="page">
-  ${topbar('Relatório de comunidade da live')}
+  ${topbar(t.docTitle)}
 
   <div class="hero">
-    <p class="over">Análise do chat da live</p>
+    <p class="over">${t.heroOver}</p>
     <h1>${escapeHtml(data.channelName)}</h1>
-    <p class="period">${fmtLong(data.from)} — ${fmtLong(data.to)} &nbsp;·&nbsp; ${m.activeDays} dia(s) de atividade</p>
+    <p class="period">${fmtLong(data.from, data.tz, lang)} — ${fmtLong(data.to, data.tz, lang)} &nbsp;·&nbsp; ${t.activeDays(m.activeDays)}</p>
   </div>
 
-  <div class="rule"><p class="lbl">Resumo <i>executivo</i></p></div>
-  <p class="lead">${emotesToHtml(data.narrative.resumoExecutivo, emotes)}</p>
+  <div class="rule"><p class="lbl">${t.execSummary}</p></div>
+  <p class="lead">${richText(data.narrative.resumoExecutivo, emotes)}</p>
 
-  <div class="rule"><p class="lbl">Números <i>do período</i></p></div>
+  <div class="rule"><p class="lbl">${t.periodNumbers}</p></div>
   <div class="bento">
-    <div class="tile dark"><p class="k">Mensagens</p><p class="v">${compact(m.totalMessages)}</p><p class="s">${compact(avgPerDay)}/dia ativo</p></div>
-    <div class="tile"><p class="k">Pico de usuários</p><p class="v">${compact(m.peakUsers)}</p><p class="s">únicos numa janela</p></div>
-    <div class="tile"><p class="k">Janelas</p><p class="v">${m.windows}</p><p class="s">analisadas</p></div>
-    <div class="tile lime"><p class="k">Pico / janela</p><p class="v">${m.peak ? compact(m.peak.messages) : '—'}</p><p class="s">${m.peak ? fmtPeak(m.peak.at) : 'sem pico destacado'}</p></div>
+    <div class="tile dark"><p class="k">${t.messages}</p><p class="v">${compact(m.totalMessages)}</p><p class="s">${t.perActiveDay(compact(avgPerDay))}</p></div>
+    <div class="tile"><p class="k">${t.peakUsers}</p><p class="v">${compact(m.peakUsers)}</p><p class="s">${t.uniqueInWindow}</p></div>
+    <div class="tile"><p class="k">${t.windows}</p><p class="v">${m.windows}</p><p class="s">${t.analyzed}</p></div>
+    <div class="tile lime"><p class="k">${t.peakPerWindow}</p><p class="v">${m.peak ? compact(m.peak.messages) : '—'}</p><p class="s">${m.peak ? fmtPeak(m.peak.at, data.tz) : t.noPeakShort}</p></div>
 
     <div class="tile span4">
-      <p class="k">Sentimento geral</p>
+      <p class="k">${t.sentiment}</p>
       <div class="senti-bar">
         <span style="width:${pct(m.sentiment.pos)};background:var(--pos)"></span>
         <span style="width:${pct(m.sentiment.neu)};background:var(--neu)"></span>
         <span style="width:${pct(m.sentiment.neg)};background:var(--negc)"></span>
       </div>
       <div class="senti-legend">
-        <span><i class="dot" style="background:var(--pos)"></i>Positivo ${pct(m.sentiment.pos)}</span>
-        <span><i class="dot" style="background:var(--neu)"></i>Neutro ${pct(m.sentiment.neu)}</span>
-        <span><i class="dot" style="background:var(--negc)"></i>Negativo ${pct(m.sentiment.neg)}</span>
+        <span><i class="dot" style="background:var(--pos)"></i>${t.positive} ${pct(m.sentiment.pos)}</span>
+        <span><i class="dot" style="background:var(--neu)"></i>${t.neutral} ${pct(m.sentiment.neu)}</span>
+        <span><i class="dot" style="background:var(--negc)"></i>${t.negative} ${pct(m.sentiment.neg)}</span>
       </div>
     </div>
 
     <div class="tile dark span4">
       <div class="peak-flex">
-        <div class="peak-num"><p class="k">Destaque</p><p class="v">${m.peak ? compact(m.peak.messages) : '—'}</p><p class="s">${m.peak ? `mensagens · ${fmtPeak(m.peak.at)}` : 'sem pico no período'}</p></div>
+        <div class="peak-num"><p class="k">${t.highlight}</p><p class="v">${m.peak ? compact(m.peak.messages) : '—'}</p><p class="s">${m.peak ? t.messagesAt(fmtPeak(m.peak.at, data.tz)) : t.noPeakPeriod}</p></div>
         <div class="peak-body">
-          <h3>${m.peak ? 'O que aconteceu no <em>pico</em>' : 'Sem pico de engajamento destacado no período'}</h3>
+          <h3>${m.peak ? t.peakTitle : t.noPeakTitle}</h3>
           ${
             peakBullets.length
-              ? `<ul class="lime-list">${peakBullets.map((b) => `<li>${emotesToHtml(b, emotes)}</li>`).join('')}</ul>`
+              ? `<ul class="lime-list">${peakBullets.map((b) => `<li>${richText(b, emotes)}</li>`).join('')}</ul>`
               : m.peak
-                ? `<ul class="lime-list"><li>${m.windows} janelas analisadas · ${compact(avgPerDay)} mensagens/dia ativo · ${compact(m.peakUsers)} usuários no pico.</li></ul>`
+                ? `<ul class="lime-list"><li>${t.peakFallback(m.windows, compact(avgPerDay), compact(m.peakUsers))}</li></ul>`
                 : ''
           }
         </div>
@@ -489,33 +625,28 @@ ul.lime-list li::before { content: ''; position: absolute; left: 0; top: 6px; wi
 
 <!-- ═══ PÁGINA 2 — conversas ═══ -->
 <div class="page p2">
-  ${topbar(`${escapeHtml(data.channelName)} · conversas`)}
-  <div class="rule" style="margin-top:40px"><p class="lbl">Conversas <i>o que moveu o chat</i></p></div>
+  ${topbar(`${escapeHtml(data.channelName)} · ${t.convMeta}`)}
+  <div class="rule" style="margin-top:40px"><p class="lbl">${t.convRule}</p></div>
   <div class="bento">${convGrid}</div>
   ${footer(2)}
 </div>
 
 <!-- ═══ PÁGINA 3 — tópicos da live ═══ -->
 <div class="page">
-  ${topbar(`${escapeHtml(data.channelName)} · tópicos`)}
+  ${topbar(`${escapeHtml(data.channelName)} · ${t.topicsMeta}`)}
   ${
     topicCards
-      ? `<div class="rule" style="margin-top:40px"><p class="lbl">Tópicos <i>abordados na live</i></p></div>
-  <div class="topics">${topicCards}</div>`
+      ? `<div class="rule" style="margin-top:40px"><p class="lbl">${t.topicsRule}</p></div>
+  <div class="topics${denseTopics ? ' dense' : ''}">${topicCards}</div>`
       : ''
   }
-
-  <div class="metodo">
-    <div class="rule" style="margin-top:0"><p class="lbl">Metodologia</p></div>
-    <p>${escapeHtml(methodology)}</p>
-  </div>
 
   <div class="closing">
     <div>
       <p class="c-brand">norya</p>
-      <p class="c-tag">Inteligência de comunidade para criadores, marcas e patrocinadores.</p>
+      <p class="c-tag">${t.closingTag}</p>
     </div>
-    <p class="c-cta">Relatório gerado automaticamente a partir do chat da live</p>
+    <p class="c-cta">${t.closingCta}</p>
   </div>
   ${footer(3)}
 </div>
