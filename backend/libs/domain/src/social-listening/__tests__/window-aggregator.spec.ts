@@ -171,7 +171,7 @@ describe('WindowAggregator', () => {
     expect(agg.sentimentWeighted).toEqual({ pos: 1, neu: 0, neg: 1 });
   });
 
-  it('emoji Unicode conhecido entra em emoteFreq e vira token semântico', () => {
+  it('emoji Unicode conhecido entra em emoteFreq e NÃO vaza como token', () => {
     const dict = new TwitchEmoteDictionary();
     const msgs = [mkMsg('m1', 'a', '😂😂😂 top demais')];
     const agg = aggregate({
@@ -184,8 +184,10 @@ describe('WindowAggregator', () => {
       emoteDictionary: dict,
     });
     expect(agg.emoteFreq.get('😂')).toBe(3);
-    // O run de emoji vira um único token [POSITIVE_HIGH] → tokenize → positive_high
-    expect(agg.tokenFreq.get('positive_high')).toBe(1);
+    // O run de emoji vira [POSITIVE_HIGH] no texto do classificador, mas o
+    // artefato não pode aparecer como palavra-chave (relatório/insights).
+    expect(agg.tokenFreq.get('positive_high')).toBeUndefined();
+    expect(agg.tokenFreq.get('top')).toBe(1);
   });
 
   it('sampleRawForLlm prioriza mods e diversifica', () => {

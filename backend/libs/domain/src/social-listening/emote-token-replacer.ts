@@ -91,6 +91,21 @@ export function replaceUnicodeEmojis(text: string, dictionary?: EmoteDictionary)
   });
 }
 
+/**
+ * Detecta tokens do `tokenize` que na verdade são artefatos de token semântico
+ * de emote: "😐" → "[NEUTRAL_MID]" → token "neutral_mid"; runs de emojis
+ * diferentes viram "neutral_mid][neutral_mid" (o tokenize só corta pontuação
+ * das bordas). Esses artefatos não são vocabulário do chat e não podem chegar
+ * às palavras-chave de relatório/insights.
+ */
+const SEMANTIC_TOKEN_RE =
+  /^(?:hype|boring|sarcasm|sad|angry|neutral|positive|negative|laugh)_(?:low|mid|high|strong)$/i;
+
+export function isEmoteTokenArtifact(token: string): boolean {
+  if (token.includes('[') || token.includes(']')) return true;
+  return SEMANTIC_TOKEN_RE.test(token);
+}
+
 /** Conveniência: opera sobre uma RawMessage. */
 export function replaceEmotesInMessage(msg: RawMessage, dictionary?: EmoteDictionary): string {
   return replaceEmotes(msg.text, msg.emotes, dictionary);

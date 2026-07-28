@@ -17,7 +17,7 @@ import type { EmoteDictionary } from '../ingestion/emote-dictionary';
 import { findUnicodeEmoteCodes } from '../ingestion/emote-dictionary';
 import type { BatchAggregate, PerUserStats, SentimentHint } from './types';
 import { tokenize } from './text-normalizer';
-import { replaceEmotesInMessage } from './emote-token-replacer';
+import { isEmoteTokenArtifact, replaceEmotesInMessage } from './emote-token-replacer';
 
 export interface WindowAggregatorInput {
   channelId: string;
@@ -87,6 +87,9 @@ export function aggregate(input: WindowAggregatorInput): BatchAggregate {
     const textForTokens = emoteDictionary ? replaceEmotesInMessage(msg, emoteDictionary) : msg.text;
     const toks = tokenize(textForTokens, { emoteDictionary: undefined });
     for (const t of toks) {
+      // Tokens semânticos de emote ("neutral_mid") não são vocabulário — o
+      // emoji real já conta em emoteFreq logo abaixo.
+      if (isEmoteTokenArtifact(t)) continue;
       tokenFreq.set(t, (tokenFreq.get(t) ?? 0) + w);
     }
 
