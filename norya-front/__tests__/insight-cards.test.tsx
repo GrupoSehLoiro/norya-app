@@ -55,9 +55,10 @@ describe('<InsightCards />', () => {
   // O componente foi enxugado para 3 cards (clima geral, pauta mais
   // comentada, marcas) — pauta menos comentada / user tóxico / badge AD
   // saíram do design. Os testes cobrem o que existe hoje.
-  it('renderiza pauta mais comentada', () => {
+  it('renderiza pauta mais comentada com rótulo humano', () => {
     renderCards({ analysis: baseAnalysis, ...PERIOD });
-    expect(screen.getByText('gameplay-negative')).toBeInTheDocument();
+    // O slug "gameplay-negative" passa pelo humanizeCategory antes de renderizar.
+    expect(screen.getByText('Críticas ao gameplay')).toBeInTheDocument();
   });
   it('renderiza marca mencionada', () => {
     renderCards({ analysis: baseAnalysis, ...PERIOD });

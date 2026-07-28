@@ -198,8 +198,17 @@ export class KickOAuthController {
         statusCode: 302,
       };
     } catch (err) {
-      this.logger.error(`Falha no callback Kick OAuth: ${(err as Error).message}`);
-      return { url: `${consoleUrl}/channels?kick=error`, statusCode: 302 };
+      // stack + userId no log: sem isso o `?kick=error` genérico é
+      // indiagnosticável (a mensagem real do erro se perdia).
+      this.logger.error(
+        `Falha no callback Kick OAuth (user=${userId}): ${(err as Error).message}`,
+        (err as Error).stack,
+      );
+      const qs = new URLSearchParams({
+        kick: 'error',
+        reason: ((err as Error).message || 'desconhecido').slice(0, 120),
+      });
+      return { url: `${consoleUrl}/channels?${qs.toString()}`, statusCode: 302 };
     }
   }
 

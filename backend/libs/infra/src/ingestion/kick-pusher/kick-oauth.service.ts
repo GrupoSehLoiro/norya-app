@@ -116,7 +116,11 @@ export class KickOAuthService {
     const sig = state.slice(dot + 1);
 
     const expected = this._sign(payload);
-    if (!timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
+    const sigBuf = Buffer.from(sig);
+    const expectedBuf = Buffer.from(expected);
+    // timingSafeEqual lança RangeError se os buffers têm tamanhos diferentes —
+    // um state truncado viraria 500 em vez de 401.
+    if (sigBuf.length !== expectedBuf.length || !timingSafeEqual(sigBuf, expectedBuf)) {
       throw new UnauthorizedException('state adulterado');
     }
 
@@ -183,12 +187,35 @@ export class KickOAuthService {
   /** Persiste o token (cifrado) vinculado a um channelId já resolvido. */
   async storeToken(channelId: string, data: KickTokenResponse): Promise<ChannelOAuthToken> {
     const expiresAt = new Date(Date.now() + data.expires_in * 1000);
+    const accessToken = this.cryptoService.encryptField(data.access_token) ?? data.access_token;
+    const refreshToken = this.cryptoService.encryptField(data.refresh_token) ?? data.refresh_token;
+
+    // Re-OAuth do MESMO canal: o índice unique (channelId, platform) impede
+    // inserir doc novo — preserva o `_id` e atualiza in-place (mesmo padrão
+    // do TwitchOAuthService). Sem isso, toda reconexão Kick morria em E11000
+    // e o usuário via um `?kick=error` genérico.
+    const existing = await this.tokenRepo.findByChannelId(channelId, 'kick');
+    if (existing) {
+      const updated = ChannelOAuthToken.reconstitute({
+        id: existing.getId(),
+        channelId,
+        platform: 'kick',
+        accessToken,
+        refreshToken,
+        scope: data.scope,
+        expiresAt,
+        updatedAt: new Date(),
+        // Re-conexão zera o flag de invalidated.
+        invalidatedAt: undefined,
+      });
+      return this.tokenRepo.save(updated);
+    }
 
     const tokenEntity = ChannelOAuthToken.create({
       channelId,
       platform: 'kick',
-      accessToken: this.cryptoService.encryptField(data.access_token) ?? data.access_token,
-      refreshToken: this.cryptoService.encryptField(data.refresh_token) ?? data.refresh_token,
+      accessToken,
+      refreshToken,
       scope: data.scope,
       expiresAt,
     });

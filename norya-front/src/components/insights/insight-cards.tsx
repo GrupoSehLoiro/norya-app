@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { api, ApiError } from '@/lib/api-client';
 import { fetchBrandCounts } from '@/lib/analytics';
+import { humanizeCategory } from '@/lib/category-labels';
 import { classifySentiment, formatPct } from '@/lib/utils';
 
 interface InsightCardsProps {
@@ -82,7 +83,7 @@ export function InsightCards({ analysis, brandsOverride, channelId, from, to }: 
         {analysis.pautaMaisComentada ? (
           <>
             <p className="mt-2 text-2xl font-bold tracking-tight text-ink-800">
-              {analysis.pautaMaisComentada.category}
+              {humanizeCategory(analysis.pautaMaisComentada.category)}
             </p>
             {analysis.pautaMaisComentada.context ? (
               <p className="mt-3 border-l-2 border-accent-400/50 pl-3 text-[15px] leading-relaxed text-ink-700">

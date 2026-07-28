@@ -1,14 +1,26 @@
 /**
  * Gestão de acesso — /api/v2/admin/users (SOMENTE role=admin).
  *
- *   GET   /api/v2/admin/users            lista usuários
- *   POST  /api/v2/admin/users            cria usuário com role (inclusive admin)
- *   PATCH /api/v2/admin/users/:id/role   troca papel (nunca o próprio)
+ *   GET    /api/v2/admin/users            lista usuários
+ *   POST   /api/v2/admin/users            cria usuário com role (inclusive admin)
+ *   PATCH  /api/v2/admin/users/:id/role   troca papel (nunca o próprio)
+ *   DELETE /api/v2/admin/users/:id        apaga usuário + TUDO dele (nunca o próprio)
  *
  * Atrás do JwtAuthGuard global; o check de role segue o padrão inline do
  * codebase (ver FeatureFlagsController).
  */
-import { Body, Controller, ForbiddenException, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { z } from 'zod';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -64,6 +76,13 @@ export class AdminUsersController {
       role: dto.role,
       actingUserId: user.sub,
     });
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@CurrentUser() user: JwtPayload, @Param('id') id: string): Promise<void> {
+    this._assertAdmin(user);
+    await this.service.deleteUser({ targetUserId: id, actingUserId: user.sub });
   }
 
   private _assertAdmin(user: JwtPayload): void {

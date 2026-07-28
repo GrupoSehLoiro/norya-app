@@ -13,6 +13,7 @@ import { Card, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
 import { PageHeader } from '@/components/layout/page-header';
 import { AdminGate } from '@/components/auth/admin-gate';
 import { useAuth } from '@/hooks/use-auth';
@@ -63,6 +64,24 @@ function AccessManager() {
       void qc.invalidateQueries({ queryKey: ['admin-users'] });
     },
     onError: (e) => setError(e instanceof ApiError ? e.message : 'falha ao trocar papel'),
+  });
+
+  // Alvo do modal de confirmação de exclusão (null = fechado).
+  const [toDelete, setToDelete] = useState<AdminUserView | null>(null);
+  const deleteUser = useMutation({
+    mutationFn: (id: string) => api.delete(`/api/v2/admin/users/${encodeURIComponent(id)}`),
+    onSuccess: (_data, id) => {
+      const target = users.data?.find((u) => u.id === id);
+      setNotice(`Usuário ${target?.email ?? id} apagado, junto com todos os dados dele.`);
+      setError(null);
+      setToDelete(null);
+      void qc.invalidateQueries({ queryKey: ['admin-users'] });
+    },
+    onError: (e) => {
+      setNotice(null);
+      setError(e instanceof ApiError ? e.message : 'falha ao apagar usuário');
+      setToDelete(null);
+    },
   });
 
   return (
@@ -134,12 +153,63 @@ function AccessManager() {
                       </option>
                     ))}
                   </select>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={u.id === me?.sub || deleteUser.isPending}
+                    onClick={() => setToDelete(u)}
+                    title={
+                      u.id === me?.sub
+                        ? 'Você não pode apagar o próprio usuário'
+                        : 'Apagar usuário e todos os dados dele'
+                    }
+                  >
+                    Apagar
+                  </Button>
                 </div>
               </li>
             ))}
           </ul>
         </Card>
       )}
+
+      {toDelete ? (
+        <Modal
+          onClose={() => (deleteUser.isPending ? undefined : setToDelete(null))}
+          title="Apagar usuário?"
+          maxWidth="max-w-md"
+          ariaLabel="Confirmar exclusão de usuário"
+        >
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-ink-700">
+              Tem certeza que quer apagar{' '}
+              <b className="text-ink-800">{toDelete.displayName || toDelete.email}</b>{' '}
+              (<span className="font-mono text-xs">{toDelete.email}</span>)?
+            </p>
+            <p className="rounded-xl border border-err/30 bg-err/[0.08] px-3 py-2.5 text-xs text-err">
+              Essa ação é irreversível: apaga o usuário e TUDO que pertence a ele —
+              workspaces, canais conectados (Twitch/Kick), tokens, sessões de live,
+              análises e relatórios.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setToDelete(null)}
+                disabled={deleteUser.isPending}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                loading={deleteUser.isPending}
+                onClick={() => deleteUser.mutate(toDelete.id)}
+              >
+                Apagar definitivamente
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
     </div>
   );
 }

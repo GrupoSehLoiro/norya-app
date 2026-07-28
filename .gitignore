@@ -6,3 +6,8 @@ A-FAZER/norya-deploy-keys.txt
 id_ed25519*
 id_rsa*
 .env
+
+# Artefatos de runtime do dev-host / editores
+infra/homolog/.dev-host/
+*.swp
+*.save

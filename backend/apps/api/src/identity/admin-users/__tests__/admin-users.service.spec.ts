@@ -30,8 +30,9 @@ function makeRepos() {
     save: jest.fn(async (m: Membership) => m),
   } as never;
   const hasher = { hash: jest.fn(async (p: string) => `hashed:${p}`) } as never;
+  const cascade = { deleteUserCascade: jest.fn() } as never;
 
-  return { users, userRepo, workspaceRepo, membershipRepo, hasher };
+  return { users, userRepo, workspaceRepo, membershipRepo, hasher, cascade };
 }
 
 function build() {
@@ -41,6 +42,7 @@ function build() {
     deps.workspaceRepo,
     deps.membershipRepo,
     deps.hasher,
+    deps.cascade,
   );
   return { service, ...deps };
 }
@@ -103,5 +105,21 @@ describe('AdminUsersService', () => {
         actingUserId: created.id,
       }),
     ).rejects.toThrow(ForbiddenException);
+  });
+
+  it('bloqueia apagar o próprio usuário (anti-lockout)', async () => {
+    const { service, cascade } = build();
+    await expect(
+      service.deleteUser({ targetUserId: 'admin-1', actingUserId: 'admin-1' }),
+    ).rejects.toThrow(ForbiddenException);
+    expect((cascade as { deleteUserCascade: jest.Mock }).deleteUserCascade).not.toHaveBeenCalled();
+  });
+
+  it('delega a exclusão de terceiros ao cascade', async () => {
+    const { service, cascade } = build();
+    await service.deleteUser({ targetUserId: 'user-2', actingUserId: 'admin-1' });
+    expect((cascade as { deleteUserCascade: jest.Mock }).deleteUserCascade).toHaveBeenCalledWith(
+      'user-2',
+    );
   });
 });

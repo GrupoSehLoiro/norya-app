@@ -17,8 +17,21 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
-import { CryptoModule, EmailModule, PersistenceModule } from '@sehloro/infra';
+import {
+  AdSegmentSchema,
+  AdSegmentSchemaName,
+  BatchMessagesSchema,
+  BatchMessagesSchemaName,
+  ChannelBrandSchema,
+  ChannelBrandSchemaName,
+  CryptoModule,
+  EmailModule,
+  PersistenceModule,
+  TwitchEventSubSubscriptionSchema,
+  TwitchEventSubSubscriptionSchemaName,
+} from '@sehloro/infra';
 import type { AppConfig } from '../config/config.schema';
 import { IdentityController } from './identity.controller';
 import { IdentityService } from './identity.service';
@@ -34,12 +47,22 @@ import { KickOAuthService } from '@sehloro/infra';
 import { AdminUsersController } from './admin-users/admin-users.controller';
 import { AdminUsersService } from './admin-users/admin-users.service';
 import { AdminUsersBootstrap } from './admin-users/admin-users.bootstrap';
+import { UserCascadeService } from './admin-users/user-cascade.service';
 
 @Module({
   imports: [
     CryptoModule,
     EmailModule.forRootAsync(),
     PersistenceModule,
+    // Models que o UserCascadeService usa e que o PersistenceModule não
+    // registra (vivem no social-listening-persistence / worker). Registrar de
+    // novo aqui é seguro: mesmo nome + mesma connection ⇒ mesmo model.
+    MongooseModule.forFeature([
+      { name: AdSegmentSchemaName, schema: AdSegmentSchema },
+      { name: BatchMessagesSchemaName, schema: BatchMessagesSchema },
+      { name: ChannelBrandSchemaName, schema: ChannelBrandSchema },
+      { name: TwitchEventSubSubscriptionSchemaName, schema: TwitchEventSubSubscriptionSchema },
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -59,6 +82,7 @@ import { AdminUsersBootstrap } from './admin-users/admin-users.bootstrap';
     IdentityService,
     AuthService,
     AdminUsersService,
+    UserCascadeService,
     AdminUsersBootstrap,
     EntitlementsService,
     PasswordHasher,

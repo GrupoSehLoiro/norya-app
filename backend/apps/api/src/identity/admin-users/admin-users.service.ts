@@ -33,6 +33,7 @@ import {
   WorkspaceRepository,
 } from '@sehloro/domain';
 import { PasswordHasher } from '../auth/password-hasher';
+import { UserCascadeService } from './user-cascade.service';
 
 export interface AdminUserView {
   id: string;
@@ -65,6 +66,7 @@ export class AdminUsersService {
     @Inject(WORKSPACE_REPOSITORY) private readonly workspaceRepo: WorkspaceRepository,
     @Inject(MEMBERSHIP_REPOSITORY) private readonly membershipRepo: MembershipRepository,
     private readonly hasher: PasswordHasher,
+    private readonly cascade: UserCascadeService,
   ) {}
 
   async list(): Promise<AdminUserView[]> {
@@ -142,6 +144,21 @@ export class AdminUsersService {
     const saved = await this.userRepo.save(user);
     this.logger.log(`Role de ${saved.getEmail()} alterado para ${input.role}`);
     return toView(saved);
+  }
+
+  /**
+   * Apaga o usuário e TODOS os dados dele (workspaces, creators, canais,
+   * tokens, sessões, análises — ver UserCascadeService). Nunca a si mesmo:
+   * anti-lockout igual ao changeRole.
+   */
+  async deleteUser(input: { targetUserId: string; actingUserId: string }): Promise<void> {
+    if (input.targetUserId === input.actingUserId) {
+      throw new ForbiddenException({
+        message: 'Você não pode apagar o próprio usuário (anti-lockout)',
+        code: 'SELF_DELETE',
+      });
+    }
+    await this.cascade.deleteUserCascade(input.targetUserId);
   }
 
   private async _uniqueWorkspaceSlug(name: string): Promise<string> {

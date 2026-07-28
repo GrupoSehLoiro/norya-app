@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ChannelPicker } from '@/components/insights/channel-picker';
 import { ChannelStatusBanner } from '@/components/insights/channel-status-banner';
 import { InsightCards } from '@/components/insights/insight-cards';
 import { LiveFeed } from '@/components/insights/live-feed';
@@ -17,7 +18,7 @@ import { useSelectedChannel } from '@/hooks/use-selected-channel';
 import type { BatchAnalysis, InsightsLatestResponse, InsightsHistoryResponse } from '@/lib/types';
 
 export default function InsightsPage() {
-  const { channelId } = useSelectedChannel();
+  const { channelId, setChannelId } = useSelectedChannel();
 
   // Período selecionado (dia) + modo ao vivo — compartilhados por gráfico,
   // boxes, palavras-chave, assuntos e marcas.
@@ -98,6 +99,11 @@ export default function InsightsPage() {
       <ChannelStatusBanner channelId={channelId} />
 
       <ClimateAlert items={history.data?.items ?? []} />
+
+      {/* Canal em análise — troca aqui muda o estado global (sidebar, feed, etc). */}
+      <div className="w-full max-w-xs">
+        <ChannelPicker value={channelId} onChange={setChannelId} />
+      </div>
 
       {channelId ? (
         <ActivityAreaChart
