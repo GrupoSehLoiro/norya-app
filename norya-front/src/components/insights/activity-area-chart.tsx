@@ -884,13 +884,15 @@ function TimelineChart({
           tickLabelProps={() => ({ fill: COLOR_TEXT, fontSize: 10, textAnchor: 'middle', dy: 4 })}
         />
 
-        {/* Marca d'água */}
+        {/* Marca d'água — central e grande; a opacidade baixa mantém as séries legíveis. */}
         <text
-          x={innerWidth - 4}
-          y={innerHeight - 8}
-          textAnchor="end"
-          fontSize={11}
-          letterSpacing={2}
+          x={innerWidth / 2}
+          y={innerHeight / 2}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={Math.max(20, Math.min(innerWidth / 12, 40))}
+          fontWeight={600}
+          letterSpacing={6}
           fill={COLOR_WATERMARK}
           style={{ textTransform: 'uppercase', pointerEvents: 'none' }}
         >
