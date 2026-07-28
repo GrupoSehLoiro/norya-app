@@ -1,4 +1,5 @@
 import type { BatchAnalysis } from '@/lib/types';
+import { humanizeCategory } from '@/lib/category-labels';
 import { formatDate, formatPct } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
@@ -28,7 +29,9 @@ export function HistoryTable({ items }: { items: BatchAnalysis[] }) {
               <td className="py-2 pr-4">{b.messageCount}</td>
               <td className="py-2 pr-4 text-ok">{formatPct(b.climaGeral.pos)}</td>
               <td className="py-2 pr-4 text-err">{formatPct(b.climaGeral.neg)}</td>
-              <td className="py-2 pr-4">{b.pautaMaisComentada?.category ?? '—'}</td>
+              <td className="py-2 pr-4">
+                {b.pautaMaisComentada ? humanizeCategory(b.pautaMaisComentada.category) : '—'}
+              </td>
               <td className="py-2 pr-4">{b.userMaisToxico?.username ?? '—'}</td>
               <td className="py-2 pr-4">
                 <Badge tone={b.llmTier === 2 ? 'accent' : b.llmTier === 0 ? 'warn' : 'neutral'}>

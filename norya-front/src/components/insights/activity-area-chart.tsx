@@ -118,6 +118,8 @@ export function ActivityAreaChart({
 }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  // Idioma do relatório: rótulos do PDF e narrativa da IA.
+  const [reportLang, setReportLang] = useState<'pt' | 'en'>('pt');
   const [expanded, setExpanded] = useState(false);
   // Seleção confirmada (dispara consultas) vs. preview durante o arrasto.
   const [sel, setSel] = useState<Sel | null>(null);
@@ -136,7 +138,8 @@ export function ActivityAreaChart({
       const token = getToken();
       const url =
         `/api/v2/social-listening/insights/report.pdf?channelId=${encodeURIComponent(channelId)}` +
-        `&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+        `&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}` +
+        `&lang=${reportLang}`;
       const res = await fetch(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -274,6 +277,16 @@ export function ActivityAreaChart({
                 {!pdfLoading && <DownloadIcon />}
                 Relatório PDF
               </Button>
+              <select
+                value={reportLang}
+                onChange={(e) => setReportLang(e.target.value as 'pt' | 'en')}
+                title="Idioma do relatório (textos e narrativa da IA)"
+                aria-label="Idioma do relatório"
+                className="h-9 appearance-none rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 text-xs font-medium text-ink-700 focus:border-accent-400/60 focus:outline-none focus:ring-2 focus:ring-accent-400/20"
+              >
+                <option value="pt" className="bg-bg-1 text-ink-800">Português</option>
+                <option value="en" className="bg-bg-1 text-ink-800">English</option>
+              </select>
             </div>
           ) : null}
           <div className="min-w-0">
