@@ -7,6 +7,10 @@ import {
   KickRestClient,
   WorkerStateSchema,
   WorkerStateSchemaName,
+  REDIS_TOKEN,
+  makeRedisChatroomIdStore,
+  parseStaticChatroomIds,
+  type RedisChatroomStoreClient,
 } from '@sehloro/infra';
 import { IngestionController } from './ingestion.controller';
 import { IngestionService } from './ingestion.service';
@@ -46,14 +50,18 @@ import { ChannelsService } from './channels/channels.service';
     {
       // Mesmo padrão do Helix acima: credenciais via ConfigService habilitam o
       // fallback pela API oficial quando o endpoint não-oficial está bloqueado.
+      // Cadeia de resolução do chatroomId: override estático → store Redis
+      // (persistente) → direto → proxies (Jina sempre por último).
       provide: KickRestClient,
-      useFactory: (config: ConfigService) =>
+      useFactory: (config: ConfigService, redis: RedisChatroomStoreClient | null) =>
         new KickRestClient({
           clientId: config.get<string>('KICK_CLIENT_ID'),
           clientSecret: config.get<string>('KICK_CLIENT_SECRET'),
           chatroomProxy: config.get<string>('KICK_CHATROOM_PROXY'),
+          staticChatroomIds: parseStaticChatroomIds(config.get<string>('KICK_CHATROOM_IDS')),
+          store: redis ? makeRedisChatroomIdStore(redis) : undefined,
         }),
-      inject: [ConfigService],
+      inject: [ConfigService, REDIS_TOKEN],
     },
     OrchestratorService,
     ReconcilerService,

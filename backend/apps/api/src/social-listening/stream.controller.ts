@@ -85,9 +85,7 @@ export class StreamController {
       if (closed) return;
       // 2. stream ao vivo
       try {
-        const u = await this.liveChat.subscribe(channelId, (m) =>
-          events$.next({ data: m }),
-        );
+        const u = await this.liveChat.subscribe(channelId, (m) => events$.next({ data: m }));
         if (closed) Promise.resolve(u()).catch(() => undefined);
         else unsub = u;
       } catch (err) {

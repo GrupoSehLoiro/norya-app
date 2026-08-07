@@ -17,7 +17,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { classifyFallback, type Tier2Output, type BrandHit } from '@sehloro/domain';
 import { CircuitBreaker } from './circuit-breaker';
-import { buildSystemBlocks, serializeAggregate } from './prompt-templates';
+import { buildSystemBlocks, promptCacheMinTokens, serializeAggregate } from './prompt-templates';
 import { CLASSIFY_BATCH_TOOL } from './tool-schemas';
 import type { LlmClassifier, LlmClassifierInput } from './llm-classifier.port';
 
@@ -78,6 +78,8 @@ export class RealAnthropicClassifier implements LlmClassifier {
   private readonly breaker = new CircuitBreaker();
   private client: AnthropicClientLike | null = null;
   private readonly model: string;
+  /** Guarda do aviso de cache inerte — loga uma vez por processo. */
+  private warnedCacheInert = false;
 
   constructor(@Inject(ConfigService) private readonly config: ConfigService) {
     this.model = config.get<string>('LLM_MODEL_TIER2') ?? HAIKU_MODEL;
@@ -97,11 +99,27 @@ export class RealAnthropicClassifier implements LlmClassifier {
     const start = Date.now();
     try {
       const client = await this._getClient();
-      // Contexto de treinamento por canal: SEMPRE por último e SEM
-      // cache_control — o prefixo cacheado (3 blocos fixos) fica
-      // byte-idêntico entre canais e o hit rate >80% é preservado.
+      // Contexto de treinamento por canal: SEMPRE por último e COM
+      // cache_control próprio (4º breakpoint — a API permite até 4).
+      // O prefixo compartilhado (tools + 3 blocos fixos) fica byte-idêntico
+      // entre canais e cacheia independente; o aiContext ganha uma entrada
+      // de cache POR CANAL.
+      //
+      // RESSALVA: no Haiku 4.5 o mínimo cacheável é 4096 tokens e o prefixo
+      // completo mede ~3,3k — então na configuração ATUAL nenhum desses
+      // breakpoints engaja e tudo é cobrado a preço cheio. Os breakpoints
+      // ficam no lugar (custo zero quando ignorados) e passam a valer assim
+      // que o prefixo crescer ou o modelo mudar. `_warnIfCacheInert` avisa
+      // quando isso está acontecendo. Ver PROMPT_CACHE_MIN_TOKENS.
       const system = input.aiContext
-        ? [...buildSystemBlocks('v1'), { type: 'text' as const, text: input.aiContext }]
+        ? [
+            ...buildSystemBlocks('v1'),
+            {
+              type: 'text' as const,
+              text: input.aiContext,
+              cache_control: { type: 'ephemeral' as const },
+            },
+          ]
         : buildSystemBlocks('v1');
       const response = (await client.messages.create({
         model: this.model,
@@ -120,6 +138,7 @@ export class RealAnthropicClassifier implements LlmClassifier {
       const cacheHitRate =
         cacheRead + cacheCreate === 0 ? 0 : cacheRead / (cacheRead + cacheCreate);
       const costUsd = this._computeCostUsd({ inputTokens, outputTokens, cacheCreate, cacheRead });
+      this._warnIfCacheInert(inputTokens, cacheRead, cacheCreate);
 
       const toolBlock = response.content.find(
         (b): b is ToolUseBlock => b.type === 'tool_use' && b.name === 'classify_batch',
@@ -143,6 +162,24 @@ export class RealAnthropicClassifier implements LlmClassifier {
       this.logger.error(`Anthropic falhou: ${(err as Error).message}`);
       throw err;
     }
+  }
+
+  /**
+   * O prompt caching falha em SILÊNCIO quando o prefixo não atinge o mínimo
+   * do modelo: a API não erra, só devolve cache_creation=0 e cache_read=0.
+   * Sem esse aviso a telemetria mostra `llmCacheHitRate: 0` para sempre e
+   * ninguém descobre que os 4 breakpoints são decorativos. Loga UMA vez.
+   */
+  private _warnIfCacheInert(inputTokens: number, cacheRead: number, cacheCreate: number): void {
+    if (this.warnedCacheInert) return;
+    if (cacheRead > 0 || cacheCreate > 0) return;
+    const min = promptCacheMinTokens(this.model);
+    this.warnedCacheInert = true;
+    this.logger.warn(
+      `prompt cache INATIVO em ${this.model}: prefixo de ~${inputTokens} tokens < mínimo ` +
+        `cacheável de ${min}. Os cache_control estão sendo ignorados e todo o input é ` +
+        `cobrado a preço cheio. Engorde o prefixo fixo ou use um modelo de mínimo menor.`,
+    );
   }
 
   private async _getClient(): Promise<AnthropicClientLike> {

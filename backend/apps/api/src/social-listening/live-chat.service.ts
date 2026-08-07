@@ -79,10 +79,7 @@ export class LiveChatService {
    * Assina o bus de chat e chama `cb` para cada mensagem NOVA do canal.
    * Devolve o unsubscribe pra o controller fechar quando o SSE cair.
    */
-  async subscribe(
-    channelId: string,
-    cb: (m: LiveChatMessage) => void,
-  ): Promise<Unsubscribe> {
+  async subscribe(channelId: string, cb: (m: LiveChatMessage) => void): Promise<Unsubscribe> {
     return this.bus.subscribe<ChatBusPayload>(CHAT_MESSAGE_BUS_CHANNEL, (payload) => {
       if (!payload || payload.channelId !== channelId) return;
       this.toLive(payload.message)
@@ -102,8 +99,7 @@ export class LiveChatService {
     } catch {
       // sentiment neutro — a cor do dot nunca derruba o feed
     }
-    const received =
-      msg.receivedAt instanceof Date ? msg.receivedAt : new Date(msg.receivedAt);
+    const received = msg.receivedAt instanceof Date ? msg.receivedAt : new Date(msg.receivedAt);
     return {
       messageId: msg.id,
       username: msg.user.username,

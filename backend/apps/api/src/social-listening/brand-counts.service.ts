@@ -42,10 +42,7 @@ interface BatchDoc {
 }
 
 function normalize(s: string): string {
-  return s
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
 function escapeRegex(s: string): string {
@@ -79,12 +76,7 @@ export class BrandCountsService {
       if (to) ws.$lte = new Date(to);
       filter.windowStart = ws;
     }
-    const docs = await this.model
-      .find(filter)
-      .sort({ windowStart: -1 })
-      .limit(1000)
-      .lean()
-      .exec();
+    const docs = await this.model.find(filter).sort({ windowStart: -1 }).limit(1000).lean().exec();
 
     // Um matcher por palavra: nome + aliases, normalizados, com fronteira \b.
     // regex custom do admin (se houver) é aplicada crua (sem unaccent) — foi

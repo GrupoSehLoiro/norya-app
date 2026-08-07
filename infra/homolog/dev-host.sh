@@ -79,7 +79,23 @@ host_env() {
   export MAIL_FROM="${MAIL_FROM:-Norya <no-reply@norya.local>}"
 }
 
-port_busy() { ss -ltn 2>/dev/null | grep -q ":$1 "; }
+# `ss` só existe no Linux; no macOS cai pro lsof (sem ele, port_busy daria
+# sempre "livre" e o bind da porta falharia lá na frente sem explicação).
+port_busy() {
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltn 2>/dev/null | grep -q ":$1 "
+  else
+    lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1
+  fi
+}
+
+proc_cwd() { # $1=pid — cwd do processo (Linux via /proc, macOS via lsof)
+  if [[ -r "/proc/$1/cwd" ]]; then
+    readlink "/proc/$1/cwd" 2>/dev/null
+  else
+    lsof -a -p "$1" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p' | head -1
+  fi
+}
 
 pid_of() { [[ -f "$RUN_DIR/$1.pid" ]] && cat "$RUN_DIR/$1.pid" 2>/dev/null || true; }
 
@@ -178,8 +194,8 @@ stop_proc front
 # corrompem (sintoma: navegação trava com request _rsc pendente). Só pode
 # haver UMA — aborta e lista as que sobraram.
 stray=""
-for p in $(pgrep -f 'next dev|next-server' 2>/dev/null); do
-  [[ "$(readlink "/proc/$p/cwd" 2>/dev/null)" == "$FRONT" ]] && stray="$stray $p"
+for p in $(pgrep -f 'next dev|next-server' 2>/dev/null || true); do
+  if [[ "$(proc_cwd "$p")" == "$FRONT" ]]; then stray="$stray $p"; fi
 done
 if [[ -n "$stray" ]]; then
   echo "ERRO: já existe next dev deste projeto rodando (pids:$stray)." >&2

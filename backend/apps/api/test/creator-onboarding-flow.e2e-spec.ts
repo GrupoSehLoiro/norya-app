@@ -88,9 +88,9 @@ describe('Creator onboarding flow (Fase 2)', () => {
     users = app.get(USER_REPOSITORY);
     channels = app.get(CHANNEL_REPOSITORY);
 
-    // Registra + verifica para ter user + workspace ativos.
+    // Sign-up direto: o register já devolve conta ativa + workspace owner
+    // (não há mais código por email no fluxo — ver AuthService.register).
     await auth.register({ email: EMAIL, password: PASSWORD, displayName: 'Creator' });
-    await auth.verifyEmail({ email: EMAIL, code: fakeEmail.lastCode() });
     const me = await auth.getMe((await users.findByEmail(EMAIL))!.getId());
     userId = me.user.id;
     workspaceId = me.activeWorkspaceId!;

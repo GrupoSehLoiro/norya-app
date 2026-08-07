@@ -12,3 +12,5 @@ export * from '../persistence/mongoose/repositories/batch-messages.mongoose.repo
 export * from '../persistence/mongoose/schemas/sentiment-configuration.schema';
 export * from '../persistence/mongoose/schemas/category-configuration.schema';
 export * from '../persistence/mongoose/schemas/batch-messages.schema';
+export * from './llm-budget-settings.service';
+export * from '../persistence/mongoose/schemas/llm-budget-settings.schema';

@@ -57,9 +57,14 @@ function pickDriver(config: ConfigService): 'memory' | 'redis' {
         if (!redis) return null;
         const monthlyBudget = config.get<number>('LLM_BUDGET_TOKENS_MONTHLY');
         const tokensPerMinute = config.get<number>('LLM_RATE_TOKENS_PER_MINUTE');
+        // Defaults de PRODUÇÃO (≠ dos constants do service, pensados pré-uso
+        // real): uma chamada do classificador custa ~1,5–2k tokens estimados,
+        // então 200/min bloquearia TUDO. 20k/min ≈ 10 chamadas/min (freio de
+        // burst/loop); 50M/mês é freio de catástrofe (~25k chamadas), não
+        // limite comercial — planos por tier vêm depois, por cima disso.
         return new LlmRateLimiterService(redis, {
-          monthlyBudget: monthlyBudget ? Number(monthlyBudget) : undefined,
-          tokensPerMinute: tokensPerMinute ? Number(tokensPerMinute) : undefined,
+          monthlyBudget: monthlyBudget ? Number(monthlyBudget) : 50_000_000,
+          tokensPerMinute: tokensPerMinute ? Number(tokensPerMinute) : 20_000,
         });
       },
     },

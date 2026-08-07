@@ -71,6 +71,11 @@ describe('SocialListeningOrchestrator — flow E2E', () => {
     // Gate de gap-of-silence desligado: o teste empurra msgs e drena na
     // sequência, sem esperar o idle de 4s do default.
     process.env.SOCIAL_LISTENING_IDLE_GAP_MS = '0';
+    // Gates de custo desligados: o teste valida o PIPELINE (tier-2 mock);
+    // com poucas msgs o gate de volume mandaria pro tier 0 e o delta-gate
+    // poderia reusar análise entre casos. Cobertura dos gates: delta-gate.spec.ts.
+    process.env.SOCIAL_LISTENING_LLM_MIN_MSGS = '0';
+    process.env.SOCIAL_LISTENING_DELTA_GATE = 'false';
     if (!process.env.CLICKHOUSE_URL) process.env.CLICKHOUSE_URL = 'http://clickhouse:8123';
     if (!process.env.CLICKHOUSE_USER) process.env.CLICKHOUSE_USER = 'default';
     if (!process.env.CLICKHOUSE_PASSWORD) process.env.CLICKHOUSE_PASSWORD = 'devpass';

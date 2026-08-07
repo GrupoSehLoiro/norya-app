@@ -34,12 +34,17 @@ import {
   AiTrainingContextSchema,
   AiTrainingContextSchemaName,
 } from '../persistence/mongoose/schemas/ai-training-context.schema';
+import {
+  LlmBudgetSettingsSchema,
+  LlmBudgetSettingsSchemaName,
+} from '../persistence/mongoose/schemas/llm-budget-settings.schema';
 import { AdSegmentMongooseRepository } from '../persistence/mongoose/repositories/ad-segment.mongoose.repository';
 import { ChannelBrandMongooseRepository } from '../persistence/mongoose/repositories/channel-brand.mongoose.repository';
 import { BatchMessagesMongooseRepository } from '../persistence/mongoose/repositories/batch-messages.mongoose.repository';
 import { PersistenceModule } from '../persistence/mongoose/persistence.module';
 import { ConfigsLoaderService } from './configs-loader.service';
 import { AiContextResolverService } from './ai-context-resolver.service';
+import { LlmBudgetSettingsService } from './llm-budget-settings.service';
 
 @Module({
   imports: [
@@ -53,6 +58,7 @@ import { AiContextResolverService } from './ai-context-resolver.service';
       { name: CategoryConfigurationSchemaName, schema: CategoryConfigurationSchema },
       { name: BatchMessagesSchemaName, schema: BatchMessagesSchema },
       { name: AiTrainingContextSchemaName, schema: AiTrainingContextSchema },
+      { name: LlmBudgetSettingsSchemaName, schema: LlmBudgetSettingsSchema },
     ]),
   ],
   providers: [
@@ -61,6 +67,7 @@ import { AiContextResolverService } from './ai-context-resolver.service';
     BatchMessagesMongooseRepository,
     ConfigsLoaderService,
     AiContextResolverService,
+    LlmBudgetSettingsService,
     { provide: AD_SEGMENT_REPOSITORY, useExisting: AdSegmentMongooseRepository },
     { provide: CHANNEL_BRAND_REPOSITORY, useExisting: ChannelBrandMongooseRepository },
   ],
@@ -72,6 +79,7 @@ import { AiContextResolverService } from './ai-context-resolver.service';
     BatchMessagesMongooseRepository,
     ConfigsLoaderService,
     AiContextResolverService,
+    LlmBudgetSettingsService,
     MongooseModule, // re-exporta forFeature dos schemas SentimentConfig/CategoryConfig
   ],
 })

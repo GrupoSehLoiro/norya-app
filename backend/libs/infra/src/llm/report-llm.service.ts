@@ -9,11 +9,31 @@
  * Respeita LLM_DRIVER: só chama a API quando 'real' e com chave presente.
  * Em qualquer outro caso (mock/fallback/sem chave/erro) devolve `null` — o
  * caller monta um relatório-template a partir dos números agregados.
+ *
+ * Custo:
+ *  - system SEMPRE em blocos com cache_control (prompt caching): base
+ *    (com sufixo de idioma) + extraContext do canal, cada um com seu
+ *    breakpoint — tool + base cacheiam compartilhado, extraContext por canal.
+ *  - `viaBatch: true` + env LLM_BATCH_API=true roteia a chamada pela
+ *    Message Batches API (−50% no preço por token). Só para fluxos que
+ *    toleram latência de minutos (relatório PDF); com timeout + fallback
+ *    para a chamada sync se o batch demorar/falhar.
  */
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001';
+/**
+ * Teto de espera pelo batch antes de cair pra chamada sync (env
+ * LLM_BATCH_TIMEOUT_MS). A Message Batches API é assíncrona de verdade — a
+ * maioria dos batches termina em MINUTOS, e o SLA é de até 24h; não em
+ * segundos. Um teto curto (o default aqui já foi 120s) faz o caminho barato
+ * estourar em quase toda chamada, pagando a latência do polling E o preço
+ * cheio do fallback sync. Só use `viaBatch` em fluxo que aguenta essa espera.
+ */
+const DEFAULT_BATCH_TIMEOUT_MS = 900_000;
+/** Intervalo de polling do status do batch (env LLM_BATCH_POLL_MS). */
+const DEFAULT_BATCH_POLL_MS = 10_000;
 
 export interface ReportLlmInput {
   /** Texto já serializado com período, métricas agregadas e amostra de msgs. */
@@ -27,11 +47,43 @@ export interface ReportLlmInput {
   extraContext?: string;
   /** Idioma do texto gerado. Default pt-BR; 'en' escreve o relatório em inglês. */
   lang?: 'pt' | 'en';
+  /**
+   * Roteia esta chamada pela Message Batches API (−50%/token) quando
+   * LLM_BATCH_API=true. Default false (chamada sync normal).
+   *
+   * NÃO use em caminho de request HTTP: o batch leva minutos e o handler
+   * ficaria pendurado até LLM_BATCH_TIMEOUT_MS antes de cair no sync. É para
+   * job offline / pré-geração agendada de relatório.
+   */
+  viaBatch?: boolean;
 }
 
-/** Anexa o contexto de treinamento (quando houver) ao system base. */
-function withExtraContext(system: string, input: ReportLlmInput): string {
-  return input.extraContext ? `${system}\n\n${input.extraContext}` : system;
+/** Bloco de system com breakpoint de prompt-cache (mesmo shape do classifier). */
+interface CacheableTextBlock {
+  type: 'text';
+  text: string;
+  cache_control?: { type: 'ephemeral' };
+}
+
+/**
+ * System em BLOCOS cacheados (antes era string crua sem cache nenhum):
+ *   [0] base + sufixo de idioma  ← cache_control (compartilhado: tool + base)
+ *   [1] extraContext do canal    ← cache_control (entrada por canal)
+ * 2 breakpoints ≤ limite de 4 da API. Repetições da mesma tela/canal pagam
+ * 0,1× nesses blocos em vez de preço cheio.
+ */
+function buildReportSystemBlocks(base: string, input: ReportLlmInput): CacheableTextBlock[] {
+  const blocks: CacheableTextBlock[] = [
+    { type: 'text', text: withLanguage(base, input), cache_control: { type: 'ephemeral' } },
+  ];
+  if (input.extraContext) {
+    blocks.push({
+      type: 'text',
+      text: input.extraContext,
+      cache_control: { type: 'ephemeral' },
+    });
+  }
+  return blocks;
 }
 
 /**
@@ -193,9 +245,31 @@ interface AnthropicContentBlock {
 interface AnthropicMessageResponse {
   content?: AnthropicContentBlock[];
 }
+/** Status/resultado mínimos da Message Batches API usados aqui. */
+interface AnthropicBatchLike {
+  id: string;
+  processing_status?: string;
+}
+interface AnthropicBatchResultEntry {
+  custom_id?: string;
+  result?: {
+    type?: string;
+    message?: AnthropicMessageResponse;
+    error?: { type?: string; message?: string };
+  };
+}
+interface AnthropicBatchesSurface {
+  create(args: Record<string, unknown>): Promise<AnthropicBatchLike>;
+  retrieve(id: string): Promise<AnthropicBatchLike>;
+  cancel(id: string): Promise<unknown>;
+  results(id: string): Promise<AsyncIterable<AnthropicBatchResultEntry>>;
+}
 /** Superfície mínima do client Anthropic usada aqui (lazy import do SDK). */
 interface AnthropicClientLike {
-  messages: { create(args: Record<string, unknown>): Promise<AnthropicMessageResponse> };
+  messages: {
+    create(args: Record<string, unknown>): Promise<AnthropicMessageResponse>;
+    batches?: AnthropicBatchesSurface;
+  };
 }
 
 @Injectable()
@@ -217,37 +291,39 @@ export class ReportLlmService {
   async generate(input: ReportLlmInput): Promise<ReportNarrative | null> {
     if (!this.isAiEnabled()) return null;
     try {
-      const client = await this._getClient();
-      const response = await client.messages.create({
-        model: this.model,
-        max_tokens: 3000,
-        system: withLanguage(withExtraContext(
-          'Você é um analista de comunidades de streaming que escreve relatórios ' +
-            'executivos em português do Brasil para marcas e streamers, no estilo de um ' +
-            'relatório de dados editorial (data storytelling). Cada frase relevante deve estar ' +
-            'ancorada num número, palavra-chave, marca ou fala real presentes nos dados. ' +
-            'Seja específico e analítico: descreva o que aconteceu e por quê. ' +
-            'NÃO escreva recomendações, conselhos nem próximos passos. ' +
-            'NÃO use frases genéricas que serviriam para qualquer live. ' +
-            'Não invente fatos além dos dados fornecidos. ' +
-            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final. ' +
-            'Não cite horários de relógio (hh:mm, "às 14h41") no texto; situe momentos ' +
-            'como "no pico" ou pelo dia.',
-          input,
-        ), input),
-        tools: [localizedTool(REPORT_TOOL, input)],
-        tool_choice: { type: 'tool', name: 'gerar_relatorio' },
-        messages: [
-          {
-            role: 'user',
-            content: withUserLanguage(
-              `Gere o relatório da live do canal "${input.channelName}" com base nestes dados:\n\n` +
-                input.context,
-              input,
-            ),
-          },
-        ],
-      });
+      const response = await this._createMessage(
+        {
+          model: this.model,
+          max_tokens: 3000,
+          system: buildReportSystemBlocks(
+            'Você é um analista de comunidades de streaming que escreve relatórios ' +
+              'executivos em português do Brasil para marcas e streamers, no estilo de um ' +
+              'relatório de dados editorial (data storytelling). Cada frase relevante deve estar ' +
+              'ancorada num número, palavra-chave, marca ou fala real presentes nos dados. ' +
+              'Seja específico e analítico: descreva o que aconteceu e por quê. ' +
+              'NÃO escreva recomendações, conselhos nem próximos passos. ' +
+              'NÃO use frases genéricas que serviriam para qualquer live. ' +
+              'Não invente fatos além dos dados fornecidos. ' +
+              'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final. ' +
+              'Não cite horários de relógio (hh:mm, "às 14h41") no texto; situe momentos ' +
+              'como "no pico" ou pelo dia.',
+            input,
+          ),
+          tools: [localizedTool(REPORT_TOOL, input)],
+          tool_choice: { type: 'tool', name: 'gerar_relatorio' },
+          messages: [
+            {
+              role: 'user',
+              content: withUserLanguage(
+                `Gere o relatório da live do canal "${input.channelName}" com base nestes dados:\n\n` +
+                  input.context,
+                input,
+              ),
+            },
+          ],
+        },
+        input.viaBatch === true,
+      );
 
       const block = (response.content ?? []).find(
         (b: { type?: string; name?: string }) =>
@@ -299,29 +375,31 @@ export class ReportLlmService {
   async describeTopics(input: ReportLlmInput): Promise<TopicsResult | null> {
     if (!this.isAiEnabled()) return null;
     try {
-      const client = await this._getClient();
-      const response = await client.messages.create({
-        model: this.model,
-        max_tokens: 700,
-        system: withLanguage(withExtraContext(
-          'Você analisa o chat de lives de streaming e resume, em português do Brasil, ' +
-            'os assuntos mais comentados. Use só os dados fornecidos, não invente. ' +
-            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final.',
-          input,
-        ), input),
-        tools: [localizedTool(TOPICS_TOOL, input)],
-        tool_choice: { type: 'tool', name: 'descrever_assuntos' },
-        messages: [
-          {
-            role: 'user',
-            content: withUserLanguage(
-              `Descreva os assuntos mais comentados no chat do canal "${input.channelName}" ` +
-                `com base nestes dados:\n\n${input.context}`,
-              input,
-            ),
-          },
-        ],
-      });
+      const response = await this._createMessage(
+        {
+          model: this.model,
+          max_tokens: 700,
+          system: buildReportSystemBlocks(
+            'Você analisa o chat de lives de streaming e resume, em português do Brasil, ' +
+              'os assuntos mais comentados. Use só os dados fornecidos, não invente. ' +
+              'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final.',
+            input,
+          ),
+          tools: [localizedTool(TOPICS_TOOL, input)],
+          tool_choice: { type: 'tool', name: 'descrever_assuntos' },
+          messages: [
+            {
+              role: 'user',
+              content: withUserLanguage(
+                `Descreva os assuntos mais comentados no chat do canal "${input.channelName}" ` +
+                  `com base nestes dados:\n\n${input.context}`,
+                input,
+              ),
+            },
+          ],
+        },
+        input.viaBatch === true,
+      );
       const block = (response.content ?? []).find(
         (b: { type?: string; name?: string }) =>
           b.type === 'tool_use' && b.name === 'descrever_assuntos',
@@ -347,27 +425,29 @@ export class ReportLlmService {
   async quickInsight(input: ReportLlmInput): Promise<string | null> {
     if (!this.isAiEnabled()) return null;
     try {
-      const client = await this._getClient();
-      const response = await client.messages.create({
-        model: this.model,
-        max_tokens: 400,
-        system: withLanguage(withExtraContext(
-          'Você analisa blocos de chat de lives e devolve um insight curto e ' +
-            'acionável em português do Brasil (2 a 4 frases). Use só os dados dados, não invente. ' +
-            'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final. ' +
-            'Não cite horários de relógio (hh:mm) no texto.',
-          input,
-        ), input),
-        messages: [
-          {
-            role: 'user',
-            content: withUserLanguage(
-              `Gere um insight curto sobre este bloco de mensagens do chat do canal "${input.channelName}":\n\n${input.context}`,
-              input,
-            ),
-          },
-        ],
-      });
+      const response = await this._createMessage(
+        {
+          model: this.model,
+          max_tokens: 400,
+          system: buildReportSystemBlocks(
+            'Você analisa blocos de chat de lives e devolve um insight curto e ' +
+              'acionável em português do Brasil (2 a 4 frases). Use só os dados dados, não invente. ' +
+              'Nunca use travessão (—) no texto; prefira vírgula, dois-pontos ou ponto final. ' +
+              'Não cite horários de relógio (hh:mm) no texto.',
+            input,
+          ),
+          messages: [
+            {
+              role: 'user',
+              content: withUserLanguage(
+                `Gere um insight curto sobre este bloco de mensagens do chat do canal "${input.channelName}":\n\n${input.context}`,
+                input,
+              ),
+            },
+          ],
+        },
+        input.viaBatch === true,
+      );
       const text = (response.content ?? [])
         .filter((b: { type?: string }) => b.type === 'text')
         .map((b: { text?: string }) => b.text ?? '')
@@ -378,6 +458,74 @@ export class ReportLlmService {
       this.logger.error(`Falha no quickInsight via IA: ${(err as Error).message}`);
       return null;
     }
+  }
+
+  /**
+   * Executa a chamada: sync por padrão; via Message Batches API (−50%/token)
+   * quando o caller pediu (`viaBatch`) E a env `LLM_BATCH_API=true`.
+   * Qualquer falha/timeout do batch cai na chamada sync — o relatório nunca
+   * deixa de sair por causa do caminho barato.
+   */
+  private async _createMessage(
+    params: Record<string, unknown>,
+    viaBatch: boolean,
+  ): Promise<AnthropicMessageResponse> {
+    const client = await this._getClient();
+    if (viaBatch && this._batchApiEnabled()) {
+      try {
+        return await this._createViaBatch(client, params);
+      } catch (err) {
+        this.logger.warn(
+          `Message Batches falhou (${(err as Error).message}) — caindo para chamada sync`,
+        );
+      }
+    }
+    return client.messages.create(params);
+  }
+
+  private _batchApiEnabled(): boolean {
+    return (this.config.get<string>('LLM_BATCH_API') ?? 'false') === 'true';
+  }
+
+  /**
+   * Batch de 1 request: create → poll até `ended` (com teto) → primeiro
+   * resultado. No timeout tenta cancelar o batch (pra não pagar por um
+   * resultado que ninguém vai ler) e lança — o caller decide o fallback.
+   */
+  private async _createViaBatch(
+    client: AnthropicClientLike,
+    params: Record<string, unknown>,
+  ): Promise<AnthropicMessageResponse> {
+    const batches = client.messages.batches;
+    if (!batches) throw new Error('SDK sem suporte a message batches');
+    const timeoutMs = Number(this.config.get('LLM_BATCH_TIMEOUT_MS') ?? DEFAULT_BATCH_TIMEOUT_MS);
+    const pollMs = Number(this.config.get('LLM_BATCH_POLL_MS') ?? DEFAULT_BATCH_POLL_MS);
+
+    const started = Date.now();
+    const batch = await batches.create({ requests: [{ custom_id: 'r0', params }] });
+    let status = batch;
+    while (status.processing_status !== 'ended') {
+      if (Date.now() - started >= timeoutMs) {
+        await batches.cancel(batch.id).catch(() => undefined);
+        throw new Error(`batch ${batch.id} não terminou em ${timeoutMs}ms`);
+      }
+      await new Promise((r) => setTimeout(r, pollMs));
+      status = await batches.retrieve(batch.id);
+    }
+
+    const results = await batches.results(batch.id);
+    for await (const entry of results) {
+      if (entry.result?.type === 'succeeded' && entry.result.message) {
+        this.logger.log(
+          `relatório via Message Batches ok (batch=${batch.id}, ${Date.now() - started}ms)`,
+        );
+        return entry.result.message;
+      }
+      throw new Error(
+        `batch result ${entry.result?.type ?? 'desconhecido'}: ${entry.result?.error?.message ?? ''}`,
+      );
+    }
+    throw new Error(`batch ${batch.id} terminou sem resultados`);
   }
 
   private async _getClient(): Promise<AnthropicClientLike> {

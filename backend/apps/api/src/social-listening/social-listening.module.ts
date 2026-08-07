@@ -53,6 +53,8 @@ import { BatchInsightController } from './batch-insight.controller';
 import { EmotesService } from './emotes.service';
 import { EmotesController } from './emotes.controller';
 import { HtmlPdfRendererService } from './html-pdf-renderer.service';
+import { LlmResultCacheService } from './llm-result-cache.service';
+import { LlmBudgetAdminController } from './llm-budget-admin.controller';
 
 @Module({
   imports: [
@@ -83,6 +85,7 @@ import { HtmlPdfRendererService } from './html-pdf-renderer.service';
     TopicsController,
     BatchInsightController,
     EmotesController,
+    LlmBudgetAdminController,
   ],
   providers: [
     SocialListeningService,
@@ -97,6 +100,8 @@ import { HtmlPdfRendererService } from './html-pdf-renderer.service';
     InsightsService,
     LiveChatService,
     MetricsService,
+    // Cache de resultados de IA sob demanda (topics/relatório) — Redis ou memória.
+    LlmResultCacheService,
     ReportLlmService,
     InsightsReportService,
     ReportPdfService,

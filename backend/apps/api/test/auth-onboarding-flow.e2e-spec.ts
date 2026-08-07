@@ -101,49 +101,48 @@ describe('Auth / onboarding flow (Fase 1)', () => {
 
   let activeWorkspaceId: string;
 
-  it('1. register cria User pending + Workspace + Membership owner e envia código', async () => {
+  it('1. register cria User ATIVO + Workspace + Membership owner e já emite JWT', async () => {
     const res = await auth.register({
       email: EMAIL,
       password: PASSWORD,
       displayName: 'YoDa',
     });
-    expect(res.status).toBe('pending_email');
+    // Sign-up direto: nasce ativa/verificada e o par de tokens vem na hora.
+    expect(res.accessToken).toBeTruthy();
+    expect(res.refreshToken).toBeTruthy();
+    expect(res.wsRole).toBe('owner');
 
     const user = await users.findByEmail(EMAIL);
     expect(user).not.toBeNull();
-    expect(user!.getStatus()).toBe('pending_email');
+    expect(user!.getStatus()).toBe('active');
+    expect(user!.isEmailVerified()).toBe(true);
 
     const wss = await workspaces.findByOwnerUserId(user!.getId());
     expect(wss).toHaveLength(1);
     activeWorkspaceId = wss[0].getId();
     expect(wss[0].getPlanKey()).toBe('free');
+    expect(res.activeWorkspaceId).toBe(activeWorkspaceId);
 
     const membership = await memberships.findByUserAndWorkspace(user!.getId(), activeWorkspaceId);
     expect(membership?.getRole()).toBe('owner');
 
-    expect(fakeEmail.sent.length).toBeGreaterThan(0);
-    expect(() => fakeEmail.lastCode()).not.toThrow();
+    // Nenhum código por email é emitido no fluxo atual.
+    expect(fakeEmail.sent).toHaveLength(0);
   });
 
-  it('2. login antes de verificar → EMAIL_NOT_VERIFIED', async () => {
-    await expect(auth.login({ email: EMAIL, password: PASSWORD })).rejects.toMatchObject({
-      response: { code: 'EMAIL_NOT_VERIFIED' },
-    });
-  });
-
-  it('3. verify: código errado falha; correto emite JWT com workspace', async () => {
-    await expect(auth.verifyEmail({ email: EMAIL, code: '000000' })).rejects.toBeDefined();
-
-    const code = fakeEmail.lastCode();
-    const result = await auth.verifyEmail({ email: EMAIL, code });
+  it('2. login logo após o register funciona (sem gate de verificação)', async () => {
+    const result = await auth.login({ email: EMAIL, password: PASSWORD });
     expect(result.accessToken).toBeTruthy();
-    expect(result.refreshToken).toBeTruthy();
     expect(result.activeWorkspaceId).toBe(activeWorkspaceId);
     expect(result.wsRole).toBe('owner');
+  });
 
-    const user = await users.findByEmail(EMAIL);
-    expect(user!.getStatus()).toBe('active');
-    expect(user!.isEmailVerified()).toBe(true);
+  it('3. verifyEmail (legado) sem código ativo → NO_ACTIVE_CODE', async () => {
+    // O endpoint continua existindo por compatibilidade, mas o register não
+    // emite mais código — logo nunca há código ativo para consumir.
+    await expect(auth.verifyEmail({ email: EMAIL, code: '000000' })).rejects.toMatchObject({
+      response: { code: 'NO_ACTIVE_CODE' },
+    });
   });
 
   it('4. login após verificar funciona', async () => {
@@ -188,19 +187,16 @@ describe('Auth / onboarding flow (Fase 1)', () => {
     expect(ent.limits.maxCreators).toBe(-1);
   });
 
-  it('8. resendCode invalida o código antigo e emite um novo', async () => {
+  it('8. resendCode (legado) é no-op para conta ativa e não vaza existência', async () => {
     const other = 'fulano@sehloro.dev';
     await auth.register({ email: other, password: PASSWORD, displayName: 'Fulano' });
-    const firstCode = fakeEmail.lastCode();
 
-    await auth.resendCode({ email: other });
-    const secondCode = fakeEmail.lastCode();
+    // Conta já nasce ativa → só age em status pending_email, então nada é enviado.
+    await expect(auth.resendCode({ email: other })).resolves.toEqual({ ok: true });
+    expect(fakeEmail.sent).toHaveLength(0);
 
-    // O código antigo não vale mais (foi invalidado).
-    await expect(auth.verifyEmail({ email: other, code: firstCode })).rejects.toBeDefined();
-
-    // O novo vale.
-    const result = await auth.verifyEmail({ email: other, code: secondCode });
-    expect(result.accessToken).toBeTruthy();
+    // Anti-enumeration: email inexistente responde igual.
+    await expect(auth.resendCode({ email: 'ninguem@sehloro.dev' })).resolves.toEqual({ ok: true });
+    expect(fakeEmail.sent).toHaveLength(0);
   });
 });
