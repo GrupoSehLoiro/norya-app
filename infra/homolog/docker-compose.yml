@@ -171,9 +171,23 @@ services:
       LLM_DRIVER: ${LLM_DRIVER:-mock}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       LLM_MODEL_TIER2: ${LLM_MODEL_TIER2:-claude-haiku-4-5-20251001}
+      # Message Batches API (−50%/token) p/ o relatório PDF; fallback sync.
+      LLM_BATCH_API: ${LLM_BATCH_API:-false}
+      LLM_BATCH_TIMEOUT_MS: ${LLM_BATCH_TIMEOUT_MS:-120000}
+      # Teto de tokens por canal (mensal/minuto) — estourou → heurística.
+      LLM_BUDGET_TOKENS_MONTHLY: ${LLM_BUDGET_TOKENS_MONTHLY:-50000000}
+      LLM_RATE_TOKENS_PER_MINUTE: ${LLM_RATE_TOKENS_PER_MINUTE:-20000}
       SOCIAL_LISTENING_CHANNELS: ${SOCIAL_LISTENING_CHANNELS:-}
-      SOCIAL_LISTENING_TICK_MS: ${SOCIAL_LISTENING_TICK_MS:-15000}
+      # Cadência calibrada p/ custo (patch performance-ai-cache): janelas
+      # maiores → menos chamadas de LLM com a mesma cobertura de mensagens.
+      SOCIAL_LISTENING_TICK_MS: ${SOCIAL_LISTENING_TICK_MS:-20000}
       SOCIAL_LISTENING_WINDOW_MS: ${SOCIAL_LISTENING_WINDOW_MS:-15000}
+      SOCIAL_LISTENING_IDLE_GAP_MS: ${SOCIAL_LISTENING_IDLE_GAP_MS:-6000}
+      SOCIAL_LISTENING_MAX_WINDOW_MS: ${SOCIAL_LISTENING_MAX_WINDOW_MS:-90000}
+      # Gates de custo: volume mínimo p/ LLM + reuso quando o chat não mudou.
+      SOCIAL_LISTENING_LLM_MIN_MSGS: ${SOCIAL_LISTENING_LLM_MIN_MSGS:-8}
+      SOCIAL_LISTENING_DELTA_GATE: ${SOCIAL_LISTENING_DELTA_GATE:-true}
+      SOCIAL_LISTENING_LLM_REUSE_MAX: ${SOCIAL_LISTENING_LLM_REUSE_MAX:-2}
       TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID:-}
       TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET:-}
       TWITCH_BOT_USER_ID: ${TWITCH_BOT_USER_ID:-}
@@ -183,6 +197,7 @@ services:
       # kick.com/api responde 403 Cloudflare por IP; o chatroomId só resolve
       # via proxy (template {url}) — sem esta var a ingestão Kick não sobe.
       KICK_CHATROOM_PROXY: ${KICK_CHATROOM_PROXY:-}
+      KICK_CHATROOM_IDS: ${KICK_CHATROOM_IDS:-}
       # Base pública — usada nos redirect_uri de OAuth (Twitch/Kick) e links.
       PUBLIC_API_URL: https://${DOMAIN}
       CONSOLE_URL: https://${DOMAIN}
@@ -252,6 +267,7 @@ services:
       # Mesma razão do nest-api: sem o proxy o chatroomId não resolve e a
       # ingestão Kick fica "chatroomId não resolvido — pulando" em loop.
       KICK_CHATROOM_PROXY: ${KICK_CHATROOM_PROXY:-}
+      KICK_CHATROOM_IDS: ${KICK_CHATROOM_IDS:-}
     networks: [sehloro-net]
     depends_on:
       nest-api:

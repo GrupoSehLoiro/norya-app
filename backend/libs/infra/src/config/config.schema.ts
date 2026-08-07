@@ -68,11 +68,18 @@ export const configSchema = z.object({
   KICK_CLIENT_ID: z.string().optional(),
   KICK_CLIENT_SECRET: z.string().optional(),
   /**
-   * Fetcher externo p/ resolver o chatroomId quando o WAF da Kick bloqueia o
-   * IP do servidor (403 "security policy"). Template com `{url}`.
-   * Ex.: https://r.jina.ai/{url}
+   * CSV de fetchers externos p/ resolver o chatroomId quando o WAF da Kick
+   * bloqueia o IP do servidor (403 "security policy"). Templates com `{url}`,
+   * tentados na ordem. O proxy público do Jina (https://r.jina.ai/{url}) é
+   * SEMPRE apensado como último recurso da cadeia — configure aqui um proxy
+   * próprio para que ele venha antes.
    */
   KICK_CHATROOM_PROXY: z.string().optional(),
+  /**
+   * Overrides estáticos slug:chatroomId ("xqc:123,streamer:456") — vencem
+   * toda a cadeia. Destrave imediato quando a resolução automática falhar.
+   */
+  KICK_CHATROOM_IDS: z.string().optional(),
 
   CORS_ORIGIN: z.string().optional(),
 
@@ -102,8 +109,40 @@ export const configSchema = z.object({
    * pra evitar buffer represado pra sempre. Default 60000.
    */
   SOCIAL_LISTENING_MAX_WINDOW_MS: z.coerce.number().int().positive().optional(),
+  /**
+   * Gate de custo: janelas com menos msgs "kept" que isso pulam o LLM e
+   * usam a heurística (tier 0). Default 8. 0 desliga o gate.
+   */
+  SOCIAL_LISTENING_LLM_MIN_MSGS: z.coerce.number().int().nonnegative().optional(),
+  /**
+   * Delta-gate: reusa a análise semântica do último tier-2 real quando a
+   * janela é similar à anterior (ver delta-gate.ts). 'false' desliga.
+   * Default ligado.
+   */
+  SOCIAL_LISTENING_DELTA_GATE: z.string().optional(),
+  /** Reusos consecutivos permitidos antes de re-ancorar no LLM. Default 2. */
+  SOCIAL_LISTENING_LLM_REUSE_MAX: z.coerce.number().int().nonnegative().optional(),
   /** Driver do LLM: mock | real | fallback. Default mock. */
   LLM_DRIVER: z.enum(['mock', 'real', 'fallback']).optional(),
+  /**
+   * Teto MENSAL de tokens de LLM por canal (freio de catástrofe, não plano
+   * comercial). Estourou → batches degradam pra heurística até virar o mês.
+   * Default 50M (ver CacheModule). Consumido pelo LlmRateLimiterService.
+   */
+  LLM_BUDGET_TOKENS_MONTHLY: z.coerce.number().int().positive().optional(),
+  /**
+   * Teto de tokens por MINUTO por canal (freio de burst/loop). Default 20k.
+   */
+  LLM_RATE_TOKENS_PER_MINUTE: z.coerce.number().int().positive().optional(),
+  /**
+   * Roteia chamadas de IA que toleram latência (relatório PDF) pela
+   * Message Batches API (−50%/token). 'true' liga. Default desligado.
+   */
+  LLM_BATCH_API: z.string().optional(),
+  /** Teto de espera pelo batch antes do fallback sync. Default 120000. */
+  LLM_BATCH_TIMEOUT_MS: z.coerce.number().int().positive().optional(),
+  /** Intervalo de polling do status do batch. Default 4000. */
+  LLM_BATCH_POLL_MS: z.coerce.number().int().positive().optional(),
   /** Driver do EventBus: memory | redis. Default redis se REDIS_URL setado. */
   EVENT_BUS_DRIVER: z.enum(['memory', 'redis']).optional(),
 
