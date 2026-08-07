@@ -22,6 +22,7 @@ import {
 } from '@sehloro/infra';
 import { InsightsService } from './insights.service';
 import { humanizeCategory } from './category-labels';
+import { LlmResultCacheService } from './llm-result-cache.service';
 import type { BatchAnalysis } from './batch-analysis.types';
 
 export interface ReportMetrics {
@@ -110,6 +111,7 @@ export class InsightsReportService {
     private readonly reportLlm: ReportLlmService,
     private readonly aiContext: AiContextResolverService,
     @Inject(CHANNEL_REPOSITORY) private readonly channels: ChannelRepository,
+    private readonly llmCache: LlmResultCacheService,
   ) {}
 
   async build(
@@ -129,18 +131,49 @@ export class InsightsReportService {
     const kickEmotes = new Map<string, string>();
     const sample = await this._sampleMessages(channelId, from, to, kickEmotes);
 
-    const context = this._buildContext(metrics, from, to, sample);
+    // Cache do par narrativa+peakInsight (as DUAS chamadas de IA do fluxo):
+    // re-download do mesmo período/idioma não re-paga o LLM. Métricas,
+    // amostra e emotes continuam recalculados (baratos, e o PDF precisa).
+    // O Treinamento IA entra na chave — sem isso, editá-lo não invalidava o
+    // relatório e o PDF saía com a narrativa antiga por até 6h.
     const extraContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
-    const ai = await this.reportLlm.generate({ context, channelName, extraContext, lang });
-    const narrative = ai ?? this._templateNarrative(metrics, channelName, tz, lang);
-    const peakInsight = await this._peakInsight(
-      channelId,
-      channelName,
-      metrics,
-      extraContext,
-      kickEmotes,
-      lang,
-    );
+    const cacheKey =
+      `report:${channelId}:${from.toISOString()}:${to.toISOString()}:${lang}` +
+      `:${this.llmCache.fingerprint(extraContext)}`;
+    const cached = await this.llmCache.get<{
+      narrative: ReportNarrative;
+      peakInsight: string | null;
+    }>(cacheKey);
+
+    let narrative: ReportNarrative;
+    let peakInsight: string | null;
+    let ai: ReportNarrative | null = null;
+    if (cached) {
+      ai = cached.narrative;
+      narrative = cached.narrative;
+      peakInsight = cached.peakInsight;
+    } else {
+      const context = this._buildContext(metrics, from, to, sample);
+      // Em paralelo: são independentes, então a latência se sobrepõe.
+      // Sem `viaBatch`: este build() roda dentro do GET que devolve o PDF, e
+      // a Message Batches API leva minutos — o handler ficaria pendurado até
+      // o timeout e cairia no sync do mesmo jeito, somando espera e pagando
+      // preço cheio. O desconto de 50% só vale num job offline.
+      const [aiNarrative, peak] = await Promise.all([
+        this.reportLlm.generate({ context, channelName, extraContext, lang }),
+        this._peakInsight(channelId, channelName, metrics, extraContext, kickEmotes, lang),
+      ]);
+      ai = aiNarrative;
+      narrative = ai ?? this._templateNarrative(metrics, channelName, tz, lang);
+      peakInsight = peak;
+      if (ai) {
+        await this.llmCache.set(
+          cacheKey,
+          { narrative: ai, peakInsight },
+          this.llmCache.ttlForRange(to),
+        );
+      }
+    }
 
     return {
       channelName,
@@ -193,6 +226,8 @@ export class InsightsReportService {
         stripLoneSurrogates(texts.join('\n')),
       extraContext,
       lang,
+      // Sem `viaBatch` pelo mesmo motivo do generate() acima: caminho síncrono
+      // de request HTTP não aguenta a latência da Message Batches API.
     });
   }
 

@@ -52,6 +52,17 @@ export class BatchMessagesPersistence {
 
   @Prop({ type: Number, default: 0 })
   uniqueUsers!: number;
+
+  /**
+   * Insight IA do bloco (BatchInsightService), gerado UMA vez no primeiro
+   * clique e servido daqui depois — o conteúdo do batch é imutável, então
+   * re-pagar o LLM a cada clique/viewer era custo puro. Ausente = nunca pedido.
+   */
+  @Prop({ type: String })
+  aiInsight?: string;
+
+  @Prop({ type: Date })
+  aiInsightAt?: Date;
 }
 
 export type BatchMessagesDocument = HydratedDocument<BatchMessagesPersistence>;

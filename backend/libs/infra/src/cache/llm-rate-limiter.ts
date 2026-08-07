@@ -49,6 +49,16 @@ export interface LlmRateLimiterOptions {
   tokensPerMinute?: number;
 }
 
+/**
+ * Limites POR CHAMADA — sobrepõem os defaults da instância. Como o script
+ * Lua já recebe os tetos como ARGV, budget individualizado por canal (admin
+ * override / plano) não exige nenhuma mudança na estrutura do Redis.
+ */
+export interface LlmBudgetLimits {
+  monthlyBudget?: number;
+  tokensPerMinute?: number;
+}
+
 export class LlmRateLimitExceededError extends Error {
   constructor(public readonly result: AcquireResult) {
     super(`LLM rate limit exceeded: ${result.reason}`);
@@ -109,11 +119,14 @@ export class LlmRateLimiterService {
     channelId: string,
     cost: number,
     now: Date = new Date(),
+    limits?: LlmBudgetLimits,
   ): Promise<AcquireResult> {
     if (cost <= 0) {
       throw new Error('cost must be > 0');
     }
 
+    const monthlyBudget = limits?.monthlyBudget ?? this.monthlyBudget;
+    const tokensPerMinute = limits?.tokensPerMinute ?? this.tokensPerMinute;
     const monthlyKey = this._monthlyKey(channelId, now);
     const minuteKey = this._minuteKey(channelId, now);
 
@@ -123,15 +136,15 @@ export class LlmRateLimiterService {
       monthlyKey,
       minuteKey,
       String(cost),
-      String(this.monthlyBudget),
-      String(this.tokensPerMinute),
+      String(monthlyBudget),
+      String(tokensPerMinute),
       String(MONTHLY_KEY_TTL_SECONDS),
       String(MINUTE_KEY_TTL_SECONDS),
     )) as [number, number, number, string];
 
     const allowed = raw[0] === 1;
     const remainingMonthly = raw[1];
-    const remainingMinute = raw[2] === -1 ? this.tokensPerMinute : raw[2];
+    const remainingMinute = raw[2] === -1 ? tokensPerMinute : raw[2];
     const reason = (raw[3] || null) as RateLimitReason;
 
     return {
@@ -157,10 +170,15 @@ export class LlmRateLimiterService {
   async getRemaining(
     channelId: string,
     now: Date = new Date(),
+    limits?: LlmBudgetLimits,
   ): Promise<{
     remainingMonthly: number;
     remainingMinute: number;
+    usedMonthly: number;
+    usedMinute: number;
   }> {
+    const monthlyBudget = limits?.monthlyBudget ?? this.monthlyBudget;
+    const tokensPerMinute = limits?.tokensPerMinute ?? this.tokensPerMinute;
     const monthlyKey = this._monthlyKey(channelId, now);
     const minuteKey = this._minuteKey(channelId, now);
 
@@ -169,10 +187,22 @@ export class LlmRateLimiterService {
       this.redis.get(minuteKey),
     ]);
 
+    const usedMonthly = Number(monthlyRaw ?? 0);
+    const usedMinute = Number(minuteRaw ?? 0);
     return {
-      remainingMonthly: this.monthlyBudget - Number(monthlyRaw ?? 0),
-      remainingMinute: this.tokensPerMinute - Number(minuteRaw ?? 0),
+      remainingMonthly: monthlyBudget - usedMonthly,
+      remainingMinute: tokensPerMinute - usedMinute,
+      usedMonthly,
+      usedMinute,
     };
+  }
+
+  /**
+   * Zera o contador MENSAL do canal (admin "conceder mais budget agora").
+   * O throttle por minuto expira sozinho em 60s — não precisa de reset.
+   */
+  async resetMonthly(channelId: string, now: Date = new Date()): Promise<void> {
+    await this.redis.del(this._monthlyKey(channelId, now));
   }
 
   private _monthlyKey(channelId: string, now: Date): string {

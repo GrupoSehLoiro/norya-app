@@ -7,6 +7,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CHANNEL_REPOSITORY, ChannelRepository } from '@sehloro/domain';
 import { AiContextResolverService, ClickHouseClient, ReportLlmService } from '@sehloro/infra';
+import { LlmResultCacheService } from './llm-result-cache.service';
 
 export interface ChatTopics {
   channelId: string;
@@ -27,9 +28,20 @@ export class TopicsService {
     private readonly reportLlm: ReportLlmService,
     private readonly aiContext: AiContextResolverService,
     @Inject(CHANNEL_REPOSITORY) private readonly channels: ChannelRepository,
+    private readonly cache: LlmResultCacheService,
   ) {}
 
   async topics(channelId: string, from?: string, to?: string): Promise<ChatTopics> {
+    // Cache do resultado (só quando a IA participou — ver gravação no fim):
+    // mesmo período re-consultado (re-render, outro viewer) não re-paga o LLM.
+    // O contexto de Treinamento IA entra na chave: editá-lo invalida na hora
+    // em vez de servir o resumo antigo até o TTL vencer. O resolver tem cache
+    // próprio de 60s, então resolver aqui não custa uma ida ao Mongo por request.
+    const extraContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
+    const cacheKey = `topics:${channelId}:${from ?? ''}:${to ?? ''}:${this.cache.fingerprint(extraContext)}`;
+    const cached = await this.cache.get<ChatTopics>(cacheKey);
+    if (cached) return cached;
+
     const params = { channelId, from: from ?? '', to: to ?? '' };
     const range = `
       channel_id = {channelId:String}
@@ -85,7 +97,6 @@ export class TopicsService {
         `Mensagens no período: ${messageCount}\n` +
         `Categorias dominantes (por mensagens): ${topCategories.map((c) => `${c.category} (${c.messages})`).join(', ') || '—'}\n` +
         `Tokens mais frequentes: ${topTokens.map((t) => `${t.token} (${t.count})`).join(', ') || '—'}`;
-      const extraContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
       const ai = await this.reportLlm.describeTopics({ channelName, context, extraContext });
       if (ai) {
         aiEnabled = true;
@@ -94,7 +105,7 @@ export class TopicsService {
       }
     }
 
-    return {
+    const result: ChatTopics = {
       channelId,
       from: from ?? null,
       to: to ?? null,
@@ -105,6 +116,15 @@ export class TopicsService {
       summary,
       aiEnabled,
     };
+
+    // Grava só quando a IA foi paga (heurística é barata e some quando o
+    // admin flipa o driver). Período fechado → TTL longo; aberto → curto.
+    if (aiEnabled) {
+      const toDate = to ? new Date(to) : null;
+      const ttl = this.cache.ttlForRange(toDate && !Number.isNaN(toDate.getTime()) ? toDate : null);
+      await this.cache.set(cacheKey, result, ttl);
+    }
+    return result;
   }
 
   /**
