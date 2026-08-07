@@ -5,9 +5,10 @@ import type { LlmClassifierInput } from '../llm-classifier.port';
 import { emptyConfigs, type BatchAggregate } from '@sehloro/domain';
 
 /**
- * Garante que o contexto de Treinamento IA entra como 4º bloco de system SEM
- * cache_control — e que sem contexto o system continua byte-idêntico ao atual
- * (prefixo cacheado preservado → hit rate do prompt-cache intacto).
+ * Garante que o contexto de Treinamento IA entra como 4º bloco de system COM
+ * cache_control próprio (4º breakpoint, cache por canal) — e que sem contexto
+ * o system continua byte-idêntico ao atual (prefixo cacheado preservado →
+ * hit rate do prompt-cache intacto).
  */
 
 function makeAggregate(): BatchAggregate {
@@ -54,7 +55,7 @@ describe('RealAnthropicClassifier — contexto de Treinamento IA', () => {
     expect(system).toEqual(buildSystemBlocks('v1'));
   });
 
-  it('com aiContext: 4º bloco por último, sem cache_control; 3 primeiros intactos', async () => {
+  it('com aiContext: 4º bloco por último, COM cache_control; 3 primeiros intactos', async () => {
     const { clf, create } = makeClassifierWithSpy();
     await clf.classify(makeInput('Contexto do canal (curadoria): FPS/Valorant.'));
     const { system } = create.mock.calls[0]![0] as never as {
@@ -65,6 +66,17 @@ describe('RealAnthropicClassifier — contexto de Treinamento IA', () => {
     const extra = system[3]!;
     expect(extra.type).toBe('text');
     expect(extra.text).toContain('FPS/Valorant');
-    expect(extra.cache_control).toBeUndefined();
+    // 4º breakpoint de cache: entrada por canal, reaproveitada entre batches.
+    expect(extra.cache_control).toEqual({ type: 'ephemeral' });
+  });
+
+  it('nunca passa de 4 breakpoints de cache (limite da API)', async () => {
+    const { clf, create } = makeClassifierWithSpy();
+    await clf.classify(makeInput('ctx'));
+    const { system } = create.mock.calls[0]![0] as never as {
+      system: Array<{ cache_control?: unknown }>;
+    };
+    const breakpoints = system.filter((b) => b.cache_control).length;
+    expect(breakpoints).toBeLessThanOrEqual(4);
   });
 });

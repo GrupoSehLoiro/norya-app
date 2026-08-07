@@ -15,8 +15,9 @@ export interface LlmClassifierInput {
   brandHits: BrandHit[];
   /**
    * Bloco "Treinamento IA" já resolvido para o canal (AiContextResolver).
-   * Opcional — mock/fallback ignoram; o classifier real anexa como bloco
-   * de system SEM cache_control (preserva o prompt-cache dos blocos fixos).
+   * Opcional — mock/fallback ignoram; o classifier real anexa como 4º bloco
+   * de system COM cache_control próprio (entrada de cache por canal; o
+   * prefixo compartilhado dos 3 blocos fixos continua cacheando à parte).
    */
   aiContext?: string;
 }
