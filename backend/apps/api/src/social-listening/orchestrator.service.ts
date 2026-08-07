@@ -7,7 +7,9 @@
  *   3. classifyHeuristic por msg → sentimentHints
  *   4. WindowAggregator (com adActive de AdSegmentService) → BatchAggregate
  *   5. detectBrands(unique, brands de channel_brand) → BrandHit[]
- *   6. LlmClassifier.classify → Tier2Output (mock/real/fallback)
+ *   6. LlmClassifier.classify → Tier2Output (mock/real/fallback), atrás de
+ *      dois gates de custo: volume mínimo (SOCIAL_LISTENING_LLM_MIN_MSGS)
+ *      e delta-gate (reuso quando a janela é similar à anterior — delta-gate.ts)
  *   7. composeBatchAnalysis → BatchAnalysis
  *   8. BatchAnalysisWriter (ClickHouse) + PublishInsightService (Redis pub/sub)
  *
@@ -45,14 +47,29 @@ import {
   ChatBufferService,
   ChannelBrandMongooseRepository,
   BatchMessagesMongooseRepository,
+  LlmRateLimiterService,
   REDIS_TOKEN,
+  type RateLimitReason,
 } from '@sehloro/infra';
 import { LLM_CLASSIFIER_TOKEN, type LlmClassifier, FallbackLlmClassifier } from '@sehloro/infra';
 import { AdSegmentService } from './ad-segment.service';
-import { AiContextResolverService, ConfigsLoaderService } from '@sehloro/infra';
+import {
+  AiContextResolverService,
+  ConfigsLoaderService,
+  LlmBudgetSettingsService,
+} from '@sehloro/infra';
 import { BatchAnalysisWriter } from './batch-analysis.writer';
 import { PublishInsightService } from './publish-insight.service';
 import { composeBatchAnalysis, type BatchAnalysis } from './batch-analysis.types';
+import {
+  DELTA_GATE_DEFAULTS,
+  makeTier2Snapshot,
+  reuseTier2,
+  shouldReuseTier2,
+  type DeltaGateOptions,
+  type Tier2Snapshot,
+} from './delta-gate';
+import { estimateClassifyTokens } from './llm-budget.util';
 
 const DEFAULT_TICK_MS = 15_000;
 const DEFAULT_WINDOW_MS = 15_000;
@@ -70,6 +87,12 @@ const DEFAULT_IDLE_GAP_MS = 4_000;
  * assim depois disso (senão o buffer enche e a UI fica congelada).
  */
 const DEFAULT_MAX_WINDOW_MS = 60_000;
+/**
+ * Gate de custo: janelas com menos msgs "kept" que isso não justificam o
+ * prompt inteiro do LLM (~1.5k tokens de overhead) — a heurística (tier 0)
+ * resolve e o batch continua sendo escrito/publicado normalmente.
+ */
+const DEFAULT_LLM_MIN_MSGS = 8;
 
 @Injectable()
 export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestroy {
@@ -84,6 +107,20 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
   /** Cache de discovery: { channels, lastFetch } */
   private channelsCache: { ids: string[]; at: number } = { ids: [], at: 0 };
   private static readonly CHANNELS_CACHE_TTL_MS = 60_000;
+
+  /** Gate de volume: mínimo de msgs kept pra justificar chamada de LLM. */
+  private readonly llmMinMsgs: number;
+  /** Delta-gate ligado? (env SOCIAL_LISTENING_DELTA_GATE, default true). */
+  private readonly deltaGateEnabled: boolean;
+  private readonly deltaGateOpts: DeltaGateOptions;
+  /** Último tier-2 REAL por canal — assinatura da janela + análise (delta-gate). */
+  private readonly tier2Memory = new Map<string, Tier2Snapshot>();
+  /**
+   * Último motivo de bloqueio de budget por canal — só loga na TRANSIÇÃO
+   * (liberado→bloqueado e vice-versa) pra não poluir o log a cada tick.
+   * Além dos motivos do limiter, 'paused' cobre a pausa do painel admin.
+   */
+  private readonly budgetBlockReason = new Map<string, RateLimitReason | 'paused'>();
 
   /** Logado uma vez quando o pipeline fica idle por falta de Redis. */
   private warnedNoBuffer = false;
@@ -123,6 +160,13 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
     private readonly redis: {
       set: (key: string, value: string, mode: string, ttl: number) => Promise<unknown>;
     } | null,
+    // Teto de tokens por canal (mensal + por minuto, Redis/Lua). Null sem
+    // Redis → sem enforcement (dev). Bloqueado → batch degrada pra heurística.
+    @Optional()
+    @Inject(LlmRateLimiterService)
+    private readonly llmBudget: LlmRateLimiterService | null,
+    // Tetos/pausa editáveis pelo admin (painel /ai-budget) — cache 45s.
+    private readonly budgetSettings: LlmBudgetSettingsService,
   ) {
     this.tickMs = Number(config.get('SOCIAL_LISTENING_TICK_MS') ?? DEFAULT_TICK_MS);
     this.windowMs = Number(config.get('SOCIAL_LISTENING_WINDOW_MS') ?? DEFAULT_WINDOW_MS);
@@ -136,6 +180,15 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
       .map((s) => s.trim())
       .filter(Boolean);
     this.emoteDictionary = new TwitchEmoteDictionary();
+    this.llmMinMsgs = Number(config.get('SOCIAL_LISTENING_LLM_MIN_MSGS') ?? DEFAULT_LLM_MIN_MSGS);
+    this.deltaGateEnabled =
+      (config.get<string>('SOCIAL_LISTENING_DELTA_GATE') ?? 'true') !== 'false';
+    this.deltaGateOpts = {
+      ...DELTA_GATE_DEFAULTS,
+      maxReuse: Number(
+        config.get('SOCIAL_LISTENING_LLM_REUSE_MAX') ?? DELTA_GATE_DEFAULTS.maxReuse,
+      ),
+    };
   }
 
   onModuleInit(): void {
@@ -278,21 +331,62 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
     // 6. brands
     const brandHits = detectBrands(kept, brands);
 
-    // 7. tier-2 (mock/real/fallback)
-    // Downgrade dinâmico: se o classifier real lançar (sem créditos, 429,
-    // rede, JSON inválido) caímos NA HORA na heurística — assim o batch é
-    // sempre escrito (degradado), nunca perdido. O circuit breaker interno
+    // 7. tier-2 (mock/real/fallback) — com dois gates de CUSTO antes do LLM:
+    //   (a) volume mínimo: janela pequena não justifica os ~1.5k tokens de
+    //       overhead do prompt — heurística resolve (tier 0);
+    //   (b) delta-gate: janela "mais do mesmo" (tokens + sentimento próximos
+    //       da última que passou pelo LLM) reaproveita a análise semântica
+    //       anterior com números recalculados da janela atual (tier 1), com
+    //       re-âncora no LLM após N reusos consecutivos. Ver delta-gate.ts.
+    // Em ambos os gates o batch É escrito e publicado normalmente — a
+    // ingestão e o feed não mudam, só a origem da análise.
+    // Downgrade dinâmico continua: se o classifier real lançar (sem créditos,
+    // 429, rede, JSON inválido) caímos NA HORA na heurística — assim o batch
+    // é sempre escrito (degradado), nunca perdido. O circuit breaker interno
     // do real ainda abre após N falhas e passa a curto-circuitar rápido.
-    // Contexto de "Treinamento IA" do canal (cache 60s no resolver).
-    const aiContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
     let tier2: Awaited<ReturnType<LlmClassifier['classify']>>;
-    try {
-      tier2 = await this.llm.classify({ aggregate: agg, configs, brandHits, aiContext });
-    } catch (err) {
-      this.logger.warn(
-        `LLM real falhou (canal=${channelId}) — fallback heurístico: ${(err as Error).message}`,
+    const snapshot = this.tier2Memory.get(channelId);
+    if (kept.length < this.llmMinMsgs) {
+      tier2 = await this.fallbackLlm.classify({ aggregate: agg, configs, brandHits });
+      this.logger.debug?.(
+        `canal=${channelId} volume baixo (kept=${kept.length} < ${this.llmMinMsgs}) — tier 0 heurístico, sem LLM`,
       );
-      tier2 = await this.fallbackLlm.classify({ aggregate: agg, configs, brandHits, aiContext });
+    } else if (
+      this.deltaGateEnabled &&
+      shouldReuseTier2(agg, snapshot, Date.now(), this.deltaGateOpts)
+    ) {
+      const base = await this.fallbackLlm.classify({ aggregate: agg, configs, brandHits });
+      tier2 = reuseTier2(base, snapshot!, agg);
+      snapshot!.reuseCount += 1;
+      this.logger.debug?.(
+        `canal=${channelId} delta-gate: reuso ${snapshot!.reuseCount}/${this.deltaGateOpts.maxReuse} do tier-2 anterior — sem LLM`,
+      );
+    } else {
+      // Contexto de "Treinamento IA" do canal (cache 60s no resolver) — só
+      // resolvido quando o LLM vai mesmo ser chamado.
+      const aiContext = (await this.aiContext.resolveForChannel(channelId)) ?? undefined;
+      // Teto de custo por canal: débito PRÉ-PAGO da estimativa de tokens.
+      // Estourou (mês ou minuto) → heurística até liberar; batch nunca é
+      // perdido. Sem Redis / erro no limiter → fail-open (não bloqueia).
+      if (!(await this._acquireLlmBudget(channelId, agg, aiContext))) {
+        tier2 = await this.fallbackLlm.classify({ aggregate: agg, configs, brandHits, aiContext });
+      } else {
+        try {
+          tier2 = await this.llm.classify({ aggregate: agg, configs, brandHits, aiContext });
+          // Memória do delta-gate: só análises que vieram do LLM (tier 2).
+          if (tier2.llmTier === 2) this.tier2Memory.set(channelId, makeTier2Snapshot(agg, tier2));
+        } catch (err) {
+          this.logger.warn(
+            `LLM real falhou (canal=${channelId}) — fallback heurístico: ${(err as Error).message}`,
+          );
+          tier2 = await this.fallbackLlm.classify({
+            aggregate: agg,
+            configs,
+            brandHits,
+            aiContext,
+          });
+        }
+      }
     }
 
     // 8. compose + persist + publish
@@ -342,5 +436,74 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
         `kept=${kept.length} tier=${analysis.llmTier} cost=${analysis.llmCostUsd}`,
     );
     return analysis;
+  }
+
+  /**
+   * Debita a estimativa de tokens do budget do canal (LlmRateLimiterService,
+   * mensal + por minuto, atômico via Lua). Retorna false quando bloqueado —
+   * o caller degrada pra heurística sem perder o batch.
+   *
+   * Os TETOS vêm do painel admin (LlmBudgetSettingsService: override do
+   * canal → global → env), passados por chamada ao limiter — mudança do
+   * admin vale em <1min, sem restart. `paused` (canal ou global) pula o LLM
+   * direto, custo zero imediato.
+   *
+   * Fail-open por design: sem limiter (Redis ausente) ou erro no Redis, a
+   * chamada segue. O log só marca TRANSIÇÕES (bloqueou/liberou) pra não
+   * poluir a cada tick durante um mês estourado.
+   */
+  private async _acquireLlmBudget(
+    channelId: string,
+    agg: Parameters<typeof estimateClassifyTokens>[0],
+    aiContext?: string,
+  ): Promise<boolean> {
+    const prev = this.budgetBlockReason.get(channelId) ?? null;
+    try {
+      const settings = await this.budgetSettings.getEffective(channelId);
+      if (settings.paused) {
+        if (prev !== 'paused') {
+          this.budgetBlockReason.set(channelId, 'paused');
+          this.logger.warn(
+            `IA PAUSADA pelo admin canal=${channelId} — batches seguem via heurística (tier 0)`,
+          );
+        }
+        return false;
+      }
+      if (!this.llmBudget) {
+        this._markBudgetFree(channelId, prev);
+        return true;
+      }
+      const cost = estimateClassifyTokens(agg, aiContext);
+      const verdict = await this.llmBudget.tryAcquire(channelId, cost, new Date(), {
+        monthlyBudget: settings.monthlyTokens,
+        tokensPerMinute: settings.tokensPerMinute,
+      });
+      if (!verdict.allowed) {
+        if (prev !== verdict.reason) {
+          this.budgetBlockReason.set(channelId, verdict.reason);
+          this.logger.warn(
+            `budget de LLM BLOQUEADO canal=${channelId} motivo=${verdict.reason} ` +
+              `teto=${settings.monthlyTokens} (${settings.source}) ` +
+              `restanteMes=${verdict.remainingMonthly} reset=${verdict.resetAt?.toISOString() ?? '?'} ` +
+              `— batches seguem via heurística (tier 0)`,
+          );
+        }
+        return false;
+      }
+      this._markBudgetFree(channelId, prev);
+      return true;
+    } catch (err) {
+      this.logger.warn(
+        `limiter de LLM falhou (canal=${channelId}): ${(err as Error).message} — fail-open`,
+      );
+      return true;
+    }
+  }
+
+  private _markBudgetFree(channelId: string, prev: string | null): void {
+    if (prev !== null) {
+      this.budgetBlockReason.set(channelId, null);
+      this.logger.log(`budget de LLM liberado canal=${channelId} — voltando ao tier-2`);
+    }
   }
 }

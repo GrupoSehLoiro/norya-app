@@ -35,6 +35,7 @@ import { SocialListeningOrchestrator } from '../src/social-listening/orchestrato
 import { InsightsService } from '../src/social-listening/insights.service';
 import { InsightsController } from '../src/social-listening/insights.controller';
 import { InsightsReportService } from '../src/social-listening/insights-report.service';
+import { LlmResultCacheService } from '../src/social-listening/llm-result-cache.service';
 import { ReportPdfService } from '../src/social-listening/report-pdf.service';
 import { HtmlPdfRendererService } from '../src/social-listening/html-pdf-renderer.service';
 import { EmotesService } from '../src/social-listening/emotes.service';
@@ -76,6 +77,9 @@ describe('REST /insights — happy path', () => {
     process.env.SOCIAL_LISTENING_CHANNELS = CHANNEL;
     // Gate de gap-of-silence desligado: o teste empurra msgs e drena na sequência.
     process.env.SOCIAL_LISTENING_IDLE_GAP_MS = '0';
+    // Gates de custo desligados — o teste valida o fluxo REST com tier-2 mock.
+    process.env.SOCIAL_LISTENING_LLM_MIN_MSGS = '0';
+    process.env.SOCIAL_LISTENING_DELTA_GATE = 'false';
     if (!process.env.CLICKHOUSE_URL) process.env.CLICKHOUSE_URL = 'http://clickhouse:8123';
     if (!process.env.CLICKHOUSE_USER) process.env.CLICKHOUSE_USER = 'default';
     if (!process.env.CLICKHOUSE_PASSWORD) process.env.CLICKHOUSE_PASSWORD = 'devpass';
@@ -115,6 +119,8 @@ describe('REST /insights — happy path', () => {
         SocialListeningOrchestrator,
         InsightsService,
         InsightsReportService,
+        // Cache de resultados de IA — sem Redis injetado aqui cai no modo memória.
+        LlmResultCacheService,
         ReportPdfService,
         HtmlPdfRendererService,
         MessageSearchService,
