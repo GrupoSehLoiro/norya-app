@@ -111,9 +111,7 @@ export class AiTrainingService {
     if (scope === 'global') return '';
     if (!key) throw new BadRequestException(`key obrigatória para scope "${scope}"`);
     if (scope !== 'brand' && !this.validKeys[scope].has(key)) {
-      throw new BadRequestException(
-        `key "${key}" não existe na taxonomia para scope "${scope}"`,
-      );
+      throw new BadRequestException(`key "${key}" não existe na taxonomia para scope "${scope}"`);
     }
     return key;
   }

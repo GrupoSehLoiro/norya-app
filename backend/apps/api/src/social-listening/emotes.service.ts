@@ -120,12 +120,22 @@ export class EmotesService {
 
   private async twitchGlobal(): Promise<ChannelEmote[]> {
     const list = await this.helix.getGlobalChatEmotes();
-    return list.map((e) => ({ code: e.code, url: e.url1x, url2x: e.url2x, provider: 'twitch' as const }));
+    return list.map((e) => ({
+      code: e.code,
+      url: e.url1x,
+      url2x: e.url2x,
+      provider: 'twitch' as const,
+    }));
   }
 
   private async twitchChannel(broadcasterId: string): Promise<ChannelEmote[]> {
     const list = await this.helix.getChannelChatEmotes(broadcasterId);
-    return list.map((e) => ({ code: e.code, url: e.url1x, url2x: e.url2x, provider: 'twitch' as const }));
+    return list.map((e) => ({
+      code: e.code,
+      url: e.url1x,
+      url2x: e.url2x,
+      provider: 'twitch' as const,
+    }));
   }
 
   private async bttvGlobal(): Promise<ChannelEmote[]> {
@@ -141,11 +151,16 @@ export class EmotesService {
   }
 
   private async sevenTvGlobal(): Promise<ChannelEmote[]> {
-    const data = await getJson<{ emotes?: SevenTvEmoteRaw[] }>('https://7tv.io/v3/emote-sets/global');
+    const data = await getJson<{ emotes?: SevenTvEmoteRaw[] }>(
+      'https://7tv.io/v3/emote-sets/global',
+    );
     return (data?.emotes ?? []).map(mapSevenTv);
   }
 
-  private async sevenTvChannel(platform: 'twitch' | 'kick', externalId: string): Promise<ChannelEmote[]> {
+  private async sevenTvChannel(
+    platform: 'twitch' | 'kick',
+    externalId: string,
+  ): Promise<ChannelEmote[]> {
     const data = await getJson<{ emote_set?: { emotes?: SevenTvEmoteRaw[] } }>(
       `https://7tv.io/v3/users/${platform}/${encodeURIComponent(externalId)}`,
     );
@@ -155,7 +170,9 @@ export class EmotesService {
   private async ffzGlobal(): Promise<ChannelEmote[]> {
     const data = await getJson<FfzSetsRaw>('https://api.frankerfacez.com/v1/set/global');
     const setIds = (data.default_sets ?? []).map(String);
-    return setIds.flatMap((id) => data.sets?.[id]?.emoticons ?? []).map(mapFfz)
+    return setIds
+      .flatMap((id) => data.sets?.[id]?.emoticons ?? [])
+      .map(mapFfz)
       .filter((e): e is ChannelEmote => e !== null);
   }
 
@@ -163,7 +180,9 @@ export class EmotesService {
     const data = await getJson<FfzSetsRaw>(
       `https://api.frankerfacez.com/v1/room/id/${encodeURIComponent(twitchId)}`,
     );
-    return Object.values(data.sets ?? {}).flatMap((s) => s.emoticons ?? []).map(mapFfz)
+    return Object.values(data.sets ?? {})
+      .flatMap((s) => s.emoticons ?? [])
+      .map(mapFfz)
       .filter((e): e is ChannelEmote => e !== null);
   }
 }

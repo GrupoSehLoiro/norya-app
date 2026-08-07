@@ -73,7 +73,10 @@ export class AiTrainingController {
 
   /** Contexto final montado para um canal — o que a IA vai receber. */
   @Get('preview')
-  async preview(@Query('channelId') channelId: string | undefined, @CurrentUser() user: JwtPayload) {
+  async preview(
+    @Query('channelId') channelId: string | undefined,
+    @CurrentUser() user: JwtPayload,
+  ) {
     this._assertAdmin(user);
     if (!channelId) throw new BadRequestException('channelId obrigatório');
     const resolved = await this.service.preview(channelId);

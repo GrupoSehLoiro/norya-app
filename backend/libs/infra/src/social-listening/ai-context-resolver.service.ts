@@ -150,7 +150,8 @@ export class AiContextResolverService {
     let used = HEADER.length;
     let capped = false;
     for (const d of docs) {
-      const title = d.scope === 'global' ? `## ${SCOPE_LABEL.global}` : `## ${SCOPE_LABEL[d.scope]}: ${d.key}`;
+      const title =
+        d.scope === 'global' ? `## ${SCOPE_LABEL.global}` : `## ${SCOPE_LABEL[d.scope]}: ${d.key}`;
       const texts = (d.prompts ?? []).map((t) => t.trim()).filter(Boolean);
       // Cada TEXTO é uma unidade: descartamos textos inteiros quando não cabem
       // (instrução cortada no meio confunde o modelo); como a ordem é
