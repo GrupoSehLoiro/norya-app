@@ -71,6 +71,7 @@ const items: NavItem[] = [
   // Admin — operação/observabilidade. Só admin; nasce recolhido.
   { href: '/ai-training',  label: 'Treinamento IA', group: 'Admin', adminOnly: true, icon: <Icon d="M12 2a7 7 0 0 1 7 7c0 2.4-1.2 4.5-3 5.7V17a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2.3C6.2 13.5 5 11.4 5 9a7 7 0 0 1 7-7zM9 21h6" /> },
   { href: '/metrics',      label: 'Métricas da IA', group: 'Admin', adminOnly: true, icon: <Icon d="M3 3v18h18M7 14l4-4 4 4 5-5" /> },
+  { href: '/ai-budget',    label: 'Custo de IA',    group: 'Admin', adminOnly: true, icon: <Icon d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /> },
   { href: '/feature-flags', label: 'Feature flags', group: 'Admin', adminOnly: true, icon: <Icon d="M6 3v18M18 3v18M3 6h18M3 18h18" /> },
   { href: '/logs',          label: 'Access logs',   group: 'Admin', adminOnly: true, icon: <Icon d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" /> },
   { href: '/access',        label: 'Gerenciador de acesso', group: 'Admin', adminOnly: true, icon: <Icon d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21v-1a6 6 0 0 1 6-6h1M16 16l2 2 4-4" /> },
