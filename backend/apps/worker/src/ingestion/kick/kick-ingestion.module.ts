@@ -14,6 +14,10 @@ import {
   KickPusherProvider,
   KickRestClient,
   PersistenceModule,
+  REDIS_TOKEN,
+  makeRedisChatroomIdStore,
+  parseStaticChatroomIds,
+  type RedisChatroomStoreClient,
 } from '@sehloro/infra';
 import { KickIngestionService } from './kick-ingestion.service';
 import { KICK_PROVIDER_CREATOR, type KickProviderCreator } from './kick-ingestion.tokens';
@@ -23,12 +27,16 @@ import { KICK_PROVIDER_CREATOR, type KickProviderCreator } from './kick-ingestio
   providers: [
     {
       provide: KickRestClient,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) =>
+      inject: [ConfigService, REDIS_TOKEN],
+      useFactory: (config: ConfigService, redis: RedisChatroomStoreClient | null) =>
         new KickRestClient({
           clientId: config.get<string>('KICK_CLIENT_ID'),
           clientSecret: config.get<string>('KICK_CLIENT_SECRET'),
           chatroomProxy: config.get<string>('KICK_CHATROOM_PROXY'),
+          // Overrides do operador (destrava imediato) + store persistente:
+          // o proxy só é necessário 1× na vida de cada canal.
+          staticChatroomIds: parseStaticChatroomIds(config.get<string>('KICK_CHATROOM_IDS')),
+          store: redis ? makeRedisChatroomIdStore(redis) : undefined,
         }),
     },
     {
