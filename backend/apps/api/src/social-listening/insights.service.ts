@@ -48,7 +48,25 @@ export class InsightsService {
   private readonly logger = new Logger(InsightsService.name);
   constructor(private readonly ch: ClickHouseClient) {}
 
+  /**
+   * Último batch COM conteúdo do canal. Janelas minúsculas (1 msg, ou tudo
+   * removido como copypasta) geram sentimento 0/0/0 e categoria 'other'; se
+   * o card do console mostrasse esse batch cru, "Clima geral" piscava pra
+   * "neutro 0%" e "Pauta" pra "—" a cada rajada curta, mesmo com a live cheia.
+   * Por isso priorizamos o batch mais recente com mensagens e sentimento
+   * preenchidos; só caímos no último bruto se o canal não tiver nenhum assim.
+   */
   async latest(channelId: string): Promise<BatchAnalysis | null> {
+    const meaningful = await this._select(
+      `SELECT * FROM batch_analysis
+       WHERE channel_id = {ch: String}
+         AND message_count > 0
+         AND (sentiment_pos + sentiment_neu + sentiment_neg) > 0
+       ORDER BY window_start DESC
+       LIMIT 1`,
+      { ch: channelId },
+    );
+    if (meaningful[0]) return this._withRecentPauta(channelId, meaningful[0]);
     const rows = await this._select(
       `SELECT * FROM batch_analysis
        WHERE channel_id = {ch: String}
@@ -57,6 +75,30 @@ export class InsightsService {
       { ch: channelId },
     );
     return rows[0] ?? null;
+  }
+
+  /**
+   * Janelas tier 0 (menos de 8 msgs, sem LLM) raramente têm categoria: a
+   * heurística por palavras-chave sai vazia e o batch grava 'other'. Pra o
+   * card "Pauta mais comentada" não alternar entre texto e "—" a cada rajada,
+   * herdamos a pauta do batch mais recente COM categoria nos últimos 15 min.
+   * Clima, contagens e demais campos continuam sendo os do batch base.
+   */
+  private async _withRecentPauta(channelId: string, base: BatchAnalysis): Promise<BatchAnalysis> {
+    if (base.pautaMaisComentada) return base;
+    const rows = await this._select(
+      `SELECT * FROM batch_analysis
+       WHERE channel_id = {ch: String}
+         AND dominant_category != ''
+         AND dominant_category != 'other'
+         AND window_start > now() - INTERVAL 15 MINUTE
+       ORDER BY window_start DESC
+       LIMIT 1`,
+      { ch: channelId },
+    );
+    const donor = rows[0];
+    if (!donor?.pautaMaisComentada) return base;
+    return { ...base, pautaMaisComentada: donor.pautaMaisComentada };
   }
 
   async history(channelId: string, from?: Date, to?: Date, limit = 200): Promise<BatchAnalysis[]> {
