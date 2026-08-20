@@ -163,3 +163,37 @@ export function makeTier2Snapshot(agg: BatchAggregate, tier2: Tier2Output): Tier
     reuseCount: 0,
   };
 }
+
+/**
+ * Janela PEQUENA (abaixo do piso de msgs pro LLM, tier 0): a heurística não
+ * tem categoria (sai 'other') e o sentimento de 1 a 7 msgs é ruidoso. Se o
+ * canal tem uma leitura recente da IA (memória do delta-gate, dentro de
+ * maxAgeMs), herdamos SÓ a parte semântica (categorias + contexto da pauta),
+ * mantendo sentimento, toxicidade e marcas calculados na janela atual.
+ * Não conta como reuso do delta-gate (não mexe em reuseCount) e fica
+ * marcado como tier 0 + 'pauta herdada' pra auditoria.
+ */
+export function inheritCategories(
+  base: Tier2Output,
+  snap: Tier2Snapshot | undefined,
+  agg: BatchAggregate,
+  now: number,
+  opts: DeltaGateOptions = DELTA_GATE_DEFAULTS,
+): Tier2Output {
+  if (!snap) return base;
+  if (now - snap.at > opts.maxAgeMs) return base;
+  if (snap.tier2.llmTier !== 2) return base;
+  if (!snap.tier2.topCategories.length) return base;
+  const scale = snap.totalMsgsWeighted > 0 ? agg.totalMsgsWeighted / snap.totalMsgsWeighted : 1;
+  const topCategories = snap.tier2.topCategories.map((c) => ({
+    category: c.category,
+    count: Math.max(1, Math.round(c.count * scale)),
+  }));
+  return {
+    ...base,
+    topCategories,
+    dominantCategoryContext: snap.tier2.dominantCategoryContext || base.dominantCategoryContext,
+    reasoning: 'janela pequena: pauta herdada da última análise da IA do canal',
+    llmModel: `${base.llmModel}+pauta-herdada`,
+  };
+}

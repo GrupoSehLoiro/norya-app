@@ -1,5 +1,6 @@
 import type { BatchAggregate, Tier2Output } from '@sehloro/domain';
 import {
+  inheritCategories,
   DELTA_GATE_DEFAULTS,
   jaccard,
   makeTier2Snapshot,
@@ -172,5 +173,42 @@ describe('reuseTier2', () => {
     expect(out.llmModel).toContain('+reuso');
     expect(out.llmCostUsd).toBe(0);
     expect(out.confidence).toBeLessThan(snap.tier2.confidence);
+  });
+});
+
+describe('inheritCategories (tier 0, janela pequena)', () => {
+  const now = Date.now();
+  const base = makeTier2({
+    topCategories: [],
+    dominantCategoryContext: undefined,
+    llmTier: 0,
+    llmModel: 'heuristic',
+  });
+
+  it('sem memória → base intacta', () => {
+    expect(inheritCategories(base, undefined, makeAggregate(), now)).toBe(base);
+  });
+
+  it('memória recente da IA → herda categorias e contexto, mantém sentimento', () => {
+    const snap = makeSnap();
+    const out = inheritCategories(base, snap, makeAggregate(), now);
+    expect(out.topCategories.map((c) => c.category)).toEqual(
+      snap.tier2.topCategories.map((c) => c.category),
+    );
+    expect(out.dominantCategoryContext).toBe(snap.tier2.dominantCategoryContext);
+    expect(out.sentiment).toEqual(base.sentiment);
+    expect(out.llmTier).toBe(0);
+    expect(out.llmModel).toContain('pauta-herdada');
+    expect(snap.reuseCount).toBe(0);
+  });
+
+  it('memória velha → base intacta', () => {
+    const snap = makeSnap({ at: now - 10 * 60_000 });
+    expect(inheritCategories(base, snap, makeAggregate(), now)).toBe(base);
+  });
+
+  it('memória que não veio do LLM → base intacta', () => {
+    const snap = makeSnap({ tier2: makeTier2({ llmTier: 1 }) });
+    expect(inheritCategories(base, snap, makeAggregate(), now)).toBe(base);
   });
 });

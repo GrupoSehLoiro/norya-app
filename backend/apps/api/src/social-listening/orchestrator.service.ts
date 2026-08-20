@@ -68,6 +68,7 @@ import {
   shouldReuseTier2,
   type DeltaGateOptions,
   type Tier2Snapshot,
+  inheritCategories,
 } from './delta-gate';
 import { estimateClassifyTokens } from './llm-budget.util';
 
@@ -347,7 +348,11 @@ export class SocialListeningOrchestrator implements OnModuleInit, OnModuleDestro
     let tier2: Awaited<ReturnType<LlmClassifier['classify']>>;
     const snapshot = this.tier2Memory.get(channelId);
     if (kept.length < this.llmMinMsgs) {
-      tier2 = await this.fallbackLlm.classify({ aggregate: agg, configs, brandHits });
+      // Tier 0: heurística na janela + pauta herdada da última leitura da IA
+      // (se recente) — sem isso o card "Pauta" ficava vazio em toda rajada
+      // curta, e a maioria das janelas é curta.
+      const base = await this.fallbackLlm.classify({ aggregate: agg, configs, brandHits });
+      tier2 = inheritCategories(base, snapshot, agg, Date.now(), this.deltaGateOpts);
       this.logger.debug?.(
         `canal=${channelId} volume baixo (kept=${kept.length} < ${this.llmMinMsgs}) — tier 0 heurístico, sem LLM`,
       );
